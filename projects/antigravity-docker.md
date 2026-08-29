@@ -2,23 +2,12 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-<<<<<<< HEAD
-updated_at: 2026-08-29T11:43:05.133220+00:00
-=======
-updated_at: 2026-08-29T11:59:02.012834+00:00
->>>>>>> 5d3f730 (chore(memory): nightly consolidation 2026-08-29)
+updated_at: 2026-08-29T11:59:02Z
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
-<<<<<<< HEAD
-- Replaced /var/run/docker.sock mounting with an SSH-based web terminal gateway
-(ttyd) to execute host commands securely without container socket exposure.
-- Integrated VS Code Web IDE (code-server) and Host Terminal (ttyd) via
-auth-proxy sidebar injection, toggleable with ENABLE_IDE and ENABLE_TERMINAL
-environment variables.
-=======
 ## Overview & Deployment
 - Published to Docker Hub at `jklinker/antigravity-docker:latest`. Docker
   Compose configurations and helper scripts pull this image directly.
@@ -28,6 +17,8 @@ environment variables.
   (proxy, `code-server`, `ttyd`, sidecars); passwordless sudo is disabled.
 - Supports dynamic `PUID`/`PGID` and `umask 0002` to maintain proper
   permissions across `conversations/`, `brain/`, and `annotations/`.
+- Replaced direct `/var/run/docker.sock` mounting with an SSH-based web terminal
+  gateway (`ttyd`) to execute host commands securely without socket exposure.
 - Keeps documentation and configurations generic across host environments
   rather than referencing specific platforms like Unraid.
 
@@ -49,9 +40,8 @@ environment variables.
   `projects.json`.
 - Default Antigravity settings: `enableTerminalSandbox: true`,
   `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`,
-  `nonWorkspaceFil
-<truncated 1230 bytes>
-DE and Host Terminal sidebar buttons.
+  `nonWorkspaceFiles: ALLOW`, with VS Code IDE and Host Terminal sidebar
+  buttons.
 
 ## Authentication Proxy & Gateway (`proxy/auth-proxy.js`)
 - Protects endpoints with dynamic 256-bit session tokens, in-memory session
@@ -87,4 +77,3 @@ DE and Host Terminal sidebar buttons.
 ## Testing
 - Automated test suite runs via Node.js native test runner
   (`node --test tests/*.js`).
->>>>>>> 5d3f730 (chore(memory): nightly consolidation 2026-08-29)
