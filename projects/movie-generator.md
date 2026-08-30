@@ -2,31 +2,30 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-08-29T11:59:13.144689+00:00
+updated_at: 2026-08-30T11:30:16.339481+00:00
 confidence: 0.95
 ---
 
 # Project: Movie-Generator
 
-- **Models**: Configured with `gemini-3.7-flash` for text reasoning and
+- **Models**: Configured with `gemini-3.7-flash` for reasoning and
   orchestration, and `gemini-omni-1.1-flash` for video generation.
-- **Rendering & Upscaling Pipeline**: Uses a hierarchical stitching workflow
-  (individual chunks -> `scene.mp4` -> `movie.mp4`) with a resolution-aware
-  generation and upscale process (360p Draft, 720p HD, 1080p Full HD,
-  4K Ultra HD) that skips already-upscaled chunks.
-- **Camera Continuity & Chunking**: `backend/src/services/gemini.ts`
-  (`generateSceneChunks`) defines heuristics for `camera_continuity`
-  (`continuous` vs `new_shot`). For continuous takes (split dialogue across
-  chunks, dynamic tracking shots, sustained two-shots, unbroken action),
-  previous chunk `video.mp4` files are attached as multimodal references to
-  Gemini Omni prompts with temporal continuity directives.
-- **Prompting & Error Recovery**:
-  - Stage 4.8A handles camera setup concept plate image prompt generation via
+- **Rendering & Upscaling**: Hierarchical stitching (chunks -> `scene.mp4` ->
+  `movie.mp4`) with resolution-aware generation/upscaling (360p Draft, 720p HD,
+  1080p FHD, 4K UHD) that skips already-upscaled chunks.
+- **Camera Continuity & Multimodal Prompting**:
+  - `backend/src/services/gemini.ts` (`generateSceneChunks`): Evaluates
+    `camera_continuity` (`continuous` vs `new_shot`).
+  - Continuous takes (split dialogue, tracking shots, sustained two-shots,
+    unbroken action) attach prior chunk `video.mp4` as multimodal references
+    with temporal directives.
+  - Stage 4.8A handles concept plate image prompt generation via
     `generateCameraSetupImagePrompt`.
+- **Error Recovery & Prompt Sanitization**:
   - Video generation executes Attempt 1 with raw script prompts and applies
     reactive sanitization (`sanitizeAndFixPrompt` via Gemini Flash) only on
-    error or policy rejection, persisting rewritten prompts to `prompt.txt`
-    and `chunk_manifest.json`.
+    error or policy rejection.
+  - Rewritten prompts are persisted to `prompt.txt` and `chunk_manifest.json`.
 - **Response Parsing & Formatting Utilities**:
   - `backend/src/utils/jsonParser.ts` (`extractGeminiResponseText`): Safely
     extracts model text and inspects diagnostic metadata (`finishReason`,

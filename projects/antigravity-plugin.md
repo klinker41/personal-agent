@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-08-29T11:58:39.384255+00:00
+updated_at: 2026-08-30T11:30:08.722025+00:00
 confidence: 1.0
 ---
 
@@ -33,12 +33,11 @@ pointing to `/workspace/antigravity-plugin`. Remote repository configured at
   `agentapi` handles LLM fact synthesis and compaction.
 - **Schedule:** Automated nightly runs at 02:00 (dreaming/extraction), 02:30
   (tiered compaction), and 03:00 (git commit and push).
-- **Extraction Logic:** Tracks progress using step-index watermarking in
-  `state.json`. Filters sub-agents via routing headers and role definitions.
-  Scans `rules/*.md` during dreaming to prevent duplicating existing rules
-  into `profile.md`.
-- **Cleanup:** Intern
-<truncated 185 bytes>
+- **Extraction Logic:** Tracks incremental processing per conversation using
+  step-index watermarking in `state.json` rather than calendar timestamps.
+  Filters sub-agents via routing headers (e.g., 'Message from Root Agent') and
+  role definitions. Scans `rules/*.md` duri
+<truncated 291 bytes>
 clutter.
 
 ## Shared Utilities (`utils/memory_utils.py`)
