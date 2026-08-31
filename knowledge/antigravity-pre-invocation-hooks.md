@@ -8,6 +8,7 @@ confidence: 0.95
 
 # Knowledge: Antigravity-Pre-Invocation-Hooks
 
-- In Antigravity PreInvocation hooks, checking initialNumSteps == 0 alongside
-invocationNum == 1 and checking transcript history prevents re-injecting context
-payloads on subsequent conversation turns.
+- In Antigravity PreInvocation hooks, checking `initialNumSteps == 0` alongside
+  `invocationNum == 1` and inspecting transcript history ensures context is
+  injected only on the initial conversation prompt, preventing redundant
+  context payloads on subsequent turns.
