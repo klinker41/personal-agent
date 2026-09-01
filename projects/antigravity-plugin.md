@@ -2,16 +2,17 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-08-31T00:31:31.856401+00:00
+updated_at: 2026-09-01T00:30:57.089254+00:00
 confidence: 1.0
 ---
 
 # Project Context: Antigravity Plugin
 
 Bundle packaging rules, skills, sidecars, and lifecycle hooks for Google
-Antigravity. Located at `/workspace/antigravity-plugin` and registered locally
-in `~/.gemini/config/plugins.json`. Remote tracks `main` at
-`git@github.com:klinker41/antigravity-plugin.git`.
+Antigravity. Located at `/workspace/antigravity-plugin`, registered locally in
+`~/.gemini/config/plugins.json`, and tracks remote `main` branch at
+`git@github.com:klinker41/antigravity-plugin.git`. Tracks agent skills via the
+`vendor/agent-skills` git submodule.
 
 ## Key Invariants & Rules
 - **Web Service Port:** All web services must run on port 4401, accessible via
@@ -33,6 +34,10 @@ in `~/.gemini/config/plugins.json`. Remote tracks `main` at
 - **Hook Injection:** `hooks/inject_memory.py` injects `profile.md` on turn 1
   (`initialNumSteps == 0` and `invocationNum == 1`) and checks transcript
   history to avoid redundant context on follow-ups.
+- **Synthesis & Cataloging:** `dreamer.py` uses
+  `utils.memory_utils.get_existing_topics` to discover and inject catalogs of
+  existing knowledge topic slugs and project names into the LLM synthesis
+  prompt, encouraging topic reuse and preventing duplicate files.
 - **Schedule:** Nightly maintenance runs Dreaming at 00:00, Compaction at
   00:30, and Git sync at 01:00 local time.
 - **Extraction & Pruning:** Watermarks step indices in `state.json` for
