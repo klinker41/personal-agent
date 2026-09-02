@@ -2,7 +2,7 @@
 topic: antigravity-conversation-storage
 category: knowledge
 tags: [knowledge, antigravity-conversation-storage]
-updated_at: 2026-08-30T11:29:35.180226+00:00
+updated_at: 2026-09-02T00:00:16.811562+00:00
 confidence: 0.95
 ---
 
@@ -28,3 +28,9 @@ transcripts/artifacts in ~/.gemini/antigravity-cli/brain/<id>/, SQLite records
 in ~/.gemini/antigravity-cli/conversations/<id>.db, and sidebar titles in
 ~/.gemini/antigravity-cli/annotations/<id>.pbtxt. Full deletion requires purging
 all three.
+
+- Antigravity conversation titles and session metadata can be extracted from
+three primary storage sources: protobuf annotations
+(`annotations/<conv_id>.pbtxt`), the session summaries SQLite database
+(`conversation_summaries.db`), and metadata cache files
+(`cache/conversation_metadata.json`).

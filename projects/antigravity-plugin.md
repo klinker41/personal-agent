@@ -2,15 +2,15 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-01T00:30:57.089254+00:00
+updated_at: 2026-09-02T00:31:17.315517+00:00
 confidence: 1.0
 ---
 
 # Project Context: Antigravity Plugin
 
 Bundle packaging rules, skills, sidecars, and lifecycle hooks for Google
-Antigravity. Located at `/workspace/antigravity-plugin`, registered locally in
-`~/.gemini/config/plugins.json`, and tracks remote `main` branch at
+Antigravity. Located at `/workspace/antigravity-plugin`, registered locally
+in `~/.gemini/config/plugins.json`, and tracks remote `main` branch at
 `git@github.com:klinker41/antigravity-plugin.git`. Tracks agent skills via the
 `vendor/agent-skills` git submodule.
 
@@ -19,7 +19,8 @@ Antigravity. Located at `/workspace/antigravity-plugin`, registered locally in
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
 - **Sidecars:** Run as managed background daemons declared in `sidecar.json`.
 - **Git Push Policy:** Always run `git commit` after self-review; never run
-  `git push` automatically without explicit confirmation (`rules/git-push.md`).
+  `git push` automatically without explicit user confirmation
+  (`rules/git-push.md`).
 - **Code Simplification:** `rules/simplify-changes.md` is `always_on`,
   mandating minimal diffs, zero extraneous edits, deduplication, and clarity.
 - **Formatting:** Strict 80-character maximum line wrapping in `.md` files.
@@ -35,10 +36,10 @@ Antigravity. Located at `/workspace/antigravity-plugin`, registered locally in
   (`initialNumSteps == 0` and `invocationNum == 1`) and checks transcript
   history to avoid redundant context on follow-ups.
 - **Synthesis & Cataloging:** `dreamer.py` uses
-  `utils.memory_utils.get_existing_topics` to discover and inject catalogs of
-  existing knowledge topic slugs and project names into the LLM synthesis
-  prompt, encouraging topic reuse and preventing duplicate files.
-- **Schedule:** Nightly maintenance runs Dreaming at 00:00, Compaction at
+  `utils.memory_utils.get_existing_topics` to inject catalogs of existing
+  knowledge topics and project names into LLM prompts, preventing duplicate
+  files. 
+<truncated 253 bytes>
   00:30, and Git sync at 01:00 local time.
 - **Extraction & Pruning:** Watermarks step indices in `state.json` for
   incremental processing. Skips subagents and omits rules already covered in
@@ -50,10 +51,12 @@ Antigravity. Located at `/workspace/antigravity-plugin`, registered locally in
   become stale.
 - **AgentApiBridge:** Subprocess runner for `agentapi`. Strips caller metadata
   (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
-  `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch errors.
+  `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch errors. Dynamically
+  fetches CSRF tokens from the web hub endpoint
+  (`window.__APP_CONFIG__.csrfToken`) and retries on auth failures.
 - **Project ID Resolution:** Resolves IDs against `~/.gemini/config/projects/`
-  by name, UUID, or path. Falls back to `DEFAULT_PROJECT_ID` (`personal-agent` /
-  `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc`) or environment variables
+  by name, UUID, or path. Falls back to `DEFAULT_PROJECT_ID` (`personal-agent`
+  / `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc`) or environment variables
   (`$ANTIGRAVITY_PROJECT_ID`, `$PROJECT_ID`, `$AGY_PROJECT_ID`).
 
 ## Sidecars & Skills

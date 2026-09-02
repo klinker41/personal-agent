@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-08-29T11:57:01.235251+00:00
+updated_at: 2026-09-02T00:00:11.175658+00:00
 confidence: 1.0
 ---
 
@@ -47,3 +47,7 @@ home sensors (Energy, Radon, Solar across Boulder and Estes Park locations).
 - Runs homelab infrastructure and containers on Unraid OS.
 - Prefers host SSH access over mounting /var/run/docker.sock into containers for
 security.
+
+- Prefers consolidated single-container Node.js architectures with
+filesystem-based JSON storage and in-process task queues over multi-container
+Python/PostgreSQL/Redis/Celery setups for homelab media generators.
