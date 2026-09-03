@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-02T00:31:17.315517+00:00
+updated_at: 2026-09-03T00:31:48.532654+00:00
 confidence: 1.0
 ---
 
@@ -23,7 +23,8 @@ in `~/.gemini/config/plugins.json`, and tracks remote `main` branch at
   (`rules/git-push.md`).
 - **Code Simplification:** `rules/simplify-changes.md` is `always_on`,
   mandating minimal diffs, zero extraneous edits, deduplication, and clarity.
-- **Formatting:** Strict 80-character maximum line wrapping in `.md` files.
+- **Formatting:** Strict 80-character maximum line wrapping in `.md` files
+  (`rules/markdown-formatting.md`).
 
 ## Memory Architecture & Daemon (`sidecars/memory-daemon`)
 - **Structure & Storage:** Progressive disclosure repository at
@@ -31,19 +32,19 @@ in `~/.gemini/config/plugins.json`, and tracks remote `main` branch at
   tiered `daily/`, `monthly/`, `yearly/` chronicles).
 - **Hybrid Processing:** Deterministic Python handles secret scrubbing, Git
   sync, and lifecycle hooks (`hooks/inject_memory.py`); `agentapi` handles LLM
-  extraction, synthesis, and compaction.
+  extraction, synthesis, and tiered compaction.
 - **Hook Injection:** `hooks/inject_memory.py` injects `profile.md` on turn 1
   (`initialNumSteps == 0` and `invocationNum == 1`) and checks transcript
   history to avoid redundant context on follow-ups.
-- **Synthesis & Cataloging:** `dreamer.py` uses
-  `utils.memory_utils.get_existing_topics` to inject catalogs of existing
-  knowledge topics and project names into LLM prompts, preventing duplicate
-  files. 
-<truncated 253 bytes>
-  00:30, and Git sync at 01:00 local time.
-- **Extraction & Pruning:** Watermarks step indices in `state.json` for
-  incremental processing. Skips subagents and omits rules already covered in
-  `rules/*.md`. Purges internal ephemeral conversation folders after runs.
+- **Maintenance Schedule:** Nightly maintenance runs Dreaming at 00:00,
+  Compaction at 00:30, and Git sync at 01:00 local time.
+- **Extraction & Synthesis:**
+<truncated 26 bytes>
+n `state.json` for
+  incremental processing, skipping subagents and rules already covered in
+  `rules/*.md`. `dreamer.py` uses `utils.memory_utils.get_existing_topics` to
+  inject topic catalogs and avoid duplicate notes. Purges ephemeral internal
+  conversations after runs.
 
 ## Shared Utilities (`utils/memory_utils.py`)
 - **Dynamic LS Discovery:** Probes runtime state files and active `cli.log` for
@@ -52,8 +53,8 @@ in `~/.gemini/config/plugins.json`, and tracks remote `main` branch at
 - **AgentApiBridge:** Subprocess runner for `agentapi`. Strips caller metadata
   (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
   `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch errors. Dynamically
-  fetches CSRF tokens from the web hub endpoint
-  (`window.__APP_CONFIG__.csrfToken`) and retries on auth failures.
+  fetches CSRF tokens from the web hub (`window.__APP_CONFIG__.csrfToken`) and
+  retries on auth failures.
 - **Project ID Resolution:** Resolves IDs against `~/.gemini/config/projects/`
   by name, UUID, or path. Falls back to `DEFAULT_PROJECT_ID` (`personal-agent`
   / `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc`) or environment variables
