@@ -2,27 +2,27 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-03T00:31:48.532654+00:00
+updated_at: 2026-09-04T00:31:18.653958+00:00
 confidence: 1.0
 ---
 
 # Project Context: Antigravity Plugin
 
 Bundle packaging rules, skills, sidecars, and lifecycle hooks for Google
-Antigravity. Located at `/workspace/antigravity-plugin`, registered locally
-in `~/.gemini/config/plugins.json`, and tracks remote `main` branch at
-`git@github.com:klinker41/antigravity-plugin.git`. Tracks agent skills via the
-`vendor/agent-skills` git submodule.
+Antigravity. Located at `/workspace/antigravity-plugin`, registered in
+`~/.gemini/config/plugins.json`, tracking remote branch `main` at
+`git@github.com:klinker41/antigravity-plugin.git`, and tracking agent skills via
+the `vendor/agent-skills` git submodule.
 
 ## Key Invariants & Rules
-- **Web Service Port:** All web services must run on port 4401, accessible via
+- **Web Service Port:** All web services run on port 4401, accessible via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
-- **Sidecars:** Run as managed background daemons declared in `sidecar.json`.
+- **Sidecars:** Managed background daemons declared in `sidecar.json`.
 - **Git Push Policy:** Always run `git commit` after self-review; never run
   `git push` automatically without explicit user confirmation
   (`rules/git-push.md`).
-- **Code Simplification:** `rules/simplify-changes.md` is `always_on`,
-  mandating minimal diffs, zero extraneous edits, deduplication, and clarity.
+- **Code Simplification:** `rules/simplify-changes.md` requires minimal diffs,
+  zero extraneous edits, deduplication, and high readability.
 - **Formatting:** Strict 80-character maximum line wrapping in `.md` files
   (`rules/markdown-formatting.md`).
 
@@ -31,20 +31,17 @@ in `~/.gemini/config/plugins.json`, and tracks remote `main` branch at
   `$MEMORY_DIRECTORY` (`profile.md`, `index.md`, `projects/`, `knowledge/`, and
   tiered `daily/`, `monthly/`, `yearly/` chronicles).
 - **Hybrid Processing:** Deterministic Python handles secret scrubbing, Git
-  sync, and lifecycle hooks (`hooks/inject_memory.py`); `agentapi` handles LLM
-  extraction, synthesis, and tiered compaction.
+  sync, and hooks (`hooks/inject_memory.py`); `agentapi` handles LLM extraction,
+  synthesis, and tiered compaction.
 - **Hook Injection:** `hooks/inject_memory.py` injects `profile.md` on turn 1
   (`initialNumSteps == 0` and `invocationNum == 1`) and checks transcript
   history to avoid redundant context on follow-ups.
 - **Maintenance Schedule:** Nightly maintenance runs Dreaming at 00:00,
   Compaction at 00:30, and Git sync at 01:00 local time.
-- **Extraction & Synthesis:**
-<truncated 26 bytes>
-n `state.json` for
+- **Dreamer Extraction:** Tracks conversation watermarks in `state.json` for
   incremental processing, skipping subagents and rules already covered in
-  `rules/*.md`. `dreamer.py` uses `utils.memory_utils.get_existing_topics` to
-  inject topic catalogs and avoid duplicate notes. Purges ephemeral internal
-  conversations after runs.
+  `rules/*.md`. Injects topic catalogs via `memory_utils.get_existing_topics` to
+  avoid duplicates, purging ephemeral internal conversations after runs.
 
 ## Shared Utilities (`utils/memory_utils.py`)
 - **Dynamic LS Discovery:** Probes runtime state files and active `cli.log` for
@@ -56,18 +53,16 @@ n `state.json` for
   fetches CSRF tokens from the web hub (`window.__APP_CONFIG__.csrfToken`) and
   retries on auth failures.
 - **Project ID Resolution:** Resolves IDs against `~/.gemini/config/projects/`
-  by name, UUID, or path. Falls back to `DEFAULT_PROJECT_ID` (`personal-agent`
+  by name, UUID, or path, falling back to `DEFAULT_PROJECT_ID` (`personal-agent`
   / `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc`) or environment variables
   (`$ANTIGRAVITY_PROJECT_ID`, `$PROJECT_ID`, `$AGY_PROJECT_ID`).
 
 ## Sidecars & Skills
-- **Slack Chat Sidecar (`sidecars/slack-chat/`):** Bridges Slack Socket Mode to
+- **Slack Chat:** Sidecar in `sidecars/slack-chat/` bridges Slack Socket Mode to
   `agentapi` via `AgentApiBridge`, maps `thread_ts` to `conversation_id`,
-  backfills context via `conversations_replies` on unmapped threads, and
-  auto-installs `requirements.txt` on startup.
-- **Prep Slack Chat (`skills/prep-slack-chat-sidecar`):** Validates Slack
-  tokens (`SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`), dependencies, and project
-  setup via `check_readiness.py`.
+  backfills unmapped threads via `conversations_replies`, and installs
+  `requirements.txt` on startup. Validated by `skills/prep-slack-chat-sidecar`
+  for tokens (`SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`) and dependencies.
 - **Self-Review Commit (`skills/self-review-commit`):** Runs pre-commit review
   with a `Model="pro"` reviewer subagent and summarizes resolved findings.
 - **Ollama Chat (`skills/ollama-chat`):** Pure Python CLI client
