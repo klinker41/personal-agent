@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-04T00:30:48.455071+00:00
+updated_at: 2026-09-05T00:30:56.599425+00:00
 confidence: 0.95
 ---
 
@@ -11,22 +11,20 @@ confidence: 0.95
 ## Overview & Architecture
 - Headless containerized Google Antigravity (`agy`) runtime
   (`jklinker/antigravity-docker:latest`) serving on port 4400.
-- Security & Permissions: Non-root execution (`developer` via `gosu`), dynamic
+- Security & Host Access: Non-root execution (`developer` via `gosu`), dynamic
   `PUID`/`PGID`, disabled passwordless sudo, and `umask 0002` across
-  `conversations/`, `brain/`, and `annotations/`.
-- Host Access: Replaces `/var/run/docker.sock` exposure with an isolated
-  SSH-based web terminal (`ttyd`) for secure host execution.
+  `conversations/`, `brain/`, and `annotations/`. Replaces
+  `/var/run/docker.sock` exposure with an isolated SSH-based web terminal
+  (`ttyd`) for secure host execution.
 
 ## Configuration & Environment
-- Environment Variables:
-  - Core & Auth: `RC_NAME`, `AUTH_PASSWORD`, `HOST_SSH_DIR`.
-  - Feature Flags: `ENABLE_IDE` (default true), `ENABLE_TERMINAL` (default
-    true).
-  - Networking: `AGY_PORT` (default 4400); `AGY_HUB_PORT` (default 4402;
-    passed via `--hub-port` to `agy --remote-control` for deterministic
-    upstream connections without log scraping).
-  - Telemetry: `BLOCK_TELEMETRY` (default true; sinkholes Google telemetry to
-    `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
+- Environment Variables: Configures core/auth (`RC_NAME`, `AUTH_PASSWORD`,
+  `HOST_SSH_DIR`), UI feature flags (`ENABLE_IDE`, `ENABLE_TERMINAL`, defaults
+  true), networking (`AGY_PORT` default 4400; `AGY_HUB_PORT` default 4402 passed
+  via `--hub-port` to `agy --remote-control` for deterministic connections
+  without log scraping), and telemetry sinkholing (`BLOCK_TELEMETRY` default
+  true; routes Google telemetry to `0.0.0.0` via `/etc/hosts` and sets
+  OpenTelemetry opt-out variables).
 - Initialization & State: Initial auth configured via `setup` subcommand with
   `~/.gemini` mounted. On startup, `entrypoint.sh` populates empty
   `$GEMINI_DIR/config/projects/` and purges stale candidate CSRF tokens.
@@ -56,15 +54,15 @@ confidence: 0.95
   unified env resolution (`buildSidecarEnv`), upstream Language Server polling
   (`waitForUpstream()`), and live CSRF token querying at
   `127.0.0.1:${AGY_HUB_PORT}`.
-- Discovery & Types:
-  - Standalone: Defined in `~/.gemini/config/sidecars/<id>/sidecar.json` and
-    toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
-  - Plugin: Discovered at `<plugin>/sidecars/<name>/sidecar.json` (namespaced
-    as `<plugin-name>/<sidecar-name>`); runs with isolated `cwd`, prepended
-    `PATH`, `PLUGIN` badges, and configuration resets.
+- Discovery & Types: Supports standalone sidecars (defined in
+  `~/.gemini/config/sidecars/<id>/sidecar.json`, toggled via
+  `sidecars[id].enabled` in `~/.gemini/config/config.json`) and plugin sidecars
+  (discovered at `<plugin>/sidecars/<name>/sidecar.json`, namespaced as
+  `<plugin-name>/<sidecar-name>`, running with isolated `cwd`, prepended `PATH`,
+  `PLUGIN` badges, and configuration resets).
 
 ## Testing & Quality
-- Test Runner: Native Node.js test runner (`node --test tests/*.js`).
-- State Isolation: `tests/test-sidecar-manager.js` isolates state by restoring
-  mock environment variables and filesystem fixtures in `finally` blocks to
-  prevent CSRF token pollution.
+- Test Runner & Isolation: Native Node.js test runner (`node --test
+  tests/*.js`). State isolation in `tests/test-sidecar-manager.js` restores mock
+  environment variables and filesystem fixtures in `finally` blocks to prevent
+  CSRF token pollution.
