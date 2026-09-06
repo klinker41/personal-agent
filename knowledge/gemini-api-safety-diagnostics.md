@@ -2,7 +2,7 @@
 topic: gemini-api-safety-diagnostics
 category: knowledge
 tags: [knowledge, gemini-api-safety-diagnostics]
-updated_at: 2026-09-03T00:00:30.694737+00:00
+updated_at: 2026-09-06T00:01:23.716612+00:00
 confidence: 0.95
 ---
 
@@ -19,3 +19,11 @@ text generation.
 returns candidates with empty content and finishReason 'OTHER' rather than
 inlineData; client services expecting media payloads must defensively handle
 missing inlineData and retry or handle the part failure gracefully.
+
+- `BlockReason: PROHIBITED_CONTENT` with zero candidates indicates gateway-level
+input prompt filtering before generation starts, commonly triggered by
+trademarked franchise names and combat/violence descriptors in concatenated
+prompts.
+- In `@google/genai`, configuring permissive safety settings to
+`BLOCK_ONLY_HIGH` requires setting all five harm categories, including
+`HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY`.

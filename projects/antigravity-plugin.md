@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-05T00:31:26.296025+00:00
+updated_at: 2026-09-06T00:31:19.068233+00:00
 confidence: 1.0
 ---
 
@@ -15,6 +15,9 @@ tracking remote `main` at `git@github.com:klinker41/antigravity-plugin.git`,
 and vendoring skills via the `vendor/agent-skills` git submodule.
 
 ## Key Invariants & Rules
+- **Web App Architecture:** Use Bun as runtime/package manager and Hono as web
+  framework; minimize external dependencies and maintain latest versions
+  (`rules/web-app-architecture.md`).
 - **Web Service Port:** All web services run on port 4401, exposed via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
 - **Git Commit & Push:** Complete iterative `self-review-commit` before
@@ -45,10 +48,11 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
 - **Dynamic LS Discovery:** Probes runtime state files and active `cli.log`
   for live `ANTIGRAVITY_LS_ADDRESS` and `ANTIGRAVITY_CSRF_TOKEN` when
   environment variables become stale.
-- **AgentApiBridge:** Subprocess runner for `agentapi`. Strips caller metadata
-  (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
-  `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch errors, fetches web hub
-  CSRF tokens (`window.__APP_CONFIG__.csrfToken`), and retries auth failures.
+- **AgentApiBridge:** Subprocess runner for `agentapi`. Strips caller
+  metadata (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
+  `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch errors, fetches web
+  hub CSRF tokens (`window.__APP_CONFIG__.csrfToken`), and retries auth
+  failures.
 - **Project ID Resolution:** Resolves project IDs against
   `~/.gemini/config/projects/` by name, UUID, or path, falling back to
   `DEFAULT_PROJECT_ID` (`personal-agent` /
@@ -59,8 +63,9 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
 - **Slack Chat (`sidecars/slack-chat/`):** Bridges Slack Socket Mode to
   `agentapi` via `AgentApiBridge`, maps `thread_ts` to `conversation_id`,
   backfills unmapped threads via `conversations_replies`, and installs
-  `requirements.txt` on startup. Validated by `skills/prep-slack-chat-sidecar`
-  for required tokens (`SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`) and dependencies.
+  `requirements.txt` on startup. Validated by
+  `skills/prep-slack-chat-sidecar` for required tokens (`SLACK_BOT_TOKEN`,
+  `SLACK_APP_TOKEN`) and dependencies.
 - **Self-Review Commit (`skills/self-review-commit`):** Runs pre-commit code
   reviews with a `Model="pro"` reviewer subagent and summarizes findings.
 - **Ollama Chat (`skills/ollama-chat`):** Pure Python CLI client

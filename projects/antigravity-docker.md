@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-05T00:30:56.599425+00:00
+updated_at: 2026-09-06T00:30:59.375688+00:00
 confidence: 0.95
 ---
 
@@ -10,27 +10,26 @@ confidence: 0.95
 
 ## Overview & Architecture
 - Headless containerized Google Antigravity (`agy`) runtime
-  (`jklinker/antigravity-docker:latest`) serving on port 4400.
+  (`jklinker/antigravity-docker:latest`) exposed on `AGY_PORT` (default 4400).
 - Security & Host Access: Non-root execution (`developer` via `gosu`), dynamic
-  `PUID`/`PGID`, disabled passwordless sudo, and `umask 0002` across
-  `conversations/`, `brain/`, and `annotations/`. Replaces
-  `/var/run/docker.sock` exposure with an isolated SSH-based web terminal
-  (`ttyd`) for secure host execution.
+  `PUID`/`PGID`, disabled passwordless sudo, and `umask 0002` for
+  `conversations/`, `brain/`, and `annotations/`. Avoids `/var/run/docker.sock`
+  exposure via an isolated SSH-based web terminal (`ttyd`) for host execution.
 
-## Configuration & Environment
-- Environment Variables: Configures core/auth (`RC_NAME`, `AUTH_PASSWORD`,
-  `HOST_SSH_DIR`), UI feature flags (`ENABLE_IDE`, `ENABLE_TERMINAL`, defaults
-  true), networking (`AGY_PORT` default 4400; `AGY_HUB_PORT` default 4402 passed
-  via `--hub-port` to `agy --remote-control` for deterministic connections
-  without log scraping), and telemetry sinkholing (`BLOCK_TELEMETRY` default
-  true; routes Google telemetry to `0.0.0.0` via `/etc/hosts` and sets
-  OpenTelemetry opt-out variables).
+## Configuration & Runtime Environment
+- Environment Variables:
+  - Auth & Host: `RC_NAME`, `AUTH_PASSWORD`, `HOST_SSH_DIR`.
+  - Feature Flags: `ENABLE_IDE`, `ENABLE_TERMINAL` (both default true).
+  - Networking: `AGY_PORT` (4400) and `AGY_HUB_PORT` (default 4402, passed via
+    `--hub-port` to `agy --remote-control` for deterministic connections
+    without log scraping).
+  - Telemetry: `BLOCK_TELEMETRY` (default true; sinkholes Google telemetry to
+    `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
 - Initialization & State: Initial auth configured via `setup` subcommand with
-  `~/.gemini` mounted. On startup, `entrypoint.sh` populates empty
-  `$GEMINI_DIR/config/projects/` and purges stale candidate CSRF tokens.
-  Persistent state (`antigravity_state.pbtxt` with `installation_uuid` and
-  schema migrations) and logs (`cli.log`) reside in
-  `$GEMINI_DIR/antigravity-cli/`.
+  `~/.gemini` mounted. Startup (`entrypoint.sh`) populates empty
+  `$GEMINI_DIR/config/projects/` and purges stale candidate CSRF tokens. State
+  (`antigravity_state.pbtxt` with `installation_uuid` and schema migrations) and
+  logs (`cli.log`) reside in `$GEMINI_DIR/antigravity-cli/`.
 - Default Settings: `enableTerminalSandbox: true`, `autoExecutionPolicy:
   CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`, `nonWorkspaceFiles:
   ALLOW`, and sidebar shortcuts for VS Code IDE and Host Terminal.
@@ -45,21 +44,21 @@ confidence: 0.95
   headers, preserves `TE: trailers`, `Trailer`, and `grpc-status`, and avoids
   TCP RST packets on upstream socket teardown.
 - UI & Routes: Unauthenticated `/status` health check (`200`/`503`), persistent
-  favicon injection (`MutationObserver`), and shared cosmic glassmorphic UI
-  with 2D canvas particles (`renderPageLayout`, `BASE_PAGE_CSS`).
+  favicon injection (`MutationObserver`), and cosmic glassmorphic UI with 2D
+  canvas particles (`renderPageLayout`, `BASE_PAGE_CSS`).
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - Supervision & Lifecycle: Manages background workers and 5-field cron tasks
-  via authenticated `/sidecars` REST APIs and UI. Features restart policies,
+  via authenticated `/sidecars` REST APIs and UI. Supports restart policies,
   unified env resolution (`buildSidecarEnv`), upstream Language Server polling
   (`waitForUpstream()`), and live CSRF token querying at
   `127.0.0.1:${AGY_HUB_PORT}`.
-- Discovery & Types: Supports standalone sidecars (defined in
-  `~/.gemini/config/sidecars/<id>/sidecar.json`, toggled via
-  `sidecars[id].enabled` in `~/.gemini/config/config.json`) and plugin sidecars
-  (discovered at `<plugin>/sidecars/<name>/sidecar.json`, namespaced as
-  `<plugin-name>/<sidecar-name>`, running with isolated `cwd`, prepended `PATH`,
-  `PLUGIN` badges, and configuration resets).
+- Discovery & Types:
+- Standalone sidecars: Defined in `~/.gemini/config/sidecars/<id>/sidecar.json`
+    and toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
+  - Plugin sidecars: Discovered at `<plugin>/sidecars/<name>/sidecar.json`,
+    namespaced as `<plugin-name>/<sidecar-name>`, running with isolated `cwd`,
+    prepended `PATH`, `PLUGIN` badges, and configuration resets.
 
 ## Testing & Quality
 - Test Runner & Isolation: Native Node.js test runner (`node --test
