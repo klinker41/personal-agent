@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-06T00:31:19.068233+00:00
+updated_at: 2026-09-07T00:31:51.997745+00:00
 confidence: 1.0
 ---
 
@@ -20,9 +20,10 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
   (`rules/web-app-architecture.md`).
 - **Web Service Port:** All web services run on port 4401, exposed via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
-- **Git Commit & Push:** Complete iterative `self-review-commit` before
-  creating commits; never run `git push` without explicit user confirmation
-  (`rules/git-push.md`, `rules/self-review-before-commit.md`).
+- **Git Commits & Secrets:** Complete iterative `self-review-commit` before
+  creating commits, inspect staged diffs to refuse secrets/credentials, and
+  never run `git push` without explicit user confirmation (`rules/git-push.md`,
+  `rules/no-secrets-in-commits.md`, `rules/self-review-before-commit.md`).
 - **Code Simplification:** Minimize diffs, eliminate extraneous edits,
   deduplicate code, and prioritize clarity (`rules/simplify-changes.md`).
 - **Formatting:** Strictly wrap markdown lines at 80 characters
@@ -37,7 +38,9 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
   `profile.md` on `initialNumSteps == 0` and `invocationNum == 1`, checking
   transcripts to avoid duplicates). `agentapi` handles LLM extraction,
   synthesis, and tiered compaction.
-- **Maintenance Schedule:** Nightly maintenance runs Dreaming at 00:00,
+
+<truncated 61 bytes>
+ at 00:00,
   Compaction at 00:30, and Git sync at 01:00 local time.
 - **Dreamer Extraction:** Incrementally processes conversations using
   watermarks in `state.json`. Skips subagents and rules covered in
