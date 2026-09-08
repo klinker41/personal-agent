@@ -2,46 +2,42 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-07T00:32:53.810122+00:00
+updated_at: 2026-09-08T00:32:42.769752+00:00
 confidence: 0.95
 ---
 
 # Project: Movie-Generator
 
 ## Architecture & Media Serving
-- **Bun & Hono Backend**: Runs on `oven/bun:alpine`, replacing Express,
-  dotenv, bcrypt (via `Bun.password`), and Jest/Supertest (via `bun test`
-  and Hono `app.request()`).
-- **Media Processing & Asset Delivery**: Direct CLI execution of `ffmpeg`
-  replaces `fluent-ffmpeg`. Route `/assets/*` serves `generated_assets/`
-  first with fallback to `frontend/dist/assets/`, secured by path traversal
-  checks.
+- **Runtime & Framework**: Runs on `oven/bun:alpine` with Hono. Native Bun
+  APIs (`Bun.password`, `bun test`) and `app.request()` replace Express,
+  dotenv, bcrypt, and Jest/Supertest.
+- **Media & Asset Delivery**: Direct CLI `ffmpeg` replaces `fluent-ffmpeg`.
+  Route `/assets/*` serves `generated_assets/` with fallback to
+  `frontend/dist/assets/`, secured with path traversal checks.
 
 ## Generation Pipeline & Continuity
-- **Models**: Uses `gemini-3.7-flash` for reasoning and orchestration;
-  `gemini-omni-1.1-flash` for video generation.
-- **Hierarchical Rendering**: Stitches `chunks` -> `scene.mp4` -> `movie.mp4`
-  across tiers (360p Draft, 720p HD, 1080p FHD, 4K UHD), skipping
-  already-upscaled chunks.
+- **Models & Hierarchical Rendering**: Uses `gemini-3.7-flash` for
+  orchestration/reasoning and `gemini-omni-1.1-flash` for video generation.
+  Stitches `chunks` -> `scene.mp4` -> `movie.mp4` across tiers (360p Draft,
+  720p HD, 1080p FHD, 4K UHD), skipping already-upscaled chunks.
 - **Concept Plates & Continuity**: Stage 4.8A generates concept plate image
-  prompts via `generateCameraSetupImagePrompt`.
-  `backend/src/services/gemini.ts` (`generateSceneChunks`) evaluates
-  `camera_continuity` (`continuous` vs `new_shot`); continuous takes (split
-  dialogue, tracking shots, sustained two-shots, unbroken action) attach the
-  prior chunk's `video.mp4` as a multimodal reference with temporal cues.
+  prompts via `generateCameraSetupImagePrompt`. In
+  `backend/src/services/gemini.ts`, `generateSceneChunks` evaluates
+  `camera_continuity` (`continuous` vs `new_shot`); continuous takes
+  (tracking shots, sustained two-shots, split dialogue, unbroken action)
+  attach prior chunk `video.mp4` with temporal cues as multimodal reference.
 
 ## Safety, Diagnostics & Error Recovery
-- **Safety Policy**: Sets `DEFAULT_SAFETY_SETTINGS` to `BLOCK_ONLY_HIGH`
-  across all harm categories (including `HARM_CATEGORY_CIVIC_INTEGRITY`) on
-  all Gemini `generateContent` calls.
-- **Reactive Prompt Sanitization**: Attempts raw script prompts first,
-  applying reactive sanitization (`sanitizeSceneContent` /
-  `sanitizeAndFixPrompt` via Gemini Flash) only on error or
-  `PROHIBITED_CONTENT` blocks. Returns distinct `setting` and
-  `action_summary` fields, persisting rewrites to `prompt.txt` and
+- **Safety & Prompt Sanitization**: `DEFAULT_SAFETY_SETTINGS` is
+  `BLOCK_ONLY_HIGH` across all categories (including
+  `HARM_CATEGORY_CIVIC_INTEGRITY`) on Gemini calls. Prompts run raw first;
+  errors or `PROHIBITED_CONTENT` trigger reactive sanitization
+  (`sanitizeSceneContent` / `sanitizeAndFixPrompt` via Gemini Flash),
+  saving rewritten `setting` and `action_summary` to `prompt.txt` and
   `chunk_manifest.json`.
-- **Response Diagnostics & Formatting**: `backend/src/utils/jsonParser.ts`
-  (`extractGeminiResponseText`) safely extracts text and inspects diagnostics
-  (`finishReason`, `safetyRatings`, `blockReason`) when responses are empty.
-  `formatTimelineBeat` and `formatTimelineAndAudio` format structured JSON
-  timeline beats from LLM outputs to prevent `[object Object]` serialization.
+- **Response Diagnostics & Formatting**: In
+  `backend/src/utils/jsonParser.ts`, `extractGeminiResponseText` inspects
+  diagnostics (`finishReason`, `safetyRatings`, `blockReason`) on empty
+  returns. `formatTimelineBeat` and `formatTimelineAndAudio` format JSON
+  timeline beats to prevent `[object Object]` serialization.

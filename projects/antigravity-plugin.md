@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-07T00:31:51.997745+00:00
+updated_at: 2026-09-08T00:32:19.596481+00:00
 confidence: 1.0
 ---
 
@@ -37,13 +37,9 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
   sync, and turn-1 hook injection (`hooks/inject_memory.py` injects
   `profile.md` on `initialNumSteps == 0` and `invocationNum == 1`, checking
   transcripts to avoid duplicates). `agentapi` handles LLM extraction,
-  synthesis, and tiered compaction.
-
-<truncated 61 bytes>
- at 00:00,
-  Compaction at 00:30, and Git sync at 01:00 local time.
-- **Dreamer Extraction:** Incrementally processes conversations using
-  watermarks in `state.json`. Skips subagents and rules covered in
+  synthesis, and tiered compa
+<truncated 262 bytes>
+covered in
   `rules/*.md`, injects topic catalogs via `memory_utils.get_existing_topics`
   to avoid duplicate topics, and purges ephemeral internal conversations.
 
@@ -63,6 +59,9 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
   (`$ANTIGRAVITY_PROJECT_ID`, `$PROJECT_ID`, `$AGY_PROJECT_ID`).
 
 ## Sidecars & Skills
+- **Model Updater (`sidecars/model-updater/`):** Scheduled sidecar
+  (`sidecars/model-updater/sidecar.json`) configured to run daily at 15:00 UTC
+  to evaluate and update Gemini model defaults.
 - **Slack Chat (`sidecars/slack-chat/`):** Bridges Slack Socket Mode to
   `agentapi` via `AgentApiBridge`, maps `thread_ts` to `conversation_id`,
   backfills unmapped threads via `conversations_replies`, and installs

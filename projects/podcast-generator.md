@@ -2,43 +2,46 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-07T00:34:20.222610+00:00
+updated_at: 2026-09-08T00:34:06.244427+00:00
 confidence: 0.95
 ---
 
 # Project: Podcast-Generator
 
 ## Architecture & Storage
-- Single-Container Architecture: Consolidated 6 legacy microservices (Postgres,
-  Redis, Celery, FastAPI, Nginx) into an `oven/bun:alpine` container (Bun, Hono,
-  FFmpeg) serving the React SPA, REST APIs, and media streams. Also consolidated
-  movie generation capabilities (`movieGemini.ts`, `moviePipeline.ts`,
-  `MovieStore`, routes, shared ffmpeg utilities).
-- Runtime & Dependencies: Reduced backend runtime dependencies to three packages
-  (`hono`, `jsonwebtoken`, `cron-parser@4.9.0`), using native `hono/cors`,
-  `Bun.password`, and native test execution (`bun test`).
-- File-Based Storage: Replaced databases with filesystem JSON storage
-  (`data/users.json`, `data/podcasts/`, `data/outputs/`), an in-process
+- Single-Container Architecture: Consolidated 6 legacy microservices
+  (PostgreSQL, Redis, Celery, FastAPI, Nginx) into an `oven/bun:alpine`
+  container (Bun, Hono, FFmpeg) serving the React SPA, REST APIs, and media
+  streams. Also consolidated movie generation capabilities (`movieGemini.ts`,
+  `moviePipeline.ts`, `MovieStore`, routes, shared FFmpeg utilities).
+- Runtime & Dependencies: Minimal backend dependencies (`hono`, `jsonwebtoken`,
+  `cron-parser@4.9.0`), using native `hono/cors`, `Bun.password`, and native
+  test execution (`bun test`).
+- File-Based Storage & Scheduling: Replaced databases with filesystem JSON
+  storage (`data/users.json`, `data/podcasts/`, `data/outputs/`), an in-process
   concurrency-limited `JobQueue`, and `PodcastScheduler`. Removed `pg` and
-  legacy DB migration scripts (previously exported via `migrateDbToFiles.ts`).
-- Storage Utilities & Security: `fileStore.ts` centralizes atomic write logic
-  (`writeText`, `writeJson`), folder name validation, and date matching. Audio
-  and cover streaming endpoints enforce `path.sep` boundaries and non-blocking
+  legacy migration scripts (`migrateDbToFiles.ts`).
+- Storage Utilities & Security: `fileStore.ts` centralizes atomic writes
+  (`writeText`, `writeJson`), folder name validation, date matching, and
+  Unicode NFC normalization preserving `[\p{L}\p{N}\p{M}]` for diacritics.
+  Streaming endpoints enforce `path.sep` boundaries and non-blocking
   `Bun.file(path).exists()` checks to prevent path traversal.
 - Code Consolidation: Unified output file streaming and route authorization
   across backend routes; deduplicated episode fetching, date parsing, and auth
   helpers on the frontend.
 - Manifest Backfill: `EpisodeStore.autoDiscoverEpisodes` backfills missing
-  `episode.json` files on `GET /api/podcasts/:id` (removed from
+  `episode.json` files on `GET /api/podcasts/:id` (omitted from
   `GET /api/v1/podcasts/` to eliminate listing latency bottlenecks).
 
-## Media Pipeline & Library Integration
-- Media Generation: Generates episodes via Gemini (script, 1:1 cover art,
+## Media Pipeline & Generation
+- Media Generation: Synthesizes episodes via Gemini (script, 1:1 cover art,
   multi-speaker TTS) and FFmpeg audio assembly with ID3v2 tagging.
 - Library Integration: Resolves disc numbers via `TITLE_TO_DISC_MAPPING` in
-  `backend/src/services/
-<truncated 1900 bytes>
-erateAudioPart` retries up to 3 times with
+  `backend/src/
+<truncated 617 bytes>
+ (`gemini.ts`) and standardized queue error handling via `failJob` in
+  `queue.ts`.
+- Audio Resilience: `GeminiService.generateAudioPart` retries up to 3 times with
   cancellable backoff on non-200 responses or API filtering (e.g., copyright
   blocks with `finishReason: 'OTHER'`), returning false instead of throwing.
   `PodcastGenerator.generateAudio` aborts only after 5 failed audio chunks
@@ -47,15 +50,14 @@ erateAudioPart` retries up to 3 times with
   `backend/src/index.ts` prunes disk and memory duplicates by audio path or
   title, prioritizing entries with `prompt_used` and longer scripts.
   Pre-compiles multi-strategy regexes (exact, Unicode NFC, legacy stripped
-  ASCII) via `buildTitlePatterns` (guarding against empty patterns from unsafe
-  characters). `fileStore.ts` normalizes Unicode NFC and preserves
-  `[\p{L}\p{N}\p{M}]` to retain diacritics and non-ASCII characters.
+  ASCII) via `buildTitlePatterns`, guarding against empty regex patterns from
+  unsafe characters.
 
 ## Configuration, Security & Testing
 - Configuration & Alerts: AI models (`TEXT_MODEL`, `IMAGE_MODEL`, `AUDIO_MODEL`)
   and Slack alerts (`SLACK_WEBHOOK` or `SLACK_WEBHOOK_URL`, default username
   `podcast-generator`) configure via env vars; removed legacy Ntfy and ComfyUI.
-  Episode completion Slack alerts include canonical RSS feed URLs resolved from
+  Episode completion alerts include canonical RSS feed URLs resolved from
   `BASE_URL` or fallback localhost port.
 - UI Scope: Settings page is restricted to user account and security
   management, excluding model and alert options.

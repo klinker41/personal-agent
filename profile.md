@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-09-02T00:00:11.175658+00:00
+updated_at: 2026-09-08T00:02:55.115126+00:00
 confidence: 1.0
 ---
 
@@ -51,3 +51,6 @@ security.
 - Prefers consolidated single-container Node.js architectures with
 filesystem-based JSON storage and in-process task queues over multi-container
 Python/PostgreSQL/Redis/Celery setups for homelab media generators.
+
+- Prefers defining application and model configuration defaults in code (e.g.
+models.ts) rather than baking default values into Dockerfiles.

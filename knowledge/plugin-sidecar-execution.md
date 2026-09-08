@@ -2,7 +2,7 @@
 topic: plugin-sidecar-execution
 category: knowledge
 tags: [knowledge, plugin-sidecar-execution]
-updated_at: 2026-09-02T00:00:39.988831+00:00
+updated_at: 2026-09-08T00:01:02.653645+00:00
 confidence: 0.95
 ---
 
@@ -17,3 +17,10 @@ name>/sidecar.json` with accompanying executables located in the same directory.
 - Sidecar managers should wait for upstream Language Server HTTP readiness and
 verify the live CSRF token prior to spawning child daemon processes to prevent
 unauthenticated startup failures.
+
+- Scheduled sidecars can implement headless maintenance routines via `builtin:
+schedule` and `agentapi new-conversation` using structured agent prompts without
+requiring custom Python or bash scripts.
+- When constructing git commit commands inside automated agent prompts or bash
+commands, use multiple `-m` flags rather than `\n` escapes to properly preserve
+multiline commit messages.

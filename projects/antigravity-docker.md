@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-07T00:31:20.344285+00:00
+updated_at: 2026-09-08T00:31:25.820470+00:00
 confidence: 0.95
 ---
 
@@ -11,11 +11,11 @@ confidence: 0.95
 ## Overview & Architecture
 - **Runtime & Security:** Headless containerized Google Antigravity (`agy`)
   runtime (`jklinker/antigravity-docker:latest`) on `AGY_PORT` (default 4400).
-  Executes as non-root (`developer` via `gosu`) with dynamic `PUID`/`PGID`,
-  disabled passwordless sudo, and `umask 0002` for `conversations/`, `brain/`,
-  and `annotations/`.
-- **Host Execution:** Avoids `/var/run/docker.sock` exposure by utilizing an
-  isolated SSH-based web terminal (`ttyd`) for host command execution.
+  Runs non-root (`developer` via `gosu`) with dynamic `PUID`/`PGID`, disabled
+  passwordless sudo, and `umask 0002` for `conversations/`, `brain/`, and
+  `annotations/`.
+- **Host Execution:** Avoids `/var/run/docker.sock` exposure via an isolated
+  SSH-based web terminal (`ttyd`) for host command execution.
 
 ## Configuration & Runtime Environment
 - **Environment Variables:**
@@ -23,24 +23,24 @@ confidence: 0.95
   - Feature Flags: `ENABLE_IDE`, `ENABLE_TERMINAL` (both default `true`).
   - Networking: `AGY_PORT` (4400) and `AGY_HUB_PORT` (default 4402, passed via
     `--hub-port` to `agy --remote-control` for deterministic connections without
-    log scraping).
-  - Telemetry: `BLOCK_TELEMETRY` (default `true`; sinkholes Google telemetry to
+    scraping logs).
+  - Telemetry: `BLOCK_TELEMETRY` (default `true`; sinkholes telemetry to
     `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
-- **Lifecycle & State:** Initial authentication configured via `setup`
-  subcommand with `~/.gemini` mounted. Startup (`entrypoint.sh`) populates empty
+- **Lifecycle & State:** Initial authentication via `setup` subcommand with
+  mounted `~/.gemini`. Startup (`entrypoint.sh`) populates empty
   `$GEMINI_DIR/config/projects/` and purges stale candidate CSRF tokens. State
   (`antigravity_state.pbtxt` with `installation_uuid` and schema migrations)
   and logs (`cli.log`) reside in `$GEMINI_DIR/antigravity-cli/`.
-- **Default Settings:** Configures `enableTerminalSandbox: true`,
+- **Default Settings:** Sets `enableTerminalSandbox: true`,
   `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`,
-  `nonWorkspaceFiles: ALLOW`, and sidebar shortcuts for VS Code IDE and Host
+  `nonWorkspaceFiles: ALLOW`, with sidebar shortcuts for VS Code IDE and Host
   Terminal.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Middleware:** Dynamic 256-bit session tokens, in-memory session
   cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path-traversal
   guards, security headers (CSP, `X-Content-Type-Options`, `X-Frame-Options`),
-  and centralized body parsing in `proxy/lib/security.js`.
+  and centralized body parsing (`proxy/lib/security.js`).
 - **Protocol Handling:** Enforces `useWebSocket=true` on `/` and `/c/...`, sets
   `X-Accel-Buffering: no`, flushes headers immediately, strips hop-by-hop
   headers, preserves `TE: trailers`, `Trailer`, and `grpc-status`, and prevents
@@ -56,12 +56,11 @@ confidence: 0.95
   polling (`waitForUpstream()`), and live CSRF token querying at
   `127.0.0.1:${AGY_HUB_PORT}`.
 - **Discovery & Types:**
-  - Standalone sidecars: Defined in
-    `~/.gemini/config/sidecars/<id>/sidecar.json` and toggled via
-    `sidecars[id].enabled` in `~/.gemini/config/config.json`.
-  - Plugin sidecars: Discovered at `<plugin>/sidecars/<name>/sidecar.json`,
-    namespaced as `<plugin-name>/<sidecar-name>`, running with isolated `cwd`,
-    prepended `PATH`, `PLUGIN` badges, and configuration resets.
+  - Standalone: Defined in `~/.gemini/config/sidecars/<id>/sidecar.json` and
+    toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
+  - Plugin: Discovered at `<plugin>/sidecars/<name>/sidecar.json`, namespaced as
+    `<plugin-name>/<sidecar-name>`, running with isolated `cwd`, prepended
+    `PATH`, `PLUGIN` badges, and configuration resets.
 
 ## Testing & Quality
 - **Test Runner & Isolation:** Native Node.js test runner (`node --test
