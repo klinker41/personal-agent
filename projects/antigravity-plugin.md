@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-09T00:31:56.529743+00:00
+updated_at: 2026-09-10T00:31:54.893201+00:00
 confidence: 1.0
 ---
 
@@ -34,13 +34,12 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
   Git sync, and turn-1 memory injection via `hooks/inject_memory.py`
   (`initialNumSteps == 0`, `invocationNum == 1`, checking transcripts to avoid
   redundancy). `agentapi` handles LLM extraction, synthesis, and compaction.
-- **Maintenance Schedule:** Nightly maintenance runs dreaming at 00:00, tiered
-  compaction at 00:30, and Git sync at 01:00 local time.
-- **Dreamer & Extraction:** Tracks step watermarks in `state.json
-<truncated 53 bytes>
- rules covered in `rules/*.md`,
-  injects topic catalogs via `memory_utils.get_existing_topics` to prevent
-  duplicate notes, and purges ephemeral internal conversations.
+- **Maintenance & Extraction:** Nightly maintenance runs dreaming at 00:00,
+  tiered compaction at 00:30, and Git sync at 01:00 local time. The dreamer
+  tracks step watermarks in `state.json` for incremental extraction, skips
+  subagents and rules covered in `rules/*.md`, queries topic catalogs via
+  `memory_utils.get_existing_topics` to prevent duplicates, and purges
+  ephemeral internal conversations.
 
 ## Shared Utilities (`utils/memory_utils.py`)
 - **Dynamic LS Discovery:** Probes runtime state and active `cli.log` for live
@@ -57,18 +56,18 @@ and vendoring skills via the `vendor/agent-skills` git submodule.
   (`$ANTIGRAVITY_PROJECT_ID`, `$PROJECT_ID`, `$AGY_PROJECT_ID`).
 
 ## Sidecars & Skills
-- **Scheduled Sidecars:** `model-updater` runs daily at 15:00 UTC to evaluate
-  and update Gemini model defaults; `submodule-updater` runs weekly (Mondays
-  15:00 UTC) to update vendored agent skills.
-- **Slack Chat (`sidecars/slack-chat/`):** Bridges Slack Socket Mode to
-  `agentapi` via `AgentApiBridge`, maps `thread_ts` to `conversation_id`,
-  backfills unmapped threads via `conversations_replies`, and installs
-  `requirements.txt` on startup. Validated by `skills/prep-slack-chat-sidecar`
-  for required tokens (`SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`) and dependencies.
-- **Self-Review Commit (`skills/self-review-commit`):** Runs pre-commit code
-  reviews with a `Model="pro"` reviewer subagent and summarizes findings.
-- **Ollama Chat (`skills/ollama-chat`):** Pure Python CLI client
-  (`scripts/ollama_client.py`) using Bearer auth (`$OLLAMA_API_KEY`) to query
-  Gemma 4 models at `https://ollama.klinker-cabin.computer`.
+- **Scheduled Sidecars:** `model-updater`
+  (`sidecars/model-updater/sidecar.json`) runs daily at 15:00 UTC to update
+  Gemini model defaults; `submodule-updater` runs weekly (Mondays 15:00 UTC) to
+  update vendored agent skills.
+- **Slack Integration:** `sidecars/slack-chat/` bridges Slack Socket Mode to
+  `agentapi` via `AgentApiBridge`, mapping `thread_ts` to `conversation_id` and
+  backfilling via `conversations_replies`. Validated by
+  `skills/prep-slack-chat-sidecar` for required tokens (`SLACK_BOT_TOKEN`,
+  `SLACK_APP_TOKEN`) and dependencies.
+- **Workflow & Chat Skills:** `self-review-commit` performs pre-commit code
+  reviews with a `Model="pro"` reviewer subagent; `ollama-chat` queries Gemma 4
+  models at `https://ollama.klinker-cabin.computer` via Bearer auth
+  (`$OLLAMA_API_KEY`); `notify-the-user` sends Slack webhook notifications.
 - **Memory Skills:** `lookup-memory` and `save-memory` provide on-demand memory
-  retrieval and persistence.
+  retrieval and persistence in `$MEMORY_DIRECTORY`.

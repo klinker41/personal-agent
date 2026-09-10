@@ -2,7 +2,7 @@
 topic: plugin-sidecar-execution
 category: knowledge
 tags: [knowledge, plugin-sidecar-execution]
-updated_at: 2026-09-08T00:01:02.653645+00:00
+updated_at: 2026-09-10T00:01:46.401125+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,8 @@ requiring custom Python or bash scripts.
 - When constructing git commit commands inside automated agent prompts or bash
 commands, use multiple `-m` flags rather than `\n` escapes to properly preserve
 multiline commit messages.
+
+- Scheduled sidecars using the builtin: schedule runner with agentapi
+new-conversation require a projectId specified under
+sidecars.<sidecar-id>.projectId in ~/.gemini/config/config.json; omitting it
+causes rpc error: project_id is required when providing project_env_config.

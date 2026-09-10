@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-09T00:33:13.574368+00:00
+updated_at: 2026-09-10T00:33:07.806584+00:00
 confidence: 0.95
 ---
 
@@ -14,28 +14,32 @@ confidence: 0.95
   FFmpeg) running React SPA, REST APIs, media streams, and movie generation
   (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`).
 - Minimal Dependencies: Standardized on minimal backend packages (`hono`,
-  `jsonwebtoken`, `cron-parser@4.9.0`), using native `hono/cors`,
-  `Bun.password`, and native test execution (`bun test`).
-- File-Based Storage & Scheduling: Replaced database dependencies with
-  filesystem JSON persistence (`data/users.json`, `data/podcasts/`,
-  `data/outputs/`), an in-process concurrency-limited `JobQueue`, and
-  `PodcastScheduler`. Removed `pg` and legacy migration scripts.
+  `jsonwebtoken`, `cron-parser@4.9.0`) using native `hono/cors`, `Bun.password`,
+  and native test execution (`bun test`). Replaced database dependencies (`pg`,
+  migrations) with filesystem JSON persistence (`data/users.json`,
+  `data/podcasts/`, `data/outputs/`), an in-process concurrency-limited
+  `JobQueue`, and `PodcastScheduler`.
 - Storage Utilities & Security: `fileStore.ts` provides atomic file writes
   (`writeText`, `writeJson`), folder validation, date matching, and Unicode NFC
   normalization preserving `[\p{L}\p{N}\p{M}]` for diacritics. Audio and cover
   streaming endpoints enforce `path.sep` boundaries and non-blocking
-  `Bun.file(path).exists()` checks to prevent path traversal.
-- Manifest Backfill & Routing: `EpisodeStore.autoDiscoverEpisodes` backfills
-  missing `episode.json` manifests on `GET /api/podcasts/:id` (omitted from
-  `GET /api/v1/podcasts/` to prevent latency bottlenecks). Output streaming and
-  authorization helpers are unified across backend routes.
+  `Bun.file(path).exists()` checks to prevent path traversal. Unified streaming
+  and authorization helpers across backend routes.
+- Manifests & Discovery: `EpisodeStore.autoDiscoverEpisodes` backfills missing
+  `episode.json` manifests on `GET /api/podcasts/:id` (omitted from
+  `GET /api/v1/podcasts/` to prevent latency bottlenecks). Podcast manifests
+  support `ad_reads?: string[] | null`, managed via dynamic textareas in
+  `PodcastForm.tsx` and handled in `podcasts.ts` CRUD routes.
 
 ## Media Pipeline, Resilience & Deduplication
-- Media Generation & Library Sync: Synthesizes episodes via Gemini (script, 1:1
-  cover art, multi-speaker TTS) and FFmpeg ID3v2 tagging. Resolves disc numbers
-  via `TITLE_TO_DISC_MAPPING` in `backend/src/services/generator.ts`; copies
-  finished MP3s and appends `<track>` metadata to `album.nfo` via
-  `EXTERNAL_OUTPUTS_DIR`.
+- Media Generation & Ad Insertion: Synthesizes episodes via Gemini (script, 1:1
+  cover art, multi-speaker TTS) and FFmpeg ID3v2 tagging. Episode prompt
+  generation (`generator.ts`) uses `formatAdReads()` to position N ad reads at
+  evenly spaced fractional intervals `k / (N + 1)` across the episode.
+- Lib
+<truncated 72 bytes>
+nd/src/services/generator.ts`; copies finished MP3s and appends
+  `<track>` metadata to `album.nfo` via `EXTERNAL_OUTPUTS_DIR`.
 - Error Handling & Resilience: Centralized HTTP exponential backoff in
   `postWithRetry` (`gemini.ts`) and standardized queue errors via `failJob` in
   `queue.ts`. `GeminiService.generateAudioPart` retries up to 3 times with

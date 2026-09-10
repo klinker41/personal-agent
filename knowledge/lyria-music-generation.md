@@ -2,7 +2,7 @@
 topic: lyria-music-generation
 category: knowledge
 tags: [knowledge, lyria-music-generation]
-updated_at: 2026-09-08T00:02:46.394569+00:00
+updated_at: 2026-09-10T00:00:56.579389+00:00
 confidence: 0.95
 ---
 
@@ -17,3 +17,5 @@ prematurely cuts off natural resolving chords and musical codas; preserving the
 full 30s duration with a tail safety fade
 (`atrim=0:30,afade=t=in:ss=0:d=1,afade=t=out:st=27:d=3`) maintains musicality
 while preventing waveform pops or clicks.
+
+- Lyria models (e.g., `lyria-3-clip-preview`) are enumerated alongside Gemini models via the Google Generative Language REST API (`https://generativelanguage.googleapis.com/v1beta/models?key=$GEMINI_API_KEY&pageSize=200`).
