@@ -2,7 +2,7 @@
 topic: jellyfin-api-v12
 category: knowledge
 tags: [knowledge, jellyfin-api-v12]
-updated_at: 2026-09-10T00:01:32.559974+00:00
+updated_at: 2026-09-11T00:00:05.655281+00:00
 confidence: 0.95
 ---
 
@@ -17,3 +17,9 @@ raw binary buffer data (`format: binary`) in the request body rather than
 base64-encoded strings.
 - `GET /Users/Me` can be used to directly resolve the authenticated user ID for
 an API key holder instead of querying all users via `GET /Users`.
+
+- Jellyfin API keys are server-level credentials without an associated session
+user; calling GET /Users/Me with an API key fails with HTTP 400.
+- Endpoints such as GET /Items only require userId when not using an API key;
+API keys allow search, metadata retrieval, and image upload operations without
+specifying a userId.

@@ -2,7 +2,7 @@
 topic: gemini-omni-api
 category: knowledge
 tags: [knowledge, gemini-omni-api]
-updated_at: 2026-08-29T11:53:39.672645+00:00
+updated_at: 2026-09-11T00:00:14.897432+00:00
 confidence: 0.95
 ---
 
@@ -13,3 +13,6 @@ response_format (360p, 720p, 1080p, 4K) and first/last frame keyframing.
 - Gemini Omni 1.1 Flash analyzes up to 10 seconds of attached multimodal
 reference video (video/mp4) for maintaining character appearance, velocity, and
 camera motion continuity across shots.
+
+- gemini-omni-1.1-flash serves as the stable release model for video generation
+workloads queried via the Gemini REST API.

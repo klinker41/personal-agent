@@ -2,16 +2,19 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-10T00:33:59.133203+00:00
+updated_at: 2026-09-11T00:33:49.386793+00:00
 confidence: 0.95
 ---
 
 # Project: Media-Generator
 
-- **Platform & Branding**: Branded as 'Media Studio' in the top app bar (not
-  'AI Media Studio' or 'Podcast Generator'). Built as a unified Bun and Hono
-  web service with JWT authentication, combining cinematic movie generation
-  and episodic podcast synthesis.
+## Platform & Architecture
+- **Branding & Stack**: Branded as 'Media Studio' in the top app bar (not 'AI
+  Media Studio' or 'Podcast Generator'). Implemented as a unified Bun and Hono
+  web service with JWT authentication, uniting cinematic movie generation and
+  episodic podcast synthesis.
+
+## Media Pipelines
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
   formulation, screenplay breakdown, character casting with reference
   portraits, scene chunking with camera setups/plates, Gemini Omni video
@@ -34,18 +37,15 @@ confidence: 0.95
     `data/podcasts/music/` (`music_{intro|outro}_<timestamp>_<uuid>.mp3`),
     tracked in `podcast.json` (`intro_music_path`, `outro_music_path`), and
     served with HTTP Range support at `/api/podcasts/music/:filename`.
-  - Episode assembly adds a 15s intro music clip (2s fade-in, 3s fade-out) and
-    a 30s outro music cl
-<truncated 999 bytes>
-ed), excluding
-    Imagen/Veo. The `models/` prefix must be stripped.
-  - Tier rules require Flash for text, audio, and video, and Pro for image
-    generation. Variants like `exp`, `experimental`, and `latest` are
-    strictly excluded, while preview models are permitted.
-  - Automated updates: The model updater sidecar
-    (`antigravity-plugin/model-updater`) targets `media-generator`
-    (`projectId: 041f44fe-de8b-42ae-8716-67010ae98326`), committing changes
-    locally and alerting via Slack webhook; pushing requires user approval.
+  - Episode assembly adds a 15s intro music clip (2s fa
+<truncated 1034 bytes>
+hile preview models are permitted.
+- **Automated Updates**: The model updater sidecar
+  (`antigravity-plugin/model-updater`) targets `media-generator`
+  (`projectId: 041f44fe-de8b-42ae-8716-67010ae98326`), committing changes
+  locally and alerting via Slack webhook; pushing requires user approval.
+
+## Storage, Environment & Integrations
 - **Asset Storage & Environment**:
   - Podcast assets are consolidated under `data/podcasts/` (`episodes`,
     `outputs`, `speaker_previews`, `music`), eliminating `OUTPUTS_DIR` and
@@ -54,7 +54,12 @@ ed), excluding
     from colliding with podcast UUID directories during listing, lookup, and
     deletion.
   - `EXTERNAL_OUTPUTS_DIR` defaults to `/app/data/outputs-external` in Docker
-    and an empty string (disabled) in backend file store if unset.
+    and an empty string (disabled) in the backend file store if unset.
+- **Jellyfin Integration**: `JellyfinService` authenticates using server-level
+  API keys and omits `userId` entirely across item search, metadata fetching,
+  and image uploads.
+
+## UI & Performance
 - **Performance Optimizations**:
   - Replaced $O(N \times M)$ per-podcast disk scans in `PodcastStore.list()`
     with a single-pass active generation `Set`.
