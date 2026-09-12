@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-09-10T00:01:32.558414+00:00
+updated_at: 2026-09-12T00:02:55.703475+00:00
 confidence: 1.0
 ---
 
@@ -56,3 +56,7 @@ Python/PostgreSQL/Redis/Celery setups for homelab media generators.
 models.ts) rather than baking default values into Dockerfiles.
 
 - Homelab media stack runs Jellyfin 12.
+
+- Prefers correcting underlying data and permissions on disk rather than
+introducing permissive fallback logic or compatibility workarounds in
+application code.

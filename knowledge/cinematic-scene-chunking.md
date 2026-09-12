@@ -2,7 +2,7 @@
 topic: cinematic-scene-chunking
 category: knowledge
 tags: [knowledge, cinematic-scene-chunking]
-updated_at: 2026-09-08T00:01:25.155331+00:00
+updated_at: 2026-09-12T00:01:40.739979+00:00
 confidence: 0.95
 ---
 
@@ -23,3 +23,7 @@ alternations.
 - Continuous shots (`camera_continuity: 'continuous'`) are primarily reserved
 for dialogue continuation when a single character's speech exceeds per-chunk
 length limits (e.g., 10 seconds or 18–20 words).
+
+- FFmpeg concat demuxer lists require quote escaping and unique temp file paths,
+paired with a re-encode fallback to handle mismatched stream parameters across
+generated chunks.

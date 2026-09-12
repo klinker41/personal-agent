@@ -2,7 +2,7 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-11T00:31:34.604598+00:00
+updated_at: 2026-09-12T00:31:57.810831+00:00
 confidence: 0.95
 ---
 
@@ -18,9 +18,9 @@ confidence: 0.95
 ## Generation Pipeline & Continuity
 - **Models & Hierarchical Rendering**: Uses `gemini-3.7-flash` for
   orchestration and `gemini-omni-1.1-flash` for video generation.
-  Hierarchically stitches `chunks` -> `scene.mp4` -> `movie.mp4` across quality
-  tiers (360p Draft, 720p HD, 1080p FHD, 4K UHD), skipping already-upscaled
-  chunks.
+  Hierarchically stitches `chunks` -> `scene.mp4` -> `movie.mp4` across
+  quality tiers (360p Draft, 720p HD, 1080p FHD, 4K UHD), skipping
+  already-upscaled chunks.
 - **Plates & Camera Continuity**: Stage 4.8A generates concept plate prompts
   via `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
   `generateSceneChunks` evaluates `camera_continuity` (`continuous` vs
@@ -40,3 +40,11 @@ confidence: 0.95
   `safetyRatings`, `blockReason`) on empty returns. `formatTimelineBeat`
   and `formatTimelineAndAudio` format JSON timeline beats to prevent
   `[object Object]` serialization.
+
+## Access Control & Permissions
+- **Role-Based Access Control (RBAC)**: Movies record creator IDs in
+  `created_by`. Standard users can only view their own movies
+  (`created_by === user.id`), whereas admins (`role: 'admin'` or
+  `is_admin: true` in `data/users.json`) have full access. Legacy accounts
+  lacking these fields default to standard access; admin rights require
+  explicitly adding `"role": "admin"` and `"is_admin": true`.

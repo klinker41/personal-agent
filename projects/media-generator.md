@@ -2,17 +2,20 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-11T00:33:49.386793+00:00
+updated_at: 2026-09-12T00:33:58.350203+00:00
 confidence: 0.95
 ---
 
 # Project: Media-Generator
 
 ## Platform & Architecture
-- **Branding & Stack**: Branded as 'Media Studio' in the top app bar (not 'AI
-  Media Studio' or 'Podcast Generator'). Implemented as a unified Bun and Hono
-  web service with JWT authentication, uniting cinematic movie generation and
-  episodic podcast synthesis.
+- **Branding & Stack**: Branded as 'Media Studio' in the top app bar (not
+  'AI Media Studio' or 'Podcast Generator'). Implemented as a unified Bun
+  and Hono web service with JWT authentication, uniting cinematic movie
+  generation, episodic podcast synthesis, and audiobook creation.
+- **Workspace Tooling**: Root scripts coordinate build, lint, typecheck, and
+  test across workspaces using Bun and Vite. Backend tests run via `bun test`;
+  frontend tests run via `vitest run`.
 
 ## Media Pipelines
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
@@ -24,55 +27,50 @@ confidence: 0.95
   making continuous camera shots rare outside extended single-speaker dialogue
   exceeding chunk limits.
 - **Episodic Podcast Pipeline**:
-  - Synthesizes multi-speaker dialogue via Gemini TTS with celestial voice
-    profiles, ID3v2-tagged MP3 mastering, automated cron releases, and RSS 2.0
-    feeds with iTunes tags.
-  - In `formatSpeakerGuidelines`, one host must always announce the podcast
-    name at the start regardless of banter setting; banter-off mode starts
-    naturally and transitions directly into discussion without small talk.
-  - Supports ad reads via the `ad_reads` property on `Podcast`, distributing
-    sponsor segments evenly across generated episode dialogue.
-  - Theme music uses Google Lyria 3 Clip (`lyria-3-clip-preview`, overridable
+  - Multi-Speaker Synthesis: Synthesizes dialogue via Gemini TTS with celestial
+    voice profiles, ID3v2-tagged MP3 mastering, automated cron releases, and
+    RSS 2.0 feeds with iTunes tags.
+  - Speaker Guidelines: In `formatSpeakerGuidelines`, one host must always
+    announce the podcast name at the start regardless of banter setting;
+    banter-off mode begins discussion promptly without small talk.
+  - Ad Reads: Supports sponsor segments via the `ad_reads` property on
+    `Podcast`, distributing segments evenly across episode dialogue.
+  - Theme Music: Uses Google Lyria 3 Clip (`lyria-3-clip-preview`, overridable
     via `MUSIC_MODEL` or `GEMINI_MUSIC_MODEL`). Audio files are stored in
-    `data/podcasts/music/` (`music_{intro|outro}_<timestamp>_<uuid>.mp3`),
-    tracked in `podcast.json` (`intro_music_path`, `outro_music_path`), and
-    served with HTTP Range support at `/api/podcasts/music/:filename`.
-  - Episode assembly adds a 15s intro music clip (2s fa
-<truncated 1034 bytes>
-hile preview models are permitted.
-- **Automated Updates**: The model updater sidecar
-  (`antigravity-plugin/model-updater`) targets `media-generator`
-  (`projectId: 041f44fe-de8b-42ae-8716-67010ae98326`), committing changes
-  locally and alerting via Slack webhook; pushing requires user approval.
+    `data/podcasts/music/` (`music_{intro|outro}_<timestamp>_<uuid>
+<truncated 4525 bytes>
+`AuthContext` preserves sessions during network
+  outages and 5xx errors using decoded JWT data (switching to an offline
+  fallback user) and only purges tokens upon explicit HTTP 401 or 403
+  responses, supporting both `token` and `auth_token` keys.
+- **Dashboard Layout**:
+  - Desktop (`lg:`): Asymmetric 2-column layout (65% creations feed, 35%
+    operations sidebar).
+  - Mobile (`<sm`): Collapses to a single column with a 2x2 telemetry grid.
+  - Components: KPI cards (`DashboardCards.tsx`), an in-flight banner
+    (`InFlightPipelineBanner.tsx`) with visualizer links, and creations feed
+    (`MediaCreationsFeed.tsx`). Reference screenshots stored in `docs/images/`
+    (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
+- **Podcasts List UI**: Mobile layout replaces nested container padding
+  (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards with
+  top-right status toggles, metadata badges, and expanded bottom action footers.
+- **Form Validation & State**:
+  - `PodcastForm` validates against empty or whitespace-only titles across all
+    submit triggers prior to invoking backend APIs.
+  - `StepInspector` preserves prop immutability during prompt editing,
+    resolution switching, and video regeneration by dispatching object copies
+    rather than mutating props in place.
+- **UI Cleanup**: Pruned duplicate `Dashboard.tsx` and legacy `LoginPage.tsx`,
+  migrating test coverage to `pages/MoviesList.tsx`.
 
-## Storage, Environment & Integrations
-- **Asset Storage & Environment**:
-  - Podcast assets are consolidated under `data/podcasts/` (`episodes`,
-    `outputs`, `speaker_previews`, `music`), eliminating `OUTPUTS_DIR` and
-    legacy fallback logic.
-  - `RESERVED_PODCAST_DIRS` in `fileStore.ts` prevents static asset folders
-    from colliding with podcast UUID directories during listing, lookup, and
-    deletion.
-  - `EXTERNAL_OUTPUTS_DIR` defaults to `/app/data/outputs-external` in Docker
-    and an empty string (disabled) in the backend file store if unset.
-- **Jellyfin Integration**: `JellyfinService` authenticates using server-level
-  API keys and omits `userId` entirely across item search, metadata fetching,
-  and image uploads.
-
-## UI & Performance
+## Performance & Testing
 - **Performance Optimizations**:
   - Replaced $O(N \times M)$ per-podcast disk scans in `PodcastStore.list()`
     with a single-pass active generation `Set`.
   - Added a 5-second mutation-invalidated in-memory cache to `EpisodeStore`.
-- **UI & Frontend Layout**:
-  - Dashboard: Desktop (`lg:`) uses an asymmetric 2-column layout (65%
-    creations feed, 35% operations sidebar); mobile (`<sm`) collapses to a
-    single column with a 2x2 telemetry grid. Includes KPI cards
-    (`DashboardCards.tsx`), an in-flight pipeline banner
-    (`InFlightPipelineBanner.tsx`) with visualizer links, and a creations feed
-    (`MediaCreationsFeed.tsx`). Documentation screenshots are stored in
-    `docs/images/` (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
-  - Podcasts List: Mobile layout replaces nested container padding
-    (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards
-    with top-right status toggles, metadata badges, and expanded bottom action
-    footers.
+- **Test Coverage & Known Issues**:
+  - Critical test coverage gaps exist in `JobQueue`
+    (`backend/src/services/queue.ts`) and startup cleanup
+    `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
+  - Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
+    unmocked fetch calls in `setupTests.ts`.

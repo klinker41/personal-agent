@@ -2,14 +2,14 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-11T00:30:40.672833+00:00
+updated_at: 2026-09-12T00:30:40.944816+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Architecture & Container Runtime
-- **Image & Isolation:** `jklinker/antigravity-docker:latest` runs headless
+- **Container Isolation:** `jklinker/antigravity-docker:latest` runs headless
   as non-root `developer` via `gosu` with dynamic `PUID`/`PGID`, disabled
   passwordless sudo, and `umask 0002` across `conversations/`, `brain/`, and
   `annotations/`.
@@ -17,16 +17,15 @@ confidence: 0.95
   mounting `/var/run/docker.sock`.
 
 ## Configuration & Environment
-- **Networking:** Defaults to `AGY_PORT=4400` and `AGY_HUB_PORT=4402` (passed to
-  `agy --remote-control --hub-port` for deterministic hub discovery without log
-  scraping).
+- **Networking & Ports:** Defaults to `AGY_PORT=4400` and `AGY_HUB_PORT=4402`
+  (passed via `--remote-control --hub-port` for deterministic hub discovery).
 - **Environment Flags:**
   - *Auth & Host:* `RC_NAME`, `AUTH_PASSWORD`, `HOST_SSH_DIR`.
-  - *Features:* `ENABLE_IDE`, `ENABLE_TERMINAL` (default: `true`).
+  - *Feature Toggles:* `ENABLE_IDE`, `ENABLE_TERMINAL` (default: `true`).
   - *Telemetry:* `BLOCK_TELEMETRY=true` (default; sinkholes telemetry to
     `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
 - **Storage & State:**
-  - Initial authentication via `setup` subcommand with mounted `~/.gemini`.
+  - Subcommand `setup` handles initial auth with mounted `~/.gemini`.
   - `entrypoint.sh` initializes empty `$GEMINI_DIR/config/projects/` and purges
     stale CSRF tokens.
   - Runtime state (`antigravity_state.pbtxt`, `installation_uuid`, migrations)
@@ -41,14 +40,17 @@ confidence: 0.95
   rate-limiting on `/__auth/login`, 16 KB request body limit, path traversal
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
-- **Protocol & Streaming:** Enforces `useWebSocket=true` for `/` and `/c/...`,
-  disables proxy buffering (`X-Accel-Buffering: no`), flushes headers
+- **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
+  `/c/...`, disables proxy buffering (`X-Accel-Buffering: no`), flushes headers
   immediately, strips hop-by-hop headers, preserves gRPC streaming headers
   (`TE: trailers`, `Trailer`, `grpc-status`), and suppresses upstream TCP RST
   during socket teardown.
 - **Endpoints & UI:** Unauthenticated `/status` health checks (`200`/`503`),
-  dynamic favicons (`MutationObserver`), and a cosmic glassmorphic UI with 2D
+  dynamic favicons (`MutationObserver`), and cosmic glassmorphic UI with 2D
   canvas particles (`renderPageLayout`, `BASE_PAGE_CSS`).
+- **Model Providers:** Managed by `proxy/lib/models-manager.js` via `/models`
+  UI; persists settings to `~/.gemini/config/custom_models.json` with masked
+  API keys.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - **Engine & Supervisor:** Authenticated `/sidecars` REST API/UI manages

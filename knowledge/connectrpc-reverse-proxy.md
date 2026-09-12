@@ -2,26 +2,28 @@
 topic: connectrpc-reverse-proxy
 category: knowledge
 tags: [knowledge, connectrpc-reverse-proxy]
-updated_at: 2026-08-29T11:58:09.902540+00:00
+updated_at: 2026-09-12T00:34:18.972891+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Connectrpc-Reverse-Proxy
 
-- Connect-RPC and gRPC-Web stream completion requires preserving and forwarding
-  HTTP trailers (such as `TE: trailers` from requests and `Trailer` headers /
-  `grpc-status: 0` from responses); stripping them as hop-by-hop headers or
-  using standard `.pipe()` operations that drop trailers causes clients to hang
-  indefinitely.
-- Reverse proxies proxying ConnectRPC / gRPC-Web streams must explicitly close
-  upstream sockets on client disconnect to prevent orphaned connections from
-  filling TCP buffers (Send-Q/Recv-Q) and blocking updates; however, in Node.js
-  HTTP proxies, `res.on("close")` fires on both normal completion and premature
-  disconnects, so unconditionally destroying sockets on close sends TCP RST
-  packets that cancel server-side request contexts.
-- Node.js buffers `res.writeHead()` headers until body chunks arrive unless
-  `res.flushHeaders()` is called, which can stall browser streaming readers on
-  long-lived RPC streams.
-- Forwarding hop-by-hop `Transfer-Encoding: chunked` headers into
-  `res.writeHead()` causes double-chunking and framing errors on streaming
-  responses.
+- **HTTP Trailers & Framing**: Preserving and forwarding HTTP trailers
+  (such as `TE: trailers` on requests and `Trailer` / `grpc-status: 0` on
+  responses) is required; stripping them or using standard `.pipe()` hangs
+  clients indefinitely. Avoid forwarding hop-by-hop
+  `Transfer-Encoding: chunked` into `res.writeHead()` to prevent
+  double-chunking and framing errors.
+- **Node.js Buffering & Sockets**: Always call `res.flushHeaders()` after
+  `res.writeHead()` so browser readers do not stall on buffered headers.
+  Explicitly close upstream sockets on client disconnect to prevent orphaned
+  connections from bloating TCP buffers (Send-Q/Recv-Q). Avoid unconditionally
+  destroying sockets on `res.on("close")`, which fires on normal completion as
+  well as disconnects, sending TCP RST packets that cancel upstream contexts.
+- **Anthropic Protocol Mapping**: Anthropic Messages streaming deltas map
+  cleanly to `agy` Protobuf events: `thinking_delta` routes to the UI thinking
+  drawer, while `tool_use` and `input_json_delta` map directly to
+  `GetChatMessageResponse` tool call frames.
+- **Frontend Model Injection**: Custom model options can be natively
+  injected into the Antigravity frontend dropdown by intercepting and
+  augmenting the `GetCascadeModelConfigData` Connect-RPC response.
