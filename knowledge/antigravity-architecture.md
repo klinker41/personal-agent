@@ -2,7 +2,7 @@
 topic: antigravity-architecture
 category: knowledge
 tags: [knowledge, antigravity-architecture]
-updated_at: 2026-09-12T00:02:19.221911+00:00
+updated_at: 2026-09-13T00:20:21.480535+00:00
 confidence: 0.95
 ---
 
@@ -21,3 +21,11 @@ crashing the agent session until container restart.
 HTTP/2 (`JetskiService`/`GetChatMessageRequest`), requiring a bidirectional
 translation proxy to adapt external LLM APIs (Anthropic, OpenAI) to the
 Antigravity agent loop.
+
+- Antigravity built-in models use placeholder identifiers in the M500-M649 range
+(e.g. M599, M605), overlapping with custom model placeholders; reverse proxies
+must verify unregistered placeholders in this range fall through to Google Cloud
+Code rather than falling back to default custom model sessions.
+- Antigravity's write_to_file tool rejects overwrites unless Overwrite: true is
+explicitly provided; third-party models (e.g., Claude, GPT) frequently omit this
+parameter on existing files, requiring proxy-level argument sanitization.

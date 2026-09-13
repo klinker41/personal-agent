@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-12T00:30:40.944816+00:00
+updated_at: 2026-09-13T00:30:59.245995+00:00
 confidence: 0.95
 ---
 
@@ -41,16 +41,28 @@ confidence: 0.95
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
 - **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
-  `/c/...`, disables proxy buffering (`X-Accel-Buffering: no`), flushes headers
-  immediately, strips hop-by-hop headers, preserves gRPC streaming headers
-  (`TE: trailers`, `Trailer`, `grpc-status`), and suppresses upstream TCP RST
-  during socket teardown.
-- **Endpoints & UI:** Unauthenticated `/status` health checks (`200`/`503`),
-  dynamic favicons (`MutationObserver`), and cosmic glassmorphic UI with 2D
-  canvas particles (`renderPageLayout`, `BASE_PAGE_CSS`).
-- **Model Providers:** Managed by `proxy/lib/models-manager.js` via `/models`
-  UI; persists settings to `~/.gemini/config/custom_models.json` with masked
+  `/c/..
+<truncated 592 bytes>
+models.json` with masked
   API keys.
+
+## Translation Proxy & Transcoding
+- **Activation & Routing (`proxy/translation-proxy.js`):**
+  - Conditionally enabled via `entrypoint.sh` only when custom models are
+    configured at container startup, ensuring standard traffic bypasses the
+    proxy to minimize failure modes.
+  - Model placeholders in the `M500`-`M649` range not registered in
+    `modelsManager` return `null` immediately to allow built-in models to pass
+    upstream to Google.
+- **Argument Transcoding (`proxy/lib/transcoder.js`):**
+  - `sanitizeToolCallArgs` provides provider-agnostic argument normalization
+    for both streaming and unary calls.
+  - Coerces stringified booleans and integers into native types.
+  - Strips `ArtifactMetadata` for workspace files outside
+    `.gemini/antigravity-cli/brain/` and sets synthesized
+    `ArtifactMetadata.UserFacing` to `false`.
+  - Defaults `Overwrite: true` on `write_to_file` calls for non-artifact paths
+    when omitted by third-party models.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - **Engine & Supervisor:** Authenticated `/sidecars` REST API/UI manages

@@ -2,7 +2,7 @@
 topic: connectrpc-reverse-proxy
 category: knowledge
 tags: [knowledge, connectrpc-reverse-proxy]
-updated_at: 2026-09-12T00:34:18.972891+00:00
+updated_at: 2026-09-13T00:34:41.671531+00:00
 confidence: 0.95
 ---
 
@@ -20,10 +20,14 @@ confidence: 0.95
   connections from bloating TCP buffers (Send-Q/Recv-Q). Avoid unconditionally
   destroying sockets on `res.on("close")`, which fires on normal completion as
   well as disconnects, sending TCP RST packets that cancel upstream contexts.
-- **Anthropic Protocol Mapping**: Anthropic Messages streaming deltas map
-  cleanly to `agy` Protobuf events: `thinking_delta` routes to the UI thinking
-  drawer, while `tool_use` and `input_json_delta` map directly to
-  `GetChatMessageResponse` tool call frames.
-- **Frontend Model Injection**: Custom model options can be natively
-  injected into the Antigravity frontend dropdown by intercepting and
-  augmenting the `GetCascadeModelConfigData` Connect-RPC response.
+- **Protocol Mapping & Tool Sanitization**: Anthropic streaming deltas map
+  cleanly to `agy` Protobuf events: `thinking_delta` routes to the UI
+  thinking drawer, while `tool_use` and `input_json_delta` map to
+  `GetChatMessageResponse` tool call frames. When proxying tool calls to
+  third-party LLMs (OpenAI, Anthropic), sanitize arguments: coerce
+  string-serialized booleans and numbers to native types, strip
+  `ArtifactMetadata` on paths outside the brain directory to prevent schema
+  validation failures, and supply defaults for artifact files.
+- **Frontend Model Injection**: Custom model options can be natively injected
+  into the Antigravity frontend dropdown by intercepting and augmenting the
+  `GetCascadeModelConfigData` Connect-RPC response.

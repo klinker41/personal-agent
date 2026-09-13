@@ -2,7 +2,7 @@
 topic: plugin-sidecar-execution
 category: knowledge
 tags: [knowledge, plugin-sidecar-execution]
-updated_at: 2026-09-10T00:01:46.401125+00:00
+updated_at: 2026-09-13T00:20:29.620489+00:00
 confidence: 0.95
 ---
 
@@ -29,3 +29,7 @@ multiline commit messages.
 new-conversation require a projectId specified under
 sidecars.<sidecar-id>.projectId in ~/.gemini/config/config.json; omitting it
 causes rpc error: project_id is required when providing project_env_config.
+
+- Scheduled sidecars (`builtin: 'schedule'`) execute `agentapi new-conversation`
+with cron expressions and command arguments defined in `sidecar.json`,
+supporting explicit model selection via `--model=<flash_lite|flash|pro>`.

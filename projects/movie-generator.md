@@ -2,7 +2,7 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-12T00:31:57.810831+00:00
+updated_at: 2026-09-13T00:31:45.611892+00:00
 confidence: 0.95
 ---
 
@@ -10,10 +10,10 @@ confidence: 0.95
 
 ## Architecture & Media Serving
 - **Stack & Asset Serving**: Built on `oven/bun:alpine` with Hono and CLI
-  `ffmpeg`, replacing Express, dotenv, bcrypt, Jest/Supertest, and
-  `fluent-ffmpeg` via native `Bun.password`, `bun test`, and `app.request()`.
-  The traversal-secured `/assets/*` route serves `generated_assets/` with a
-  fallback to `frontend/dist/assets/`.
+  `ffmpeg`, using native `Bun.password`, `bun test`, and `app.request()`
+  (replacing Express, dotenv, bcrypt, Jest/Supertest, and `fluent-ffmpeg`).
+  Traversal-secured `/assets/*` serves `generated_assets/` with fallback to
+  `frontend/dist/assets/`.
 
 ## Generation Pipeline & Continuity
 - **Models & Hierarchical Rendering**: Uses `gemini-3.7-flash` for
@@ -24,18 +24,18 @@ confidence: 0.95
 - **Plates & Camera Continuity**: Stage 4.8A generates concept plate prompts
   via `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
   `generateSceneChunks` evaluates `camera_continuity` (`continuous` vs
-  `new_shot`); continuous takes (tracking shots, sustained two-shots, split
-  dialogue, unbroken action) attach the prior chunk's `video.mp4` with
-  temporal cues as a multimodal reference.
+  `new_shot`); continuous takes (tracking, two-shots, split dialogue,
+  unbroken action) attach the prior chunk's `video.mp4` with temporal cues as
+  a multimodal reference.
 
-## Safety, Diagnostics & Error Recovery
+## Safety, Diagnostics & Serialization
 - **Safety & Reactive Sanitization**: Sets `DEFAULT_SAFETY_SETTINGS` to
   `BLOCK_ONLY_HIGH` across all categories (including
   `HARM_CATEGORY_CIVIC_INTEGRITY`) on Gemini calls. Raw prompts run first;
   errors or `PROHIBITED_CONTENT` trigger reactive Flash sanitization
-  (`sanitizeSceneContent` / `sanitizeAndFixPrompt`), saving rewritten
+  (`sanitizeSceneContent` / `sanitizeAndFixPrompt`), writing rewritten
   `setting` and `action_summary` to `prompt.txt` and `chunk_manifest.json`.
-- **Diagnostics & Serialization**: In `backend/src/utils/jsonParser.ts`,
+- **Diagnostics & Formatting**: In `backend/src/utils/jsonParser.ts`,
   `extractGeminiResponseText` inspects diagnostics (`finishReason`,
   `safetyRatings`, `blockReason`) on empty returns. `formatTimelineBeat`
   and `formatTimelineAndAudio` format JSON timeline beats to prevent
@@ -45,6 +45,6 @@ confidence: 0.95
 - **Role-Based Access Control (RBAC)**: Movies record creator IDs in
   `created_by`. Standard users can only view their own movies
   (`created_by === user.id`), whereas admins (`role: 'admin'` or
-  `is_admin: true` in `data/users.json`) have full access. Legacy accounts
-  lacking these fields default to standard access; admin rights require
-  explicitly adding `"role": "admin"` and `"is_admin": true`.
+  `is_admin: true` in `data/users.json`) have full access. Legacy or
+  unspecified accounts default to standard access; admin rights require
+  explicitly setting `"role": "admin"` and `"is_admin": true`.

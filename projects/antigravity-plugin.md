@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-12T00:31:14.638111+00:00
+updated_at: 2026-09-13T00:31:26.913904+00:00
 confidence: 1.0
 ---
 
@@ -30,8 +30,8 @@ lifecycle hooks at `/workspace/antigravity-plugin`. Registered in
 - **Structure:** Progressive disclosure store at `$MEMORY_DIRECTORY`
   (`profile.md`, `index.md`, `projects/`, `knowledge/`, and tiered
   `daily/`/`monthly/`/`yearly/` chronicles).
-- **Hybrid Pipeline & Hooks:** Deterministic Python scrubs secrets, syncs git,
-  and performs turn-1 memory injection via `hooks/inject_memory.py`
+- **Hybrid Pipeline & Hooks:** Deterministic Python scrubs secrets, syncs
+  git, and performs turn-1 memory injection via `hooks/inject_memory.py`
   (`initialNumSteps == 0`, `invocationNum == 1`, checking transcripts).
   `agentapi` handles LLM extraction, synthesis, and compaction.
 - **Nightly Maintenance:** Dreamer at 00:00 (tracks step watermarks in
@@ -53,9 +53,10 @@ lifecycle hooks at `/workspace/antigravity-plugin`. Registered in
   `$ANTIGRAVITY_PROJECT_ID` / `$PROJECT_ID` / `$AGY_PROJECT_ID`.
 
 ## Sidecars & Skills
-- **Scheduled Sidecars:** `model-updater` updates Gemini defaults daily at
-  15:00 UTC; `submodule-updater` updates `vendor/agent-skills` Mondays at
-  15:00 UTC.
+- **Scheduled Sidecars (`sidecar.json`):** Configure recurring tasks via
+  `agentapi new-conversation` in `args` (supporting `--model` overrides).
+  Runs `model-updater` (Gemini defaults daily at 15:00 UTC) and
+  `submodule-updater` (`vendor/agent-skills` Mondays at 15:00 UTC).
 - **Slack Integration:** `sidecars/slack-chat/` bridges Slack Socket Mode to
   `agentapi` via `AgentApiBridge`, mapping `thread_ts` to conversation IDs
   with `conversations_replies` backfill. Config validated by
