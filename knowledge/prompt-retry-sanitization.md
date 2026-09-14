@@ -2,7 +2,7 @@
 topic: prompt-retry-sanitization
 category: knowledge
 tags: [knowledge, prompt-retry-sanitization]
-updated_at: 2026-09-06T00:01:23.716718+00:00
+updated_at: 2026-09-14T00:11:07.013159+00:00
 confidence: 0.95
 ---
 
@@ -16,3 +16,7 @@ safety or trademark rejection before retrying generation.
 implement automatic recovery using LLM-guided rewriting to replace trademarked
 franchise lore and de-escalate violent action with generic equivalents before
 retrying.
+
+- Diagnostic reprompting loops achieve reliable error recovery by returning
+structured validation diagnostics (syntax errors, schema boundary failures)
+alongside sanitized response snippets rather than raw unparsed payloads.

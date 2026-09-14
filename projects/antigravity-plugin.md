@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-13T00:31:26.913904+00:00
+updated_at: 2026-09-14T00:32:18.645519+00:00
 confidence: 1.0
 ---
 
@@ -19,12 +19,14 @@ lifecycle hooks at `/workspace/antigravity-plugin`. Registered in
   minimal dependencies (`rules/web-app-architecture.md`), and port 4401 via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
 - **Git & Commits:** Mandatory `self-review-commit` pre-commit loop (with
-  `Model="pro"` reviewer subagent), zero secrets in diffs, and explicit
-  user approval before `git push` (`rules/self-review-before-commit.md`,
-  `rules/no-secrets-in-commits.md`, `rules/git-push.md`).
-- **Engineering Standards:** Minimal diffs, no code duplication, kebab-case
-  rule/skill names, non-verbose tests, updated README, and strict 80-character
-  Markdown line wrapping (`rules/*.md`).
+  `Model="pro"` reviewer subagent), passing non-verbose tests, zero secrets in
+  diffs, and explicit user approval before `git push`
+  (`rules/self-review-before-commit.md`, `rules/no-secrets-in-commits.md`,
+  `rules/git-push.md`, `rules/tests-must-pass-before-commit.md`).
+- **Subagents & Standards:** Configure `Model: "flash"` for coding/testing
+  subagents (`rules/coding-subagent-model.md`). Enforce minimal diffs, no
+  duplication, kebab-case rule/skill names, updated README, and strict
+  80-character Markdown line wrapping (`rules/*.md`).
 
 ## Memory Architecture & Daemon (`sidecars/memory-daemon`)
 - **Structure:** Progressive disclosure store at `$MEMORY_DIRECTORY`

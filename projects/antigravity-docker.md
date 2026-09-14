@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-13T00:30:59.245995+00:00
+updated_at: 2026-09-14T00:31:56.886846+00:00
 confidence: 0.95
 ---
 
@@ -36,33 +36,28 @@ confidence: 0.95
   shortcuts for VS Code IDE and Host Terminal.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
-- **Security:** 256-bit session tokens, in-memory session cleanup, IP
+- **Security:** Enforces 256-bit session tokens, in-memory session cleanup, IP
   rate-limiting on `/__auth/login`, 16 KB request body limit, path traversal
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
 - **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
-  `/c/..
-<truncated 592 bytes>
-models.json` with masked
-  API keys.
-
-## Translation Proxy & Transcoding
+<truncated 1614 bytes>
+ists settings to
+  `~/.gemini/config/custom_models.json` with masked API keys.
 - **Activation & Routing (`proxy/translation-proxy.js`):**
-  - Conditionally enabled via `entrypoint.sh` only when custom models are
-    configured at container startup, ensuring standard traffic bypasses the
-    proxy to minimize failure modes.
-  - Model placeholders in the `M500`-`M649` range not registered in
-    `modelsManager` return `null` immediately to allow built-in models to pass
-    upstream to Google.
+  - Conditionally enabled in `entrypoint.sh` only when custom models are
+    configured, bypassing the proxy for standard traffic to minimize failures.
+  - Model placeholders in `M500`-`M649` unregistered in `modelsManager` return
+    `null` immediately, properly routing built-in models (Claude, GPT-OSS)
+    directly to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):**
   - `sanitizeToolCallArgs` provides provider-agnostic argument normalization
-    for both streaming and unary calls.
-  - Coerces stringified booleans and integers into native types.
-  - Strips `ArtifactMetadata` for workspace files outside
-    `.gemini/antigravity-cli/brain/` and sets synthesized
-    `ArtifactMetadata.UserFacing` to `false`.
+    for unary and streaming calls, coercing stringified booleans and integers
+    into native types.
+  - Strips `ArtifactMetadata` for files outside `.gemini/antigravity-cli/brain/`
+    and synthesizes `ArtifactMetadata.UserFacing: false`.
   - Defaults `Overwrite: true` on `write_to_file` calls for non-artifact paths
-    when omitted by third-party models.
+    when omitted by third-party models to prevent writing failures.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - **Engine & Supervisor:** Authenticated `/sidecars` REST API/UI manages
