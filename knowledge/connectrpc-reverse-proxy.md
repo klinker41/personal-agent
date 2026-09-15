@@ -2,23 +2,22 @@
 topic: connectrpc-reverse-proxy
 category: knowledge
 tags: [knowledge, connectrpc-reverse-proxy]
-updated_at: 2026-09-14T00:37:54.980611+00:00
+updated_at: 2026-09-15T00:38:38.609972+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Connectrpc-Reverse-Proxy
 
 - **Traffic Interception & Model Injection**: Connect-RPC traffic (including
-  over WebSockets) can be intercepted to redirect model requests to alternate
-  providers while passing native traffic through. Custom model options can be
-  injected into the frontend dropdown by intercepting and augmenting the
-  `GetCascadeModelConfigData` response.
+  over WebSockets) can be intercepted to selectively route model requests to
+  alternate providers while passing native traffic through. Inject custom
+  frontend model options by augmenting `GetCascadeModelConfigData` responses.
 - **HTTP Trailers & Framing**: Preserving and forwarding HTTP trailers (such
   as `TE: trailers` on requests and `Trailer` / `grpc-status: 0` on responses)
   is required; stripping them or using standard `.pipe()` hangs clients
-  indefinitely. Avoid forwarding hop-by-hop `Transfer-Encoding: chunked` into
+  indefinitely. Strip hop-by-hop `Transfer-Encoding: chunked` before
   `res.writeHead()` to prevent double-chunking and framing errors.
-- **Node.js Buffering & Sockets**: Always call `res.flushHeaders()` after
+- **Node.js Buffering & Sockets**: Call `res.flushHeaders()` immediately after
   `res.writeHead()` so browser readers do not stall on buffered headers.
   Explicitly close upstream sockets on client disconnect to prevent orphaned
   connections from bloating TCP buffers (Send-Q/Recv-Q). Avoid unconditionally

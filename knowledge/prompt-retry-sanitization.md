@@ -2,7 +2,7 @@
 topic: prompt-retry-sanitization
 category: knowledge
 tags: [knowledge, prompt-retry-sanitization]
-updated_at: 2026-09-14T00:11:07.013159+00:00
+updated_at: 2026-09-15T00:00:32.249224+00:00
 confidence: 0.95
 ---
 
@@ -20,3 +20,8 @@ retrying.
 - Diagnostic reprompting loops achieve reliable error recovery by returning
 structured validation diagnostics (syntax errors, schema boundary failures)
 alongside sanitized response snippets rather than raw unparsed payloads.
+
+- Preserving per-attempt history, raw response text, and intermediate diagnostic
+reprompts across all retry cycles—on both success and exhaustion errors—enables
+downstream LLMs to analyze and diagnose validation failure patterns during
+post-mortems.

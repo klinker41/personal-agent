@@ -2,7 +2,7 @@
 topic: llm-plays-pokemon
 category: project
 tags: [project, llm-plays-pokemon]
-updated_at: 2026-09-14T00:37:09.729180+00:00
+updated_at: 2026-09-15T00:01:32.078500+00:00
 confidence: 0.95
 ---
 
@@ -76,3 +76,70 @@ nfigured.
     (`/tmp/tier*-e2e-*`) and Unix sockets to prevent disk leaks.
   - Asynchronous rejection assertions must explicitly await
     `expect(promise).rejects` to prevent vacuous passes.
+
+- TurnAuditLogger (`src/core/audit.ts`) records complete per-turn LLM inputs,
+prompts, validation diagnostics, decisions, and emulator receipts into
+`${DATA_DIR}/runs/${runId}/audit.log` (human- and LLM-readable Markdown) and
+`${DATA_DIR}/runs/${runId}/audit.jsonl` (JSON Lines for programmatic analysis).
+- Run checkpoint paths in `src/core/checkpoint.ts` define `auditLogPath` and
+`auditJsonlPath` per run ID.
+- Reprompter diagnostics in `src/llm/reprompter.ts` preserve per-attempt logs,
+raw response text, diagnostic reprompts, and schema error breakdowns across all
+retry cycles on both successful completions and `DecisionSchemaExhaustedError`.
+- Turn audit logging is integrated into `GameController.executeTurn()` across
+all lifecycle outcomes.
+
+- Cartridge loading (/api/admin/cartridge/load) while in non-idle/non-ready
+states requires calling `await controller.stop()` to finalize SQLite records,
+release timers, and reset FSM error context.
+- FSM transitions include 'LOADING' in COMPLETION_PENDING and use an
+IDLE_TRANSITION_PATHS lookup table for transition resolution.
+- Server enters standby mode when no active LLM profile is configured in the
+database, preventing autonomous game loops until a profile is set up via admin
+routes.
+
+- Boot fast-forwarding (`bootSkipFrames`) defaults to 1200 frames (~20 seconds
+at 60 FPS) upon ROM load before accepting model decisions.
+- Post-action settling buffer (`settlingFrames`) defaults to 240 frames (4
+seconds at 60 FPS) after completing an action batch before transitioning back to
+THINKING mode.
+
+- Checkpoint restore uses fail-closed pre-validation (checking ROM existence,
+SHA256 integrity, run ownership, and state file validity) before terminating an
+active game run.
+- Checkpoint screenshot and state download endpoints enforce canonical path
+containment within the data directory to prevent traversal attacks.
+- Cartridge resolution (`resolveRomPathForRun`) recursively searches `romsDir`
+by filename and SHA256 hash with fallback to virtual adapter paths, ensuring ROM
+resolution is independent of working directory.
+
+- PyBoy emulator worker processes and RESET RPC payloads use `--speed 1` to
+enforce real-time (~59.73 fps) wall-clock pacing.
+- Manual mode tracks held buttons via a `heldButtons` set and a 100ms ticker
+advancing 6 frames per tick (~60fps), resetting automatically on lease timeouts,
+manual button releases, or FSM transitions out of MANUAL.
+
+- Victory claim workflow in `runTurn()` persists the claiming decision turn to
+SQLite and working memory, caching claim metadata on the controller
+(`latestVictoryClaim`).
+- Admin victory confirmation archives the final framebuffer snapshot as durable
+evidence to `/data/runs/<run_uuid>/evidence/victory.png`.
+
+- Runtime LLM client swaps in `controller.ts` are queued via `pendingLlmClient`
+during active turns and applied at turn boundaries to isolate executing turns
+from mid-flight mutations.
+- `loadRom()` auto-attaches the active database profile if the controller is
+initialized with `UnconfiguredLlmClient`.
+
+- Historical run inspection APIs in src/web/routes/admin.ts provide paginated
+decision history, single-turn lookups, and audit log extraction
+(/runs/:id/errors, /runs/:id/trace) parsing failure modes (SCHEMA_EXHAUSTED,
+TRANSIENT_ERROR, STALL_HALTED) and prompt traces from audit.jsonl.
+
+- Enforces canonical ROM file path containment in `POST /api/admin/run/start`
+using `resolveCartridgePath`, failing closed with HTTP 400 on directory
+traversal attempts.
+
+- Admin CSRF origin validation (`src/web/auth.ts`) requires setting
+`PUBLIC_ORIGIN` or comma-separated `ALLOWED_ORIGINS` when accessed behind a
+reverse proxy.

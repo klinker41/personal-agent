@@ -2,15 +2,15 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-14T00:31:56.886846+00:00
+updated_at: 2026-09-15T00:31:51.031546+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
-## Architecture & Container Runtime
-- **Container Isolation:** `jklinker/antigravity-docker:latest` runs headless
-  as non-root `developer` via `gosu` with dynamic `PUID`/`PGID`, disabled
+## Container Runtime & Isolation
+- **Runtime Security:** `jklinker/antigravity-docker:latest` runs headless as
+  non-root `developer` via `gosu` with dynamic `PUID`/`PGID`, disabled
   passwordless sudo, and `umask 0002` across `conversations/`, `brain/`, and
   `annotations/`.
 - **Host Execution:** Employs an isolated SSH web terminal (`ttyd`) rather than
@@ -18,18 +18,17 @@ confidence: 0.95
 
 ## Configuration & Environment
 - **Networking & Ports:** Defaults to `AGY_PORT=4400` and `AGY_HUB_PORT=4402`
-  (passed via `--remote-control --hub-port` for deterministic hub discovery).
+  (passed to `agy --remote-control --hub-port` for deterministic discovery).
 - **Environment Flags:**
-  - *Auth & Host:* `RC_NAME`, `AUTH_PASSWORD`, `HOST_SSH_DIR`.
+  - *Access & Auth:* `RC_NAME`, `AUTH_PASSWORD`, `HOST_SSH_DIR`.
   - *Feature Toggles:* `ENABLE_IDE`, `ENABLE_TERMINAL` (default: `true`).
   - *Telemetry:* `BLOCK_TELEMETRY=true` (default; sinkholes telemetry to
     `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
-- **Storage & State:**
-  - Subcommand `setup` handles initial auth with mounted `~/.gemini`.
-  - `entrypoint.sh` initializes empty `$GEMINI_DIR/config/projects/` and purges
-    stale CSRF tokens.
-  - Runtime state (`antigravity_state.pbtxt`, `installation_uuid`, migrations)
-    and `cli.log` reside in `$GEMINI_DIR/antigravity-cli/`.
+- **Storage & State:** Subcommand `setup` handles initial auth with mounted
+  `~/.gemini`. `entrypoint.sh` initializes empty `$GEMINI_DIR/config/projects/`
+  and purges stale CSRF tokens. Runtime state (`antigravity_state.pbtxt`,
+  `installation_uuid`, migrations) and `cli.log` reside in
+  `$GEMINI_DIR/antigravity-cli/`.
 - **Default Policies:** `enableTerminalSandbox: true`,
   `nonWorkspaceFiles: ALLOW`, `autoExecutionPolicy:
   CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`, with sidebar navigation
@@ -41,19 +40,21 @@ confidence: 0.95
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
 - **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
-<truncated 1614 bytes>
-ists settings to
-  `~/.gemini/config/custom_models.json` with masked API keys.
-- **Activation & Routing (`proxy/translation-proxy.js`):**
-  - Conditionally enabled in `entrypoint.sh` only when custom models are
-    configured, bypassing the proxy for standard traffic to minimize failures.
-  - Model placeholders in `M500`-`M649` unregistered in `modelsManager` return
-    `null` immediately, properly routing built-in models (Claude, GPT-OSS)
-    directly to Google when Astra is active.
+  `/c/...`, disa
+<truncated 565 bytes>
+; persists settings to `~/.gemini/config/custom_models.json` with masked API
+  keys.
+
+## Translation Proxy & Transcoding
+- **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js
+  streaming transcoder (no LiteLLM dependency) conditionally enabled via
+  `entrypoint.sh` only when custom models are configured. Model placeholders in
+  `M500`-`M649` unregistered in `modelsManager` return `null` immediately,
+  properly routing built-in models (Claude, GPT-OSS) directly to Google when
+  Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):**
-  - `sanitizeToolCallArgs` provides provider-agnostic argument normalization
-    for unary and streaming calls, coercing stringified booleans and integers
-    into native types.
+  - `sanitizeToolCallArgs` normalizes arguments across unary and streaming
+    calls, coercing stringified booleans and integers into native types.
   - Strips `ArtifactMetadata` for files outside `.gemini/antigravity-cli/brain/`
     and synthesizes `ArtifactMetadata.UserFacing: false`.
   - Defaults `Overwrite: true` on `write_to_file` calls for non-artifact paths

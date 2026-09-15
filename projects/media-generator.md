@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-14T00:36:02.002494+00:00
+updated_at: 2026-09-15T00:00:39.374551+00:00
 confidence: 0.95
 ---
 
@@ -76,3 +76,8 @@ ng to an
     `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
   - Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
     unmocked fetch calls in `setupTests.ts`.
+
+- Default generative model identifiers are defined in shared/models.ts
+(DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
+DEFAULT_VIDEO_MODEL, DEFAULT_MUSIC_MODEL), standardized to use non-experimental
+Gemini and Lyria model names without the 'models/' prefix.

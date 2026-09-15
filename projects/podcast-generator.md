@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-14T00:34:29.472324+00:00
+updated_at: 2026-09-15T00:33:50.308939+00:00
 confidence: 0.95
 ---
 
@@ -13,34 +13,33 @@ confidence: 0.95
   (PostgreSQL, Redis, Celery, FastAPI, Nginx) into an `oven/bun:alpine`
   container running Bun, Hono, and FFmpeg for the React SPA, REST APIs,
   media streaming, and movie generation (`movieGemini.ts`, `moviePipeline.ts`,
-  `MovieStore`). Uses minimal dependencies (`hono`, `jsonwebtoken`,
+  `MovieStore`). Standardized on minimal dependencies (`hono`, `jsonwebtoken`,
   `cron-parser@4.9.0`), native `hono/cors`, `Bun.password`, and `bun test`.
 - **Filesystem Persistence & Tenancy**: Replaced database dependencies (`pg`,
-  migrations) with filesystem JSON persistence (`data/users.json`,
+  migrations) with filesystem JSON storage (`data/users.json`,
   `data/podcasts/`, `data/outputs/`), an in-process concurrency-limited
-  `JobQueue`, and `PodcastScheduler`. Manifests enforce tenancy via `user_id`
-  (`GET /api/podcasts` filters via `PodcastStore.list(user.id)`; episodes
-  inherit tenancy) and support `ad_reads?: string[] | null` edited in
-  `PodcastForm.tsx` and handled in `podcasts.ts`.
-  `EpisodeStore.autoDiscoverEpisodes` backfills missing `episode.json` on
-  `GET /api/podcasts/:id` (omitted from `GET /api/v1/podcasts/` to eliminate
-  listing latency).
-- **File Utilities & Security**: `fileStore.ts` provides atomic writes
+  `JobQueue`, and `PodcastScheduler`. Stamped manifests enforce tenancy via
+  `user_id` (`GET /api/podcasts` filters via `PodcastStore.list(user.id)`;
+  episodes inherit tenancy) and support `ad_reads?: string[] | null` via
+  `PodcastForm.tsx` and `podcasts.ts`. `EpisodeStore.autoDiscoverEpisodes`
+  backfills missing `episode.json` on `GET /api/podcasts/:id` (omitted from
+  listing routes to eliminate latency).
+- **File Utilities & Security**: `fileStore.ts` provides atomic file writes
   (`writeText`, `writeJson`), folder validation, date matching, and Unicode NFC
   normalization preserving `[\p{L}\p{N}\p{M}]` for diacritics. Audio and cover
-  streaming enforces `path.sep` boundaries and non-blocking
+  streaming endpoints enforce `path.sep` boundaries and non-blocking
   `Bun.file(path).exists()` checks against path traversal. Unified streaming
-  and route auth helpers.
+  and route authorization helpers.
 
 ## Media Pipeline, Integrations & Resilience
 - **Generation, Ads & Library Sync**: Synthesizes episodes via Gemini (script,
   1:1 cover art, multi-speaker TTS) and FFmpeg ID3v2 tagging. Distributes N ad
   reads evenly at fractional intervals `k / (N + 1)` across dialogue via
-  `formatAdReads()` in `generator.ts`. Resolves disc numbers via
-  `TITLE_TO_D
-<truncated 52 bytes>
-ck>` metadata
-  to `album.nfo` in `EXTERNAL_OUTPUTS_DIR`, and updates Jellyfin item metadata
+  `formatAdReads()` in `generator.ts`. Resolves disc numbers via title disc
+
+<truncated 41 bytes>
+ck>` metadata to `album.nfo` in
+  `EXTERNAL_OUTPUTS_DIR`, and updates Jellyfin item metadata
   (`POST /Items/{itemId}`) using an admin user ID resolved from `GET /Users`.
 - **Error Handling & Resilience**: Centralized HTTP exponential backoff in
   `postWithRetry` (`gemini.ts`) and standardized queue errors via `failJob` in
