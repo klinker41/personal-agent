@@ -2,7 +2,7 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-15T00:32:43.901702+00:00
+updated_at: 2026-09-16T00:33:12.194214+00:00
 confidence: 0.95
 ---
 
@@ -10,21 +10,21 @@ confidence: 0.95
 
 ## Architecture & Media Serving
 - **Stack & Assets**: Built on `oven/bun:alpine` with Hono and CLI `ffmpeg`,
-  using native `Bun.password`, `bun test`, and `app.request()`. Traversal-
-  secured `/assets/*` serves `generated_assets/` with fallback to
+  using native `Bun.password`, `bun test`, and `app.request()`.
+  Traversal-secured `/assets/*` serves `generated_assets/` with fallback to
   `frontend/dist/assets/`.
 
 ## Generation Pipeline & Continuity
 - **Orchestration & Rendering**: Orchestrated by `gemini-3.7-flash` with
-  `gemini-omni-1.1-flash` video generation. Stitches `chunks` -> `scene.mp4`
-  -> `movie.mp4` across quality tiers (360p Draft, 720p HD, 1080p FHD, 4K
-  UHD), skipping existing or upscaled chunks.
+  `gemini-omni-1.1-flash` video generation. Stitches `chunks` -> `scene.mp4` ->
+  `movie.mp4` across quality tiers (360p Draft, 720p HD, 1080p FHD, 4K UHD),
+  skipping existing or upscaled chunks.
 - **Plates & Camera Continuity**: Stage 4.8A creates concept plate prompts via
   `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
-  `generateSceneChunks` checks `camera_continuity` (`continuous` vs
-  `new_shot`); continuous takes (tracking, two-shots, split dialogue,
-  unbroken action) attach the previous chunk's `video.mp4` with temporal
-  cues as a multimodal reference.
+  `generateSceneChunks` checks `camera_continuity` (`continuous` vs `new_shot`);
+  continuous takes (tracking, two-shots, split dialogue, unbroken action)
+  attach the previous chunk's `video.mp4` with temporal cues as a
+  multimodal reference.
 
 ## Safety, Diagnostics & Serialization
 - **Safety & Reactive Sanitization**: `DEFAULT_SAFETY_SETTINGS` is set to
@@ -43,5 +43,5 @@ confidence: 0.95
 - **Role-Based Access Control (RBAC)**: Movies record creator IDs in
   `created_by`; standard users can only view their own movies
   (`created_by === user.id`). Admin access requires both `"role": "admin"`
-  and `"is_admin": true` in `data/users.json`; legacy or unspecified
-  accounts default to standard access.
+  and `"is_admin": true` in `data/users.json`; legacy or unspecified accounts
+  default to standard access.

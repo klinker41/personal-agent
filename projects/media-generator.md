@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-15T00:00:39.374551+00:00
+updated_at: 2026-09-16T00:36:42.935411+00:00
 confidence: 0.95
 ---
 
@@ -14,10 +14,23 @@ confidence: 0.95
   web service with JWT authentication, uniting cinematic movie generation,
   episodic podcast synthesis, and audiobook creation.
 - **RBAC & User Management**: Multi-user role-based access control requires an
-  admin role in users.json on disk to access and manage legacy creations.
+  admin role in `users.json` on disk to access and manage legacy creations.
 - **Workspace Tooling**: Root scripts coordinate build, lint, typecheck, and
   testing across workspaces using Bun and Vite. Backend tests run via
   `bun test`; frontend tests run via `vitest run`.
+
+## Model Configuration & Standards
+- **Model Identifiers**: Default generative model identifiers are centralized in
+  `shared/models.ts` and mirrored in `.env.example` across five constants:
+  `DEFAULT_TEXT_MODEL`, `DEFAULT_IMAGE_MODEL`, `DEFAULT_AUDIO_MODEL`,
+  `DEFAULT_VIDEO_MODEL`, and `DEFAULT_MUSIC_MODEL`.
+- **Model Selection & Updates**: Model selection policy strictly requires
+  non-experimental `gemini-*` models (or `lyria-*` for music) without the
+  `models/` prefix. Excludes experimental models (`exp`, `experimental`,
+  `latest`) while allowing preview releases. Tier rules mandate Flash for text,
+  audio, and video, and Pro for image generation. Automated updates via the
+  model updater sidecar commit locally and notify via Slack; pushing requires
+  explicit user approval.
 
 ## Media Pipelines
 - **Cinematic Movie Pipeline**:
@@ -26,20 +39,8 @@ confidence: 0.95
     setups/plates, Gemini Omni video generation with temporal continuity, and
     FFmpeg stitching with single-chunk regeneration and upscaling.
   - Camera continuity: In `movieGemini.ts`, scene chunking enforces
-    shot/reverse-shot rules where speaker alternations mandate `new_shot`.
-    Continuous shots (`camera_continuity: 'continuous'`) are reserved for
-    extended single-speaker dialogue exceeding chunk limits (10s or 18–20
-    words) or sustained shared staging.
-  - Video stitching: FFmpeg concat demuxer lists require quote escaping,
-    unique temporary file paths, and re-encode fallback handling for mismatched
-    stream parameters across chunks.
-- **Episodic Podcast Pipeline**:
-  - Multi-speaker synthesis: Synthesizes dialogue via Gemini TTS with celestial
-    voice profiles, ID3v2-tagged MP3 mastering, automated cron releases, and
-    RSS 2.0 feeds with iTunes tags.
-  - Speaker guidelines: In `formatSpeakerGuidelines`, one host must always
-    announce the podcast name at the start regar
-<truncated 3353 bytes>
+    sho
+<truncated 2297 bytes>
 ng to an
   offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
   responses, supporting both `token` and `auth_token` keys. Handles clean
@@ -76,8 +77,3 @@ ng to an
     `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
   - Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
     unmocked fetch calls in `setupTests.ts`.
-
-- Default generative model identifiers are defined in shared/models.ts
-(DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
-DEFAULT_VIDEO_MODEL, DEFAULT_MUSIC_MODEL), standardized to use non-experimental
-Gemini and Lyria model names without the 'models/' prefix.

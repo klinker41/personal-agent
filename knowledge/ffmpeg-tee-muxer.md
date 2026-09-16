@@ -2,7 +2,7 @@
 topic: ffmpeg-tee-muxer
 category: knowledge
 tags: [knowledge, ffmpeg-tee-muxer]
-updated_at: 2026-09-14T00:17:58.002010+00:00
+updated_at: 2026-09-16T00:01:02.937667+00:00
 confidence: 0.95
 ---
 
@@ -32,3 +32,7 @@ primary pipeline.
 - When streaming destinations are empty, directing output to a null sink or
 local test stream preserves pipeline lifecycle without exiting or dropping the
 ingest loop.
+
+- Multi-destination broadcasting via a single-pass FFmpeg `-f tee` pipeline
+requires adhering to the most restrictive endpoint codec; standard Twitch RTMP
+requires H.264 (AVC) and rejects H.265 (HEVC).

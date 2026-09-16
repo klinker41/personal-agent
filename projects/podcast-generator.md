@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-15T00:33:50.308939+00:00
+updated_at: 2026-09-16T00:35:04.308504+00:00
 confidence: 0.95
 ---
 
@@ -15,30 +15,29 @@ confidence: 0.95
   media streaming, and movie generation (`movieGemini.ts`, `moviePipeline.ts`,
   `MovieStore`). Standardized on minimal dependencies (`hono`, `jsonwebtoken`,
   `cron-parser@4.9.0`), native `hono/cors`, `Bun.password`, and `bun test`.
-- **Filesystem Persistence & Tenancy**: Replaced database dependencies (`pg`,
-  migrations) with filesystem JSON storage (`data/users.json`,
-  `data/podcasts/`, `data/outputs/`), an in-process concurrency-limited
-  `JobQueue`, and `PodcastScheduler`. Stamped manifests enforce tenancy via
-  `user_id` (`GET /api/podcasts` filters via `PodcastStore.list(user.id)`;
-  episodes inherit tenancy) and support `ad_reads?: string[] | null` via
-  `PodcastForm.tsx` and `podcasts.ts`. `EpisodeStore.autoDiscoverEpisodes`
-  backfills missing `episode.json` on `GET /api/podcasts/:id` (omitted from
-  listing routes to eliminate latency).
-- **File Utilities & Security**: `fileStore.ts` provides atomic file writes
+- **Filesystem Persistence & Manifests**: Replaced databases (`pg`, migrations)
+  with JSON storage (`data/users.json`, `data/podcasts/`, `data/outputs/`), an
+  in-process concurrency-limited `JobQueue`, and `PodcastScheduler`. Stamped
+  manifests enforce tenancy via `user_id` (`GET /api/podcasts` filters via
+  `PodcastStore.list(user.id)`; episodes inherit tenancy) and support optional
+  `ad_reads?: string[] | null` configured via `PodcastForm.tsx` and handled in
+  `podcasts.ts`. `EpisodeStore.autoDiscoverEpisodes` backfills missing
+  `episode.json` on `GET /api/podcasts/:id` (omitted from listings to prevent
+  latency bottlenecks).
+- **File Utilities & Security**: `fileStore.ts` centralizes atomic operations
   (`writeText`, `writeJson`), folder validation, date matching, and Unicode NFC
-  normalization preserving `[\p{L}\p{N}\p{M}]` for diacritics. Audio and cover
-  streaming endpoints enforce `path.sep` boundaries and non-blocking
+  normalization preserving `[\p{L}\p{N}\p{M}]` for diacritics. Media streaming
+  endpoints enforce `path.sep` boundaries and non-blocking
   `Bun.file(path).exists()` checks against path traversal. Unified streaming
-  and route authorization helpers.
+  and authorization helpers across backend routes.
 
 ## Media Pipeline, Integrations & Resilience
-- **Generation, Ads & Library Sync**: Synthesizes episodes via Gemini (script,
-  1:1 cover art, multi-speaker TTS) and FFmpeg ID3v2 tagging. Distributes N ad
-  reads evenly at fractional intervals `k / (N + 1)` across dialogue via
-  `formatAdReads()` in `generator.ts`. Resolves disc numbers via title disc
-
-<truncated 41 bytes>
-ck>` metadata to `album.nfo` in
+- **Generation, Ad Placement & Library Sync**: Synthesizes episodes via Gemini
+  (script, 1:1 cover art, multi-speaker TTS) and FFmpeg ID3v2 tagging.
+  Distributes N ad reads evenly at fractional intervals `k / (N + 1)` across
+  dialogue via `formatAdReads()` in `generator.ts`. Resolv
+<truncated 116 bytes>
+ends `<track>` metadata to `album.nfo` in
   `EXTERNAL_OUTPUTS_DIR`, and updates Jellyfin item metadata
   (`POST /Items/{itemId}`) using an admin user ID resolved from `GET /Users`.
 - **Error Handling & Resilience**: Centralized HTTP exponential backoff in
@@ -50,9 +49,9 @@ ck>` metadata to `album.nfo` in
 - **Deduplication & Title Matching**: `EpisodeStore.deduplicate()` in
   `backend/src/index.ts` prunes disk and memory duplicate records by audio path
   or title (preferring entries with `prompt_used` and longer scripts).
-  Pre-compiles multi-strategy regexes (exact, Unicode NFC, legacy stripped
-  ASCII) via `buildTitlePatterns`, guarding against empty regex patterns from
-  unsafe characters.
+  `buildTitlePatterns` pre-compiles multi-strategy regexes (exact, Unicode NFC,
+  legacy stripped ASCII), guarding against empty patterns from unsafe
+  characters.
 
 ## Configuration, Security & Testing
 - **Configuration & Alerts**: AI models (`TEXT_MODEL`, `IMAGE_MODEL`,

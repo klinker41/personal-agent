@@ -2,7 +2,7 @@
 topic: ffmpeg-drawtext-overlay
 category: knowledge
 tags: [knowledge, ffmpeg-drawtext-overlay]
-updated_at: 2026-09-14T00:39:18.432729+00:00
+updated_at: 2026-09-16T00:01:13.196437+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,7 @@ confidence: 0.95
   loaded via FreeType `drawtext` trigger expansion errors (`Stray % near ...`,
   exit code 234). Add `expansion=none` to filter parameters or sanitize `%`
   characters in the input.
+
+- When using FFmpeg drawtext filters driven by dynamic text files for real-time
+overlays, maintain an in-memory state cache to skip redundant disk writes when
+overlay content hasn't changed, significantly reducing synchronous disk I/O.

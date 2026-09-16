@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-15T00:31:51.031546+00:00
+updated_at: 2026-09-16T00:31:18.735085+00:00
 confidence: 0.95
 ---
 
@@ -10,9 +10,8 @@ confidence: 0.95
 
 ## Container Runtime & Isolation
 - **Runtime Security:** `jklinker/antigravity-docker:latest` runs headless as
-  non-root `developer` via `gosu` with dynamic `PUID`/`PGID`, disabled
-  passwordless sudo, and `umask 0002` across `conversations/`, `brain/`, and
-  `annotations/`.
+  non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled passwordless
+  sudo, and `umask 0002` across `conversations/`, `brain/`, and `annotations/`).
 - **Host Execution:** Employs an isolated SSH web terminal (`ttyd`) rather than
   mounting `/var/run/docker.sock`.
 
@@ -21,9 +20,9 @@ confidence: 0.95
   (passed to `agy --remote-control --hub-port` for deterministic discovery).
 - **Environment Flags:**
   - *Access & Auth:* `RC_NAME`, `AUTH_PASSWORD`, `HOST_SSH_DIR`.
-  - *Feature Toggles:* `ENABLE_IDE`, `ENABLE_TERMINAL` (default: `true`).
-  - *Telemetry:* `BLOCK_TELEMETRY=true` (default; sinkholes telemetry to
-    `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
+  - *Features & Telemetry:* `ENABLE_IDE`, `ENABLE_TERMINAL` (default: `true`);
+    `BLOCK_TELEMETRY=true` (default; sinkholes telemetry to `0.0.0.0` via
+    `/etc/hosts` and sets OpenTelemetry opt-out variables).
 - **Storage & State:** Subcommand `setup` handles initial auth with mounted
   `~/.gemini`. `entrypoint.sh` initializes empty `$GEMINI_DIR/config/projects/`
   and purges stale CSRF tokens. Runtime state (`antigravity_state.pbtxt`,
@@ -40,9 +39,9 @@ confidence: 0.95
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
 - **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
-  `/c/...`, disa
-<truncated 565 bytes>
-; persists settings to `~/.gemini/config/custom_models.json` with masked API
+  `/c/...`, disables proxy bu
+<truncated 529 bytes>
+ists settings to `~/.gemini/config/custom_models.json` with masked API
   keys.
 
 ## Translation Proxy & Transcoding
@@ -74,7 +73,8 @@ confidence: 0.95
     `PATH`, `PLUGIN` badge, and isolated config resets.
 
 ## Testing & Quality
-- **Test Suite:** Native Node test runner (`node --test tests/*.js`).
-- **State Isolation:** `tests/test-sidecar-manager.js` cleans up mock
-  environment variables and filesystem fixtures in `finally` blocks to prevent
-  CSRF token or state leakage between suites.
+- **Test Suite & Isolation:** Native Node test runner
+  (`node --test tests/*.js`). Mock environment variables and filesystem
+  fixtures are cleaned up in `finally` blocks (e.g.,
+  `tests/test-sidecar-manager.js`) to prevent CSRF token or state leakage
+  between suites.
