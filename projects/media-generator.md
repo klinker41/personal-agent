@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-16T00:36:42.935411+00:00
+updated_at: 2026-09-17T00:00:19.718522+00:00
 confidence: 0.95
 ---
 
@@ -77,3 +77,7 @@ ng to an
     `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
   - Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
     unmocked fetch calls in `setupTests.ts`.
+
+- Default generative model identifiers are centralized in shared/models.ts via
+DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
+DEFAULT_VIDEO_MODEL, and DEFAULT_MUSIC_MODEL.
