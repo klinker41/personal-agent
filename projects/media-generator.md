@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-17T00:00:19.718522+00:00
+updated_at: 2026-09-18T00:01:03.880592+00:00
 confidence: 0.95
 ---
 
@@ -81,3 +81,6 @@ ng to an
 - Default generative model identifiers are centralized in shared/models.ts via
 DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
 DEFAULT_VIDEO_MODEL, and DEFAULT_MUSIC_MODEL.
+
+- Default AI model IDs across text, image, audio, video, and music generation
+are centralized in shared/models.ts and mirrored in .env.example.

@@ -2,7 +2,7 @@
 topic: llm-plays-pokemon
 category: project
 tags: [project, llm-plays-pokemon]
-updated_at: 2026-09-16T00:38:40.574076+00:00
+updated_at: 2026-09-18T00:01:10.070654+00:00
 confidence: 0.95
 ---
 
@@ -77,3 +77,9 @@ hitecture & Mock Infrastructure (`tests/`)
     (`/tmp/tier*-e2e-*`) and Unix sockets to prevent disk leaks.
   - Asynchronous rejection assertions must explicitly await
     `expect(promise).rejects` to prevent vacuous passes.
+
+- Stream video recordings in `src/broadcast/recording.ts` are formatted as
+`YYYY-MM-DD_HH-mm-ss_<romname>.mkv` with date/time prefixes followed by
+lowercase normalized ROM names.
+- Recording collisions in `/recordings` are handled via sequential counter
+suffixes (e.g., `-1`, `-2`).

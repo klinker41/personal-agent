@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-17T00:30:58.553627+00:00
+updated_at: 2026-09-18T00:31:12.277690+00:00
 confidence: 0.95
 ---
 
@@ -39,9 +39,10 @@ confidence: 0.95
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
 - **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
-  `/c/...`, disables proxy buffering (`X-Accel-Bufferi
-<truncated 504 bytes>
-ists settings to `~/.gemini/config/custom_models.json` with masked API
+  `/c/...`, disables proxy buffering (`X-Accel-
+<truncated 434 bytes>
+roviders:** Managed by `proxy/lib/models-manager.js` via `/models`
+  UI; persists settings to `~/.gemini/config/custom_models.json` with masked API
   keys.
 
 ## Translation Proxy & Transcoding
@@ -51,13 +52,12 @@ ists settings to `~/.gemini/config/custom_models.json` with masked API
   `M500`-`M649` unregistered in `modelsManager` return `null` immediately,
   properly routing built-in models (Claude, GPT-OSS) directly to Google when
   Astra is active.
-- **Argument Transcoding (`proxy/lib/transcoder.js`):**
-  - `sanitizeToolCallArgs` normalizes arguments across unary and streaming
-    calls, coercing stringified booleans and integers into native types.
-  - Strips `ArtifactMetadata` for files outside `.gemini/antigravity-cli/brain/`
-    and synthesizes `ArtifactMetadata.UserFacing: false`.
-  - Defaults `Overwrite: true` on `write_to_file` calls for non-artifact paths
-    when omitted by third-party models to prevent writing failures.
+- **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
+  normalizes arguments across unary and streaming calls, coercing stringified
+  booleans and integers into native types. Strips `ArtifactMetadata` outside
+  `.gemini/antigravity-cli/brain/` (synthesizing `UserFacing: false`) and
+  defaults `Overwrite: true` on non-artifact `write_to_file` calls when omitted
+  by third-party models.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - **Engine & Supervisor:** Authenticated `/sidecars` REST API/UI manages
