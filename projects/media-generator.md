@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-18T00:01:03.880592+00:00
+updated_at: 2026-09-19T00:33:14.465283+00:00
 confidence: 0.95
 ---
 
@@ -32,55 +32,58 @@ confidence: 0.95
   model updater sidecar commit locally and notify via Slack; pushing requires
   explicit user approval.
 
-## Media Pipelines
-- **Cinematic Movie Pipeline**:
-  - 7-stage workflow: Prompting, plot formulation, screenplay breakdown,
-    character casting with reference portraits, scene chunking with camera
-    setups/plates, Gemini Omni video generation with temporal continuity, and
-    FFmpeg stitching with single-chunk regeneration and upscaling.
-  - Camera continuity: In `movieGemini.ts`, scene chunking enforces
-    sho
-<truncated 2297 bytes>
-ng to an
+## Media Pipelines & Storage
+- **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
+  formulation, screenplay breakdown, character casting with reference
+  portraits, scene chunking with camera setups/plates, Gemini Omni video
+  generation with temporal continuity, and FFmpeg stitching with single-chunk
+  regeneration and upscaling. In `movieGemini.ts`, scene chunking enforces
+  shot/reverse-shot rules where speaker alternations mandate `new_shot`.
+  Continuous shots are reserved for extended single-speaker dialogue exceeding
+  chunk limits (10s or 18–20 words) or sustained shared staging. Concat demuxer
+  lists require quote escaping, temp paths, and re-encode fallback handling.
+- **Episodic Podcast Pipeline**: Synthesizes multi-speaker dialogue via Gemini
+  TTS with celestial voice profiles, ID3v2-tagged MP3 mastering, automated cron
+  releases, and RSS 2.0 feeds with iTunes tags. In
+  `formatSpeakerGuidelines`, one host must always announce the podcast name at
+  the start regardless of banter setting. Theme music uses Google Lyria 3 Clip
+  (`lyria-3-clip-preview`), stored in `data/podcasts/music/` and served via HTTP
+  Range, with 15s intro and 30s outro fades.
+- **Asset Storage & Environment**: Podcast assets are consolidated under
+  `data/podcasts/` (`episodes`, `outputs`, `speaker_previews`), eliminating
+  `OUTPUTS_DIR` and legacy fallbacks. `RESERVED_PODCAST_DIRS` in `fileStore.ts`
+  prevents collisions with podcast UUID folders. `EXTERNAL_OUTPUTS_DIR` defaults
+  to `/app/data/outputs-external` in Docker and is disabled if unset.
+
+## Frontend & UI Architecture
+- **Auth Resilience & Stream Lifecycle**: `AuthContext` preserves sessions
+  during network outages and 5xx errors using decoded JWT data (switching to an
   offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
   responses, supporting both `token` and `auth_token` keys. Handles clean
   `EventSource` SSE stream termination on unmount and disconnect.
-- **Dashboard Layout**:
-  - Desktop (`lg:`): Asymmetric 2-column layout (65% creations feed, 35%
-    operations sidebar).
-  - Mobile (`<sm`): Collapses to a single column with a 2x2 telemetry grid.
-  - Components: KPI cards (`DashboardCards.tsx`), an in-flight pipeline banner
-    (`InFlightPipelineBanner.tsx`) with visualizer links, and creations feed
-    (`MediaCreationsFeed.tsx`). Reference screenshots stored in `docs/images/`
-    (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
+- **Dashboard Layout**: Desktop (`lg:`): Asymmetric 2-column layout (65%
+  creations feed, 35% operations sidebar); mobile (`<sm`): Single column with a
+  2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`), an
+  in-flight pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer
+  links, and creations feed (`MediaCreationsFeed.tsx`). Reference screenshots
+  stored in `docs/images/` (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
 - **Podcasts List UI**: Mobile layout replaces nested container padding
   (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards with
-  top-right status toggles, metadata badges, and expanded bottom action
-  footers.
-- **Form Validation & State Immutability**:
-  - `PodcastForm` validates against empty or whitespace-only titles across all
-    submit triggers prior to invoking backend APIs.
-  - `StepInspector` preserves prop immutability during prompt editing,
-    resolution switching, and video regeneration by dispatching object copies
-    rather than mutating props in place.
+  top-right status toggles, metadata badges, and expanded bottom action footers.
+- **Form Validation & State Immutability**: `PodcastForm` validates against
+  empty or whitespace-only titles across all submit triggers prior to invoking
+  backend APIs. `StepInspector` preserves prop immutability during prompt
+  editing, resolution switching, and video regeneration by dispatching object
+  copies rather than mutating props in place.
 - **UI Cleanup**: Pruned duplicate `Dashboard.tsx` and legacy `LoginPage.tsx`,
   migrating test coverage to `pages/MoviesList.tsx`.
 
 ## Performance & Testing
-- **Performance Optimizations**:
-  - Replaced $O(N \times M)$ per-podcast disk scans in `PodcastStore.list()`
-    with a single-pass active generation `Set`.
-  - Added a 5-second mutation-invalidated in-memory cache to `EpisodeStore`.
-- **Test Coverage & Known Issues**:
-  - Critical test coverage gaps exist in `JobQueue`
-    (`backend/src/services/queue.ts`) and startup cleanup
-    `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
-  - Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
-    unmocked fetch calls in `setupTests.ts`.
-
-- Default generative model identifiers are centralized in shared/models.ts via
-DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
-DEFAULT_VIDEO_MODEL, and DEFAULT_MUSIC_MODEL.
-
-- Default AI model IDs across text, image, audio, video, and music generation
-are centralized in shared/models.ts and mirrored in .env.example.
+- **Performance Optimizations**: Replaced $O(N \times M)$ per-podcast disk scans
+  in `PodcastStore.list()` with a single-pass active generation `Set`. Added a
+  5-second mutation-invalidated in-memory cache to `EpisodeStore`.
+- **Test Coverage & Known Issues**: Critical test coverage gaps exist in
+  `JobQueue` (`backend/src/services/queue.ts`) and startup cleanup
+  `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`). Frontend
+  Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to unmocked
+  fetch calls in `setupTests.ts`.

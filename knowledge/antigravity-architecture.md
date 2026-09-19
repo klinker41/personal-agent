@@ -2,7 +2,7 @@
 topic: antigravity-architecture
 category: knowledge
 tags: [knowledge, antigravity-architecture]
-updated_at: 2026-09-18T00:38:15.227306+00:00
+updated_at: 2026-09-19T00:37:35.669656+00:00
 confidence: 0.95
 ---
 
@@ -17,17 +17,15 @@ confidence: 0.95
 - **Cloud Code Protocol & Translation Proxy**: `agy` calls internal Cloud Code
   PA endpoints (`/v1internal:streamGenerateContent` and
   `/v1internal:fetchAvailableModels`) via HTTP/2 Protobuf
-  (`JetskiService`/`GetChatMessageRequest`). Streaming SSE chunks must be
-  wrapped in `{"response": {"candidates": [...]}}` rather than standard Gemini
-  AI Studio payloads, requiring a bidirectional translation proxy for external
-  LLMs (OpenAI, Anthropic).
-- **Model Routing & Stream Execution**: Built-in models use placeholder IDs in
-  the M500–M649 range (e.g., M599, M605). Proxies must route unregistered IDs
-  in this range to Cloud Code rather than custom sessions. `agy` expects a
-  single unified stream (`thought -> text -> functionCall`) with tools attached
-  nearly every turn; split-model routing or fallback delegation (e.g., to
-  Gemini Flash) bypasses model reasoning and adds severe latency.
-- **Proxy Tool Argument Sanitization**: Because external LLMs often omit
-  required fields, the translation proxy must sanitize tool payloads:
-  `write_to_file` requires `Overwrite: true` to overwrite files and mandates
-  `UserFacing` whenever `ArtifactMetadata` is provided.
+  (`JetskiService`/`GetChatMessageRequest`). External LLMs (OpenAI, Anthropic)
+  require a bidirectional translation proxy that wraps streaming SSE chunks in
+  `{"response": {"candidates": [...]}}` (not standard Gemini AI Studio
+  payloads) and sanitizes arguments when external models omit required fields
+  (e.g., enforcing `Overwrite: true` to overwrite files and mandating
+  `UserFacing` in `ArtifactMetadata` for `write_to_file`).
+- **Model Routing & Stream Execution**: Built-in models use placeholder IDs
+  in the M500–M649 range (e.g., M599, M605); proxies must route unregistered
+  IDs in this range to Cloud Code rather than custom sessions. `agy` expects
+  a single unified stream (`thought -> text -> functionCall`) with tools
+  attached nearly every turn; split-model routing or fallback delegation
+  (e.g., to Gemini Flash) bypasses model reasoning and adds severe latency.

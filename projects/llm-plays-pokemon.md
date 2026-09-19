@@ -2,7 +2,7 @@
 topic: llm-plays-pokemon
 category: project
 tags: [project, llm-plays-pokemon]
-updated_at: 2026-09-18T00:01:10.070654+00:00
+updated_at: 2026-09-19T00:37:14.047687+00:00
 confidence: 0.95
 ---
 
@@ -33,16 +33,15 @@ confidence: 0.95
 
 ## Emulator Subsystem & IPC (`src/emulator/`)
 
+- **PyBoy vs gen1recomp**: Evaluated gen1recomp as an alternative engine;
+  retained PyBoy for strict requirements of deterministic frame-freezing,
+  cycle-accurate save-state checkpointing, and headless containerized execution.
 - **Dual Unix Domain Socket IPC**:
   - *Control Socket (`/tmp/llm-pokemon-control.sock`)*: Bidirectional NDJSON RPC
     (`load_rom`, `execute_batch`, `capture_screenshot`, state management).
-    Unlinks stale sockets on startup. Preserves incoming request correlation
-    IDs on errors (ID 0 reserved strictly for unparseable payloads); provides
-    camelCase state metrics (`totalFrames`, `currentTicks`) alongside legacy
-    snake_case.
-  - *Media Socket (`/tmp/llm-pokemon-media.sock`)*: Fixed 16-byte `PKMN` binary
-    header streaming
-<truncated 5916 bytes>
+    Unlinks stale sockets on startup. Preserves request correlation IDs on
+    errors (ID 0 reserved strictly for unpar
+<truncated 3005 bytes>
 hitecture & Mock Infrastructure (`tests/`)
 
 - **Tiered Opaque-Box Methodology**: 32+ test files executing under `bun test`
@@ -77,9 +76,3 @@ hitecture & Mock Infrastructure (`tests/`)
     (`/tmp/tier*-e2e-*`) and Unix sockets to prevent disk leaks.
   - Asynchronous rejection assertions must explicitly await
     `expect(promise).rejects` to prevent vacuous passes.
-
-- Stream video recordings in `src/broadcast/recording.ts` are formatted as
-`YYYY-MM-DD_HH-mm-ss_<romname>.mkv` with date/time prefixes followed by
-lowercase normalized ROM names.
-- Recording collisions in `/recordings` are handled via sequential counter
-suffixes (e.g., `-1`, `-2`).

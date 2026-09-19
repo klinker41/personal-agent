@@ -2,17 +2,17 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-18T00:31:12.277690+00:00
+updated_at: 2026-09-19T00:31:09.992073+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Container Runtime & Isolation
-- **Runtime Security & Isolation:** `jklinker/antigravity-docker:latest` runs
-  headless as non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
-  passwordless sudo, and `umask 0002` across `conversations/`, `brain/`, and
-  `annotations/`). Employs an isolated SSH web terminal (`ttyd`) rather than
+- **Security & Execution:** Headless `jklinker/antigravity-docker:latest` runs
+  as non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
+  passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
+  `annotations/`). Employs an SSH web terminal gateway (`ttyd`) rather than
   mounting `/var/run/docker.sock`.
 
 ## Configuration & Environment
@@ -34,13 +34,13 @@ confidence: 0.95
   shortcuts for VS Code IDE and Host Terminal.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
-- **Security:** Enforces 256-bit session tokens, in-memory session cleanup, IP
-  rate-limiting on `/__auth/login`, 16 KB request body limit, path traversal
+- **Security & Hardening:** Enforces 256-bit session tokens, in-memory session
+  cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path traversal
   protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
-- **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` for `/` and
-  `/c/...`, disables proxy buffering (`X-Accel-
-<truncated 434 bytes>
+- **Reverse Proxy & Protocol:** Enforces `useWebSocket=true` for `/` and
+  `/c/...`, disables proxy buffering (`X-Accel-Buffering
+<truncated 425 bytes>
 roviders:** Managed by `proxy/lib/models-manager.js` via `/models`
   UI; persists settings to `~/.gemini/config/custom_models.json` with masked API
   keys.
@@ -48,8 +48,8 @@ roviders:** Managed by `proxy/lib/models-manager.js` via `/models`
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js
   streaming transcoder (no LiteLLM dependency) conditionally enabled via
-  `entrypoint.sh` only when custom models are configured. Model placeholders in
-  `M500`-`M649` unregistered in `modelsManager` return `null` immediately,
+  `entrypoint.sh` only when custom models are configured. Model placeholders
+  in `M500`-`M649` unregistered in `modelsManager` return `null` immediately,
   properly routing built-in models (Claude, GPT-OSS) directly to Google when
   Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
