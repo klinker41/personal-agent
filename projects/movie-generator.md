@@ -2,7 +2,7 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-19T00:32:14.309367+00:00
+updated_at: 2026-09-20T00:32:00.374307+00:00
 confidence: 0.95
 ---
 
@@ -15,7 +15,7 @@ confidence: 0.95
   `frontend/dist/assets/`.
 
 ## Generation Pipeline & Continuity
-- **Orchestration & Stitching**: Orchestrated by `gemini-3.7-flash` with
+- **Pipeline & Quality Tiers**: Orchestrated by `gemini-3.7-flash` with
   `gemini-omni-1.1-flash` video generation. Stitches `chunks` -> `scene.mp4` ->
   `movie.mp4` across quality tiers (360p Draft, 720p HD, 1080p FHD, 4K UHD),
   skipping existing or upscaled chunks.
@@ -23,16 +23,16 @@ confidence: 0.95
   via `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
   `generateSceneChunks` checks `camera_continuity` (`continuous` vs
   `new_shot`); continuous takes (tracking, two-shots, split dialogue, unbroken
-  action) attach the previous chunk's `video.mp4` with temporal cues as a
+  action) attach the prior chunk's `video.mp4` with temporal cues as a
   multimodal reference.
 
 ## Safety, Diagnostics & Serialization
-- **Safety & Sanitization**: `DEFAULT_SAFETY_SETTINGS` enforces
+- **Safety & Reactive Sanitization**: `DEFAULT_SAFETY_SETTINGS` enforces
   `BLOCK_ONLY_HIGH` across all categories (including
   `HARM_CATEGORY_CIVIC_INTEGRITY`). Prompts run raw first; failures or
-  `PROHIBITED_CONTENT` trigger reactive Flash sanitization
-  (`sanitizeSceneContent` / `sanitizeAndFixPrompt`), saving revised `setting`
-  and `action_summary` to `prompt.txt` and `chunk_manifest.json`.
+  `PROHIBITED_CONTENT` trigger Flash sanitization (`sanitizeSceneContent` /
+  `sanitizeAndFixPrompt`), saving revised `setting` and `action_summary` to
+  `prompt.txt` and `chunk_manifest.json`.
 - **Diagnostics & Formatting**: On empty responses, `extractGeminiResponseText`
   (`backend/src/utils/jsonParser.ts`) inspects `finishReason`, `safetyRatings`,
   and `blockReason`. `formatTimelineBeat` and `formatTimelineAndAudio`

@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-19T00:33:14.465283+00:00
+updated_at: 2026-09-20T00:32:42.759256+00:00
 confidence: 0.95
 ---
 
@@ -23,14 +23,14 @@ confidence: 0.95
 - **Model Identifiers**: Default generative model identifiers are centralized in
   `shared/models.ts` and mirrored in `.env.example` across five constants:
   `DEFAULT_TEXT_MODEL`, `DEFAULT_IMAGE_MODEL`, `DEFAULT_AUDIO_MODEL`,
-  `DEFAULT_VIDEO_MODEL`, and `DEFAULT_MUSIC_MODEL`.
-- **Model Selection & Updates**: Model selection policy strictly requires
-  non-experimental `gemini-*` models (or `lyria-*` for music) without the
-  `models/` prefix. Excludes experimental models (`exp`, `experimental`,
-  `latest`) while allowing preview releases. Tier rules mandate Flash for text,
-  audio, and video, and Pro for image generation. Automated updates via the
-  model updater sidecar commit locally and notify via Slack; pushing requires
-  explicit user approval.
+  `DEFAULT_VIDEO_MODEL`, and `DEFAULT_MUSIC_MODEL`. Identifiers have the
+  `models/` prefix stripped.
+- **Model Selection & Updates**: Policy strictly requires non-experimental
+  `gemini-*` models (or `lyria-*` for music), excluding experimental tags
+  (`exp`, `experimental`, `latest`) while permitting preview releases. Tier
+  rules mandate Flash for text, audio, and video, and Pro for image generation.
+  Automated updates via the model updater sidecar commit locally and notify via
+  Slack; pushing requires explicit user approval.
 
 ## Media Pipelines & Storage
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
@@ -38,26 +38,9 @@ confidence: 0.95
   portraits, scene chunking with camera setups/plates, Gemini Omni video
   generation with temporal continuity, and FFmpeg stitching with single-chunk
   regeneration and upscaling. In `movieGemini.ts`, scene chunking enforces
-  shot/reverse-shot rules where speaker alternations mandate `new_shot`.
-  Continuous shots are reserved for extended single-speaker dialogue exceeding
-  chunk limits (10s or 18–20 words) or sustained shared staging. Concat demuxer
-  lists require quote escaping, temp paths, and re-encode fallback handling.
-- **Episodic Podcast Pipeline**: Synthesizes multi-speaker dialogue via Gemini
-  TTS with celestial voice profiles, ID3v2-tagged MP3 mastering, automated cron
-  releases, and RSS 2.0 feeds with iTunes tags. In
-  `formatSpeakerGuidelines`, one host must always announce the podcast name at
-  the start regardless of banter setting. Theme music uses Google Lyria 3 Clip
-  (`lyria-3-clip-preview`), stored in `data/podcasts/music/` and served via HTTP
-  Range, with 15s intro and 30s outro fades.
-- **Asset Storage & Environment**: Podcast assets are consolidated under
-  `data/podcasts/` (`episodes`, `outputs`, `speaker_previews`), eliminating
-  `OUTPUTS_DIR` and legacy fallbacks. `RESERVED_PODCAST_DIRS` in `fileStore.ts`
-  prevents collisions with podcast UUID folders. `EXTERNAL_OUTPUTS_DIR` defaults
-  to `/app/data/outputs-external` in Docker and is disabled if unset.
-
-## Frontend & UI Architecture
-- **Auth Resilience & Stream Lifecycle**: `AuthContext` preserves sessions
-  during network outages and 5xx errors using decoded JWT data (switching to an
+  shot/reverse-s
+<truncated 1279 bytes>
+ring network outages and 5xx errors using decoded JWT data (switching to an
   offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
   responses, supporting both `token` and `auth_token` keys. Handles clean
   `EventSource` SSE stream termination on unmount and disconnect.

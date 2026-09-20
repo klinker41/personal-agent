@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-19T00:31:41.179168+00:00
+updated_at: 2026-09-20T00:31:18.676258+00:00
 confidence: 1.0
 ---
 
@@ -22,7 +22,7 @@ skills via `vendor/agent-skills`.
   (`rules/no-secrets-in-commits.md`), mandatory `self-review-commit` loop
   (`Model: "pro"` reviewer), and user approval before `git push`
   (`rules/git-push.md`).
-- **Coding Standards:** Subagents for coding/tests use `Model: "flash"`
+- **Coding & Subagents:** Coding and test subagents use `Model: "flash"`
   (`rules/coding-subagent-model.md`). Enforce kebab-case rule and skill names,
   minimal non-duplicative diffs, README updates, and strict 80-character
   Markdown wrapping.
@@ -32,34 +32,32 @@ skills via `vendor/agent-skills`.
   (`profile.md`, `index.md`, `projects/`, `knowledge/`, and tiered
   `daily/`/`monthly/`/`yearly/` chronicles), accessed via `lookup-memory` and
   `save-memory` skills.
-- **Pipeline & Maintenance:** Turn-1 memory injection via
-  `hooks/inject_memory.py` (`initialNumSteps == 0`, `invocationNum == 1`,
-  inspecting transcripts). Nightly schedule: Dreamer at 00:00 (tracks step
-  watermarks in `state.json`, checks topics via
-  `memory_utils.get_existing_topics`, skips subagents and `rules/*.md`, purges
-  ephemeral sessions); tiered compaction at 00:30; Git sync at 01:00 local
-  time. LLM extraction/synthesis/compaction runs via `agentapi`; deterministic
-  Python scrubs secrets and manages Git sync.
-- **Shared Utilities (`utils/memory_utils.py`):**
-  - *AgentApiBridge:* Subprocess runner for `agentapi`. Strips caller env
-    vars (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
-    `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch, extracts web hub
-    CSRF tokens (`window.__APP_CONFIG__.csrfToken`), and retries on auth
-    failure.
-  - *Runtime & Project Resolution:* Resolves `~/.gemini/config/projects/` by
-    name, UUID, or path (defaults to `personal-agent`
-    `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc` or `$ANTIGRAVITY_PROJECT_ID`);
-    recovers stale `ANTIGRAVITY_LS_ADDRESS` and CSRF tokens from active
-    `cli.log` and runtime state.
+- **Pipeline & Maintenance:**
+  - *Turn-1 Injection:* `hooks/inject_memory.py` injects context when
+    `initialNumSteps == 0` and `invocationNum == 1` from transcripts.
+  - *Nightly Lifecycle (Local Time):* 00:00 Dreamer (tracks step watermarks
+    in `state.json`, checks topics via `memory_utils.get_existing_topics`,
+    skips subagents and `rules/*.md`, purges ephemeral sessions); 00:30 tiered
+    compaction; 01:00 Git sync. LLM operations run via `agentapi`;
+    deterministic Python scrubs secrets and manages Git sync.
+- **Shared Utilities (`utils/memory_utils.py`):** Subprocess runner for
+  `agentapi` (`AgentApiBridge`) with auth retries. Strips caller env vars
+  (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
+  `ANTIGRAVITY_TRAJECTORY_ID`) to prevent project mismatch. Resolves target
+  projects in `~/.gemini/config/projects/` by name, UUID, or path (defaults to
+  `personal-agent` `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc` or
+  `$ANTIGRAVITY_PROJECT_ID`). Recovers language server address
+  (`ANTIGRAVITY_LS_ADDRESS`) and web hub CSRF tokens
+  (`window.__APP_CONFIG__.csrfToken`) from active `cli.log` and runtime state.
 
 ## Sidecars & Integrations
 - **Scheduled Tasks (`sidecar.json`):** Recurring `agentapi new-conversation`
-  tasks with `--model` support. Runs `model-updater` (Gemini defaults daily at
+  tasks with `--model` support: `model-updater` (Gemini defaults daily at
   15:00 UTC) and `submodule-updater` (`vendor/agent-skills` Mondays at
   15:00 UTC).
-- **Slack Integration:** `sidecars/slack-chat/` connects Slack Socket Mode to
-  `agentapi` via `AgentApiBridge`, mapping `thread_ts` to conversation IDs
-  with `conversations_replies` backfill. Verified by `prep-slack-chat-sidecar`
-  (`SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`); `notify-the-user` sends alerts.
+- **Slack Integration (`sidecars/slack-chat/`):** Connects Slack Socket Mode to
+  `agentapi` via `AgentApiBridge`, mapping `thread_ts` to conversation IDs with
+  `conversations_replies` backfill. Verified by `prep-slack-chat-sidecar`
+  (`SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`); alerts sent via `notify-the-user`.
 - **External AI Skills:** `ollama-chat` queries Gemma models hosted at
   `https://ollama.klinker-cabin.computer` using `$OLLAMA_API_KEY`.
