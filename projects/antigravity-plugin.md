@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-20T00:31:18.676258+00:00
+updated_at: 2026-09-21T00:32:00.486447+00:00
 confidence: 1.0
 ---
 
@@ -17,15 +17,15 @@ skills via `vendor/agent-skills`.
 - **Web Applications:** Bun runtime/package manager, Hono framework, minimal
   up-to-date dependencies (`rules/web-app-architecture.md`), and port 4401 via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
-- **Git & Review:** Passing non-verbose tests (`rules/non-verbose-tests.md`,
-  `rules/tests-must-pass-before-commit.md`), zero secrets in diffs
-  (`rules/no-secrets-in-commits.md`), mandatory `self-review-commit` loop
-  (`Model: "pro"` reviewer), and user approval before `git push`
-  (`rules/git-push.md`).
+- **Git & Review:** Tests must pass non-verbosely before committing
+  (`rules/non-verbose-tests.md`, `rules/tests-must-pass-before-commit.md`), zero
+  secrets in diffs (`rules/no-secrets-in-commits.md`), mandatory
+  `self-review-commit` loop (`Model: "pro"` reviewer), and user approval before
+  `git push` (`rules/git-push.md`).
 - **Coding & Subagents:** Coding and test subagents use `Model: "flash"`
   (`rules/coding-subagent-model.md`). Enforce kebab-case rule and skill names,
-  minimal non-duplicative diffs, README updates, and strict 80-character
-  Markdown wrapping.
+  minimal non-duplicative diffs, README updates on architectural changes, and
+  strict 80-character Markdown wrapping.
 
 ## Memory System (`sidecars/memory-daemon`)
 - **Structure & Access:** Progressive disclosure store at `$MEMORY_DIRECTORY`
@@ -35,9 +35,9 @@ skills via `vendor/agent-skills`.
 - **Pipeline & Maintenance:**
   - *Turn-1 Injection:* `hooks/inject_memory.py` injects context when
     `initialNumSteps == 0` and `invocationNum == 1` from transcripts.
-  - *Nightly Lifecycle (Local Time):* 00:00 Dreamer (tracks step watermarks
-    in `state.json`, checks topics via `memory_utils.get_existing_topics`,
-    skips subagents and `rules/*.md`, purges ephemeral sessions); 00:30 tiered
+  - *Nightly Lifecycle (Local Time):* 00:00 Dreamer (tracks step watermarks in
+    `state.json`, checks topics via `memory_utils.get_existing_topics`, skips
+    subagents and `rules/*.md`, purges ephemeral sessions); 00:30 tiered
     compaction; 01:00 Git sync. LLM operations run via `agentapi`;
     deterministic Python scrubs secrets and manages Git sync.
 - **Shared Utilities (`utils/memory_utils.py`):** Subprocess runner for

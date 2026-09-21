@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-20T00:32:42.759256+00:00
+updated_at: 2026-09-21T00:33:37.264695+00:00
 confidence: 0.95
 ---
 
@@ -16,31 +16,31 @@ confidence: 0.95
 - **RBAC & User Management**: Multi-user role-based access control requires an
   admin role in `users.json` on disk to access and manage legacy creations.
 - **Workspace Tooling**: Root scripts coordinate build, lint, typecheck, and
-  testing across workspaces using Bun and Vite. Backend tests run via
-  `bun test`; frontend tests run via `vitest run`.
+  testing across workspaces using Bun and Vite (`bun test` for backend,
+  `vitest run` for frontend).
 
 ## Model Configuration & Standards
-- **Model Identifiers**: Default generative model identifiers are centralized in
-  `shared/models.ts` and mirrored in `.env.example` across five constants:
-  `DEFAULT_TEXT_MODEL`, `DEFAULT_IMAGE_MODEL`, `DEFAULT_AUDIO_MODEL`,
-  `DEFAULT_VIDEO_MODEL`, and `DEFAULT_MUSIC_MODEL`. Identifiers have the
-  `models/` prefix stripped.
+- **Model Identifiers & Defaults**: Default generative model identifiers are
+  centralized in `shared/models.ts` and mirrored in `.env.example` across five
+  constants without `models/` prefix: `DEFAULT_TEXT_MODEL` (`gemini-3.8-flash`),
+  `DEFAULT_IMAGE_MODEL` (`gemini-3-pro-image`), `DEFAULT_AUDIO_MODEL`
+  (`gemini-3.1-flash-tts-preview`), `DEFAULT_VIDEO_MODEL`
+  (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
+  (`lyria-3-clip-preview`).
 - **Model Selection & Updates**: Policy strictly requires non-experimental
   `gemini-*` models (or `lyria-*` for music), excluding experimental tags
   (`exp`, `experimental`, `latest`) while permitting preview releases. Tier
   rules mandate Flash for text, audio, and video, and Pro for image generation.
-  Automated updates via the model updater sidecar commit locally and notify via
-  Slack; pushing requires explicit user approval.
+  Automated updates via the model updater sidecar commit locally and notify
+  via Slack; pushing requires explicit user approval.
 
 ## Media Pipelines & Storage
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
   formulation, screenplay breakdown, character casting with reference
   portraits, scene chunking with camera setups/plates, Gemini Omni video
-  generation with temporal continuity, and FFmpeg stitching with single-chunk
-  regeneration and upscaling. In `movieGemini.ts`, scene chunking enforces
-  shot/reverse-s
-<truncated 1279 bytes>
-ring network outages and 5xx errors using decoded JWT data (switching to an
+  generation with temporal continuity, and FFmpeg stitching with single-chu
+<truncated 1377 bytes>
+ng network outages and 5xx errors using decoded JWT data (switching to an
   offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
   responses, supporting both `token` and `auth_token` keys. Handles clean
   `EventSource` SSE stream termination on unmount and disconnect.
@@ -52,7 +52,8 @@ ring network outages and 5xx errors using decoded JWT data (switching to an
   stored in `docs/images/` (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
 - **Podcasts List UI**: Mobile layout replaces nested container padding
   (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards with
-  top-right status toggles, metadata badges, and expanded bottom action footers.
+  top-right status toggles, metadata badges, and expanded bottom action
+  footers.
 - **Form Validation & State Immutability**: `PodcastForm` validates against
   empty or whitespace-only titles across all submit triggers prior to invoking
   backend APIs. `StepInspector` preserves prop immutability during prompt
@@ -62,9 +63,9 @@ ring network outages and 5xx errors using decoded JWT data (switching to an
   migrating test coverage to `pages/MoviesList.tsx`.
 
 ## Performance & Testing
-- **Performance Optimizations**: Replaced $O(N \times M)$ per-podcast disk scans
-  in `PodcastStore.list()` with a single-pass active generation `Set`. Added a
-  5-second mutation-invalidated in-memory cache to `EpisodeStore`.
+- **Performance Optimizations**: Replaced $O(N \times M)$ per-podcast disk
+  scans in `PodcastStore.list()` with a single-pass active generation `Set`.
+  Added a 5-second mutation-invalidated in-memory cache to `EpisodeStore`.
 - **Test Coverage & Known Issues**: Critical test coverage gaps exist in
   `JobQueue` (`backend/src/services/queue.ts`) and startup cleanup
   `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`). Frontend

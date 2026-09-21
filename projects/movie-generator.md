@@ -2,24 +2,24 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-20T00:32:00.374307+00:00
+updated_at: 2026-09-21T00:32:13.186028+00:00
 confidence: 0.95
 ---
 
 # Project: Movie-Generator
 
 ## Architecture & Media Serving
-- **Stack & Asset Serving**: Built on `oven/bun:alpine` with Hono and CLI
-  `ffmpeg`, using native `Bun.password`, `bun test`, and `app.request()`.
-  Traversal-secured `/assets/*` serves `generated_assets/` with fallback to
-  `frontend/dist/assets/`.
+- **Stack & Assets**: Built on `oven/bun:alpine` with Hono and CLI `ffmpeg`,
+  using native `Bun.password`, `bun test`, and `app.request()`. Route
+  `/assets/*` is path-traversal secured, serving `generated_assets/` with
+  fallback to `frontend/dist/assets/`.
 
 ## Generation Pipeline & Continuity
 - **Pipeline & Quality Tiers**: Orchestrated by `gemini-3.7-flash` with
   `gemini-omni-1.1-flash` video generation. Stitches `chunks` -> `scene.mp4` ->
   `movie.mp4` across quality tiers (360p Draft, 720p HD, 1080p FHD, 4K UHD),
   skipping existing or upscaled chunks.
-- **Plates & Camera Continuity**: Stage 4.8A generates concept plate prompts
+- **Continuity & Concept Plates**: Stage 4.8A generates concept plate prompts
   via `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
   `generateSceneChunks` checks `camera_continuity` (`continuous` vs
   `new_shot`); continuous takes (tracking, two-shots, split dialogue, unbroken
@@ -33,13 +33,14 @@ confidence: 0.95
   `PROHIBITED_CONTENT` trigger Flash sanitization (`sanitizeSceneContent` /
   `sanitizeAndFixPrompt`), saving revised `setting` and `action_summary` to
   `prompt.txt` and `chunk_manifest.json`.
-- **Diagnostics & Formatting**: On empty responses, `extractGeminiResponseText`
-  (`backend/src/utils/jsonParser.ts`) inspects `finishReason`, `safetyRatings`,
-  and `blockReason`. `formatTimelineBeat` and `formatTimelineAndAudio`
-  explicitly format timeline beats to prevent `[object Object]` serialization.
+- **Diagnostics & Serialization**: On empty responses,
+  `extractGeminiResponseText` (`backend/src/utils/jsonParser.ts`) inspects
+  `finishReason`, `safetyRatings`, and `blockReason`. `formatTimelineBeat` and
+  `formatTimelineAndAudio` explicitly format timeline beats to prevent
+  `[object Object]` serialization.
 
 ## Access Control & Permissions
 - **RBAC & Ownership**: Movies record creator IDs in `created_by`; standard
-  users can only view their own movies (`created_by === user.id`). Admin access
+  users view only their own movies (`created_by === user.id`). Admin access
   requires both `"role": "admin"` and `"is_admin": true` in `data/users.json`;
   legacy or unspecified accounts default to standard access.
