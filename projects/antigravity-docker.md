@@ -2,56 +2,55 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-21T00:31:12.260541+00:00
+updated_at: 2026-09-22T00:32:07.015076+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Container Runtime & Isolation
-- **Runtime Security & Isolation:** Headless
-  `jklinker/antigravity-docker:latest` runs as non-root `developer` via `gosu`
-  (dynamic `PUID`/`PGID`, disabled passwordless sudo, `umask 0002` across
-  `conversations/`, `brain/`, and `annotations/`). Employs an isolated SSH web
-  terminal gateway (`ttyd`) rather than mounting `/var/run/docker.sock`.
+- **Security & Execution:** Runs headless `jklinker/antigravity-docker:latest`
+  as non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
+  passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
+  `annotations/`). Employs an isolated SSH web terminal gateway (`ttyd`)
+  rather than mounting `/var/run/docker.sock`.
 
 ## Configuration & Environment
-- **Networking & Ports:** Defaults to `AGY_PORT=4400` and `AGY_HUB_PORT=4402`
-  (passed via `agy --remote-control --hub-port` for deterministic hub
-  discovery).
+- **Networking & Ports:** Exposes `AGY_PORT=4400` (web interface/auth proxy) and
+  `AGY_HUB_PORT=4402` (passed to `agy --remote-control --hub-port` for
+  deterministic discovery).
 - **Environment Flags:** Supports `RC_NAME`, `AUTH_PASSWORD`, and `HOST_SSH_DIR`
-  for auth/access; `ENABLE_IDE` and `ENABLE_TERMINAL` (default: `true`); and
-  `BLOCK_TELEMETRY=true` (sinkholes telemetry to `0.0.0.0` via `/etc/hosts` and
-  sets OpenTelemetry opt-out variables).
-- **Storage & Lifecycle:** Initial authentication handled via `setup`
-  subcommand with mounted `~/.gemini`. `entrypoint.sh` initializes
-  `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Runtime state
-  (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
-  reside in `$GEMINI_DIR/antigravity-cli/`.
-- **Default Policies & UI:** Configures `enableTerminalSandbox: true`,
+  for auth and host access; `ENABLE_IDE` and `ENABLE_TERMINAL` (default: `true`)
+  for web tools; and `BLOCK_TELEMETRY=true` (sinkholes telemetry to `0.0.0.0`
+  via `/etc/hosts` and sets OpenTelemetry opt-out variables).
+- **Storage & Lifecycle:** Subcommand `setup` handles initial auth with mounted
+  `~/.gemini`. `entrypoint.sh` initializes `$GEMINI_DIR/config/projects/` and
+  purges stale CSRF tokens. Persistent state (`antigravity_state.pbtxt`,
+  `installation_uuid`, migrations) and `cli.log` reside in
+  `$GEMINI_DIR/antigravity-cli/`.
+- **Default Policies & UI:** Enforces `enableTerminalSandbox: true`,
   `nonWorkspaceFiles: ALLOW`, and `autoExecutionPolicy:
   CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`, with sidebar navigation
   shortcuts for VS Code IDE and Host Terminal.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Enforces 256-bit session tokens, in-memory session
-  cleanup, IP rate-limiting on `/__auth/login`, 16 KB request body limit, path
+  cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
-  centralized body parsing via `proxy/lib/security.js`.
-- **Reverse Proxy & Streaming:** Enforces `useWebSocket=true` for `/` and
-  `/c
-<truncated 515 bytes>
-oviders via `/models`
-  (`proxy/lib/models-manager.js`, persisting masked API keys to
-  `~/.gemini/config/custom_models.json`).
+  centralized body parsing in `proxy/lib/security.js`. Serves unauthenticated
+  `/status` health checks.
+- **Reverse Proxy 
+<truncated 306 bytes>
+viders:** Managed via `/models` UI
+  (`proxy/lib/models-manager.js`), persisting configurations with masked API
+  keys to `~/.gemini/config/custom_models.json`.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js
-  streaming transcoder (no LiteLLM dependency) conditionally enabled via
-  `entrypoint.sh` only when custom models are configured. Unregistered
-  placeholder models in `M500`-`M649` return `null` immediately, properly
-  routing built-in models (Claude, GPT-OSS) directly upstream to Google when
-  Astra is active.
+  streaming transcoder conditionally enabled by `entrypoint.sh` only when
+  custom models are configured. Unregistered placeholder models in `M500`-`M649`
+  return `null` immediately, routing built-in models (Claude, GPT-OSS)
+  directly upstream to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across unary and streaming calls, coercing
   stringified booleans and integers into native types. Strips `ArtifactMetadata`
@@ -60,7 +59,7 @@ oviders via `/models`
   omitted by third-party models.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
-- **Supervisor Engine:** Authenticated `/sidecars` REST API/UI manages
+- **Supervisor Engine:** Authenticated `/sidecars` REST API and UI manages
   background workers and 5-field cron tasks. Coordinates restart policies,
   unified env injection (`buildSidecarEnv`), upstream Language Server polling
   (`waitForUpstream()`), and live CSRF token discovery at
@@ -70,11 +69,11 @@ oviders via `/models`
     toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
   - *Plugin:* Defined in `<plugin>/sidecars/<name>/sidecar.json`, namespaced as
     `<plugin-name>/<sidecar-name>`, executed with isolated `cwd`, prepended
-    `PATH`, `PLUGIN` badge, and isolated config resets.
+    `PATH`, `PLUGIN` UI badge, and isolated config resets.
 
 ## Testing & Quality
 - **Test Suite & Isolation:** Native Node test runner
-  (`node --test tests/*.js`). State isolation is maintained by cleaning up mock
+  (`node --test tests/*.js`). Maintains state isolation by cleaning up mock
   environment variables and filesystem fixtures in `finally` blocks (e.g.,
   `tests/test-sidecar-manager.js`) to prevent CSRF token or state leakage
   between test suites.

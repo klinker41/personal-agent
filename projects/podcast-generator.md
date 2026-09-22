@@ -2,16 +2,16 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-21T00:32:40.955260+00:00
+updated_at: 2026-09-22T00:33:58.112181+00:00
 confidence: 0.95
 ---
 
 # Project: Podcast-Generator
 
 ## Architecture & Storage
-- **Single-Container Runtime**: Consolidated 6 legacy microservices (Postgres,
-  Redis, Celery, FastAPI, Nginx) into an `oven/bun:alpine` container running
-  Bun, Hono, and FFmpeg for the React SPA, REST APIs, streaming, and movie
+- **Single-Container Runtime**: Consolidated legacy services (Postgres, Redis,
+  Celery, FastAPI, Nginx, ComfyUI, Ntfy) into an `oven/bun:alpine` container.
+  Runs Bun, Hono, and FFmpeg for the React SPA, REST APIs, streaming, and movie
   generation (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`). Minimal
   dependencies: `hono`, `jsonwebtoken`, `cron-parser@4.9.0`, native
   `hono/cors`, `Bun.password`, and `bun test`.
@@ -25,11 +25,12 @@ confidence: 0.95
   `GET /api/podcasts/:id` (omitted from list endpoints to prevent latency).
 
 ## Media Pipeline & Integrations
-- **Generation & Ad Placement**: Synthesizes episodes via Gemini (script, 1:1
-  cover art, multi-speaker TTS) and FFmpeg ID3v2 tagging. Distributes optional
-  ad reads (`ad_reads?: string[] | null` from `PodcastForm.tsx` and
-  `podcasts.ts`) evenly across dialogue at intervals `k / (N + 1)` via
-  `formatAdReads()` in `generator.ts`.
+- **Generation & Ad Placement**: Synthesizes episodes via Gemini
+  (`TEXT_MODEL`, `IMAGE_MODEL`, `AUDIO_MODEL` for script, 1:1 cover art,
+  multi-speaker TTS) and FFmpeg ID3v2 tagging. Distributes optional ad reads
+  (`ad_reads?: string[] | null` from `PodcastForm.tsx` / `podcasts.ts`) evenly
+  across dialogue at intervals `k / (N + 1)` via `formatAdReads()` in
+  `generator.ts`.
 - **Deduplication & Matching**: `EpisodeStore.deduplicate()` in
   `backend/src/index.ts` prunes duplicate records by audio path or title,
   preferring entries with `prompt_used` and longer scripts.
@@ -44,21 +45,18 @@ confidence: 0.95
 ## Resilience, Security & Testing
 - **Auth Hardening & Traversal Defense**: Startup fails fast in production if
   `JWT_SECRET` is unset or default in `authMiddleware.ts`. Public registration
-  is toggleable via `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`). Media
-  streaming prevents path traversal via `path.sep` boundaries and non-blocking
-  `Bun.file(path).exists()`.
-- **Git Hygiene**: Purge Git history (`git-filter-repo` or squashed commit)
-  before release to eliminate leaked secrets (Gemini keys, Jellyfin tokens,
-  private domains).
+  is toggleable via `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`); settings
+  UI is limited to account/security. Media streaming prevents path traversal
+  via `path.sep` boundaries and non-blocking `Bun.file(path).exists()`. Purge
+  Git history (`git-filter-repo` or squashed commit) before release to remove
+  leaked secrets (Gemini keys, Jellyfin tokens, private domains).
 - **Error Handling & Retries**: Centralized exponential backoff handles HTTP
   calls via `postWithRetry` (`gemini.ts`); queue errors standardize on
   `failJob` (`queue.ts`). `GeminiService.generateAudioPart` retries up to 3
   times on non-200 responses or API filtering (returns false without throwing).
   `PodcastGenerator.generateAudio` aborts only when `failedParts >= 5`.
-- **Config, Alerts & Testing**: AI models use `TEXT_MODEL`, `IMAGE_MODEL`,
-  and `AUDIO_MODEL`. Slack alerts use `SLACK_WEBHOOK` or `SLACK_WEBHOOK_URL`
-  (default user `podcast-generator`; legacy Ntfy and ComfyUI removed).
-  Completion alerts include canonical RSS feed URLs from `BASE_URL` or
-  fallback port; settings UI is limited to account/security. Generator and
-  notification unit tests must mock `NotificationManager.prototype.notify` to
-  avoid live Slack webhook calls.
+- **Alerts & Test Requirements**: Sends Slack alerts via `SLACK_WEBHOOK` or
+  `SLACK_WEBHOOK_URL` (default user `podcast-generator`). Completion alerts
+  include canonical RSS feed URLs from `BASE_URL` or fallback port. Generator
+  and notification unit tests must mock `NotificationManager.prototype.notify`
+  to avoid live Slack webhook calls.

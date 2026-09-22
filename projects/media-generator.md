@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-21T00:33:37.264695+00:00
+updated_at: 2026-09-22T00:35:26.069512+00:00
 confidence: 0.95
 ---
 
@@ -14,46 +14,47 @@ confidence: 0.95
   web service with JWT authentication, uniting cinematic movie generation,
   episodic podcast synthesis, and audiobook creation.
 - **RBAC & User Management**: Multi-user role-based access control requires an
-  admin role in `users.json` on disk to access and manage legacy creations.
+  admin role in `users.json` on disk to access and manage legacy creations;
+  standard users can view only their own creations.
 - **Workspace Tooling**: Root scripts coordinate build, lint, typecheck, and
   testing across workspaces using Bun and Vite (`bun test` for backend,
   `vitest run` for frontend).
 
 ## Model Configuration & Standards
-- **Model Identifiers & Defaults**: Default generative model identifiers are
-  centralized in `shared/models.ts` and mirrored in `.env.example` across five
-  constants without `models/` prefix: `DEFAULT_TEXT_MODEL` (`gemini-3.8-flash`),
-  `DEFAULT_IMAGE_MODEL` (`gemini-3-pro-image`), `DEFAULT_AUDIO_MODEL`
+- **Centralized Model Defaults**: Centralized in `shared/models.ts` and
+  mirrored in `.env.example` across five constants without `models/` prefix:
+  `DEFAULT_TEXT_MODEL` (`gemini-3.8-flash`), `DEFAULT_IMAGE_MODEL`
+  (`gemini-3-pro-image`), `DEFAULT_AUDIO_MODEL`
   (`gemini-3.1-flash-tts-preview`), `DEFAULT_VIDEO_MODEL`
   (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
   (`lyria-3-clip-preview`).
-- **Model Selection & Updates**: Policy strictly requires non-experimental
-  `gemini-*` models (or `lyria-*` for music), excluding experimental tags
-  (`exp`, `experimental`, `latest`) while permitting preview releases. Tier
-  rules mandate Flash for text, audio, and video, and Pro for image generation.
-  Automated updates via the model updater sidecar commit locally and notify
-  via Slack; pushing requires explicit user approval.
+- **Model Selection & Update Policies**: Model names must strip `models/`
+  prefixes and use non-experimental Gemini models (Lyria for music), strictly
+  excluding experimental tags (`exp`, `experimental`, `latest`) while permitting
+  preview releases. Tier rules mandate Flash for text, audio, and video, and Pro
+  for images. Automated model updates via sidecar commit locally and notify via
+  Slack; pushing requires explicit user approval.
 
 ## Media Pipelines & Storage
-- **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
-  formulation, screenplay breakdown, character casting with reference
-  portraits, scene chunking with camera setups/plates, Gemini Omni video
-  generation with temporal continuity, and FFmpeg stitching with single-chu
-<truncated 1377 bytes>
-ng network outages and 5xx errors using decoded JWT data (switching to an
+- **Cinematic Movie Pipeline**: 7-stage workflow (prompting, plot formulation,
+  screenplay breakdown, character casting with portraits, scene chunking with
+  plates, Gemini Omni video with temporal continuity, FFmpeg stitching with
+  single-chunk regeneration and upscaling). In
+<truncated 1322 bytes>
+essions
+  during network outages and 5xx errors using decoded JWT data (switching to an
   offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
-  responses, supporting both `token` and `auth_token` keys. Handles clean
-  `EventSource` SSE stream termination on unmount and disconnect.
+  responses, supporting both `token` and `auth_token` keys. EventSource SSE
+  streams terminate cleanly on unmount and disconnect.
 - **Dashboard Layout**: Desktop (`lg:`): Asymmetric 2-column layout (65%
   creations feed, 35% operations sidebar); mobile (`<sm`): Single column with a
-  2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`), an
-  in-flight pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer
-  links, and creations feed (`MediaCreationsFeed.tsx`). Reference screenshots
-  stored in `docs/images/` (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
+  2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`), in-flight
+  pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer links, and
+  creations feed (`MediaCreationsFeed.tsx`). Reference screenshots reside in
+  `docs/images/` (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
 - **Podcasts List UI**: Mobile layout replaces nested container padding
   (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards with
-  top-right status toggles, metadata badges, and expanded bottom action
-  footers.
+  top-right status toggles, metadata badges, and expanded bottom action footers.
 - **Form Validation & State Immutability**: `PodcastForm` validates against
   empty or whitespace-only titles across all submit triggers prior to invoking
   backend APIs. `StepInspector` preserves prop immutability during prompt

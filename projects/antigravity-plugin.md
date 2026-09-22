@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-21T00:32:00.486447+00:00
+updated_at: 2026-09-22T00:32:58.315391+00:00
 confidence: 1.0
 ---
 
@@ -17,12 +17,12 @@ skills via `vendor/agent-skills`.
 - **Web Applications:** Bun runtime/package manager, Hono framework, minimal
   up-to-date dependencies (`rules/web-app-architecture.md`), and port 4401 via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
-- **Git & Review:** Tests must pass non-verbosely before committing
+- **Git & Quality Gates:** Tests must pass non-verbosely before committing
   (`rules/non-verbose-tests.md`, `rules/tests-must-pass-before-commit.md`), zero
   secrets in diffs (`rules/no-secrets-in-commits.md`), mandatory
   `self-review-commit` loop (`Model: "pro"` reviewer), and user approval before
   `git push` (`rules/git-push.md`).
-- **Coding & Subagents:** Coding and test subagents use `Model: "flash"`
+- **Coding & Subagents:** Subagents for coding and tests use `Model: "flash"`
   (`rules/coding-subagent-model.md`). Enforce kebab-case rule and skill names,
   minimal non-duplicative diffs, README updates on architectural changes, and
   strict 80-character Markdown wrapping.
@@ -32,23 +32,20 @@ skills via `vendor/agent-skills`.
   (`profile.md`, `index.md`, `projects/`, `knowledge/`, and tiered
   `daily/`/`monthly/`/`yearly/` chronicles), accessed via `lookup-memory` and
   `save-memory` skills.
-- **Pipeline & Maintenance:**
-  - *Turn-1 Injection:* `hooks/inject_memory.py` injects context when
-    `initialNumSteps == 0` and `invocationNum == 1` from transcripts.
-  - *Nightly Lifecycle (Local Time):* 00:00 Dreamer (tracks step watermarks in
-    `state.json`, checks topics via `memory_utils.get_existing_topics`, skips
-    subagents and `rules/*.md`, purges ephemeral sessions); 00:30 tiered
-    compaction; 01:00 Git sync. LLM operations run via `agentapi`;
-    deterministic Python scrubs secrets and manages Git sync.
-- **Shared Utilities (`utils/memory_utils.py`):** Subprocess runner for
-  `agentapi` (`AgentApiBridge`) with auth retries. Strips caller env vars
+- **Pipeline & Lifecycle:** Turn-1 injection (`hooks/inject_memory.py`) loads
+  memory when `initialNumSteps == 0` and `invocationNum == 1`. Nightly cycle
+  (local time): 00:00 Dreamer (tracks step watermarks in `state.json`, checks
+  topics via `memory_utils.get_existing_topics`, skips subagents and
+  `rules/*.md`, purges ephemeral sessions); 00:30 tiered compaction; 01:00 Git
+  sync with secret scrubbing.
+- **Bridge & Discovery (`utils/memory_utils.py`):** `AgentApiBridge` runs
+  `agentapi` subprocesses with auth retries, stripping caller env vars
   (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`,
-  `ANTIGRAVITY_TRAJECTORY_ID`) to prevent project mismatch. Resolves target
-  projects in `~/.gemini/config/projects/` by name, UUID, or path (defaults to
+  `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch. Resolves projects in
+  `~/.gemini/config/projects/` by name, UUID, or path (defaults to
   `personal-agent` `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc` or
-  `$ANTIGRAVITY_PROJECT_ID`). Recovers language server address
-  (`ANTIGRAVITY_LS_ADDRESS`) and web hub CSRF tokens
-  (`window.__APP_CONFIG__.csrfToken`) from active `cli.log` and runtime state.
+  `$ANTIGRAVITY_PROJECT_ID`). Recovers `ANTIGRAVITY_LS_ADDRESS` and CSRF tokens
+  (`window.__APP_CONFIG__.csrfToken`) from `cli.log` and runtime state.
 
 ## Sidecars & Integrations
 - **Scheduled Tasks (`sidecar.json`):** Recurring `agentapi new-conversation`
