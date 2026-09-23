@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-22T00:32:07.015076+00:00
+updated_at: 2026-09-23T00:31:30.913974+00:00
 confidence: 0.95
 ---
 
@@ -20,18 +20,17 @@ confidence: 0.95
   `AGY_HUB_PORT=4402` (passed to `agy --remote-control --hub-port` for
   deterministic discovery).
 - **Environment Flags:** Supports `RC_NAME`, `AUTH_PASSWORD`, and `HOST_SSH_DIR`
-  for auth and host access; `ENABLE_IDE` and `ENABLE_TERMINAL` (default: `true`)
-  for web tools; and `BLOCK_TELEMETRY=true` (sinkholes telemetry to `0.0.0.0`
-  via `/etc/hosts` and sets OpenTelemetry opt-out variables).
-- **Storage & Lifecycle:** Subcommand `setup` handles initial auth with mounted
+  for auth/access; `ENABLE_IDE` and `ENABLE_TERMINAL` (default: `true`) with
+  sidebar navigation shortcuts; and `BLOCK_TELEMETRY=true` (sinkholes telemetry
+  to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
+- **Storage & Lifecycle:** Subcommand `setup` handles auth with mounted
   `~/.gemini`. `entrypoint.sh` initializes `$GEMINI_DIR/config/projects/` and
   purges stale CSRF tokens. Persistent state (`antigravity_state.pbtxt`,
   `installation_uuid`, migrations) and `cli.log` reside in
   `$GEMINI_DIR/antigravity-cli/`.
-- **Default Policies & UI:** Enforces `enableTerminalSandbox: true`,
+- **Default Policies:** Enforces `enableTerminalSandbox: true`,
   `nonWorkspaceFiles: ALLOW`, and `autoExecutionPolicy:
-  CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`, with sidebar navigation
-  shortcuts for VS Code IDE and Host Terminal.
+  CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Enforces 256-bit session tokens, in-memory session
@@ -39,8 +38,9 @@ confidence: 0.95
   traversal protection, security headers (CSP, frame/content-type options), and
   centralized body parsing in `proxy/lib/security.js`. Serves unauthenticated
   `/status` health checks.
-- **Reverse Proxy 
-<truncated 306 bytes>
+- **Reverse Proxy & Streaming:** Enforces `useWebSocket=true` for `/` and
+  `/c/...`, disables pro
+<truncated 227 bytes>
 viders:** Managed via `/models` UI
   (`proxy/lib/models-manager.js`), persisting configurations with masked API
   keys to `~/.gemini/config/custom_models.json`.

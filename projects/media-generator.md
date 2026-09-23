@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-22T00:35:26.069512+00:00
+updated_at: 2026-09-23T00:33:45.209375+00:00
 confidence: 0.95
 ---
 
@@ -39,8 +39,8 @@ confidence: 0.95
 - **Cinematic Movie Pipeline**: 7-stage workflow (prompting, plot formulation,
   screenplay breakdown, character casting with portraits, scene chunking with
   plates, Gemini Omni video with temporal continuity, FFmpeg stitching with
-  single-chunk regeneration and upscaling). In
-<truncated 1322 bytes>
+  single-chunk regeneration and up
+<truncated 1340 bytes>
 essions
   during network outages and 5xx errors using decoded JWT data (switching to an
   offline fallback user) and only purges tokens upon explicit HTTP 401 or 403

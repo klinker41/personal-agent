@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-09-22T00:32:58.315391+00:00
+updated_at: 2026-09-23T00:32:03.551486+00:00
 confidence: 1.0
 ---
 
@@ -17,15 +17,15 @@ skills via `vendor/agent-skills`.
 - **Web Applications:** Bun runtime/package manager, Hono framework, minimal
   up-to-date dependencies (`rules/web-app-architecture.md`), and port 4401 via
   `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
+- **Coding & Subagents:** Subagents for coding/tests use `Model: "flash"`
+  (`rules/coding-subagent-model.md`). Enforce kebab-case for rule and skill
+  names, minimal non-duplicative diffs, README updates on architectural changes,
+  and strict 80-character Markdown wrapping.
 - **Git & Quality Gates:** Tests must pass non-verbosely before committing
   (`rules/non-verbose-tests.md`, `rules/tests-must-pass-before-commit.md`), zero
   secrets in diffs (`rules/no-secrets-in-commits.md`), mandatory
   `self-review-commit` loop (`Model: "pro"` reviewer), and user approval before
   `git push` (`rules/git-push.md`).
-- **Coding & Subagents:** Subagents for coding and tests use `Model: "flash"`
-  (`rules/coding-subagent-model.md`). Enforce kebab-case rule and skill names,
-  minimal non-duplicative diffs, README updates on architectural changes, and
-  strict 80-character Markdown wrapping.
 
 ## Memory System (`sidecars/memory-daemon`)
 - **Structure & Access:** Progressive disclosure store at `$MEMORY_DIRECTORY`
