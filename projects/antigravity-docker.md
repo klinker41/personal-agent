@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-23T00:31:30.913974+00:00
+updated_at: 2026-09-24T00:32:14.158785+00:00
 confidence: 0.95
 ---
 
@@ -16,21 +16,20 @@ confidence: 0.95
   rather than mounting `/var/run/docker.sock`.
 
 ## Configuration & Environment
-- **Networking & Ports:** Exposes `AGY_PORT=4400` (web interface/auth proxy) and
-  `AGY_HUB_PORT=4402` (passed to `agy --remote-control --hub-port` for
-  deterministic discovery).
-- **Environment Flags:** Supports `RC_NAME`, `AUTH_PASSWORD`, and `HOST_SSH_DIR`
-  for auth/access; `ENABLE_IDE` and `ENABLE_TERMINAL` (default: `true`) with
-  sidebar navigation shortcuts; and `BLOCK_TELEMETRY=true` (sinkholes telemetry
-  to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out variables).
-- **Storage & Lifecycle:** Subcommand `setup` handles auth with mounted
-  `~/.gemini`. `entrypoint.sh` initializes `$GEMINI_DIR/config/projects/` and
-  purges stale CSRF tokens. Persistent state (`antigravity_state.pbtxt`,
-  `installation_uuid`, migrations) and `cli.log` reside in
-  `$GEMINI_DIR/antigravity-cli/`.
-- **Default Policies:** Enforces `enableTerminalSandbox: true`,
-  `nonWorkspaceFiles: ALLOW`, and `autoExecutionPolicy:
-  CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
+- **Networking & Access:** Exposes `AGY_PORT=4400` (web interface/auth proxy)
+  and `AGY_HUB_PORT=4402` (`agy --remote-control --hub-port` for deterministic
+  hub discovery). Configurable via `RC_NAME`, `AUTH_PASSWORD`, and
+  `HOST_SSH_DIR`.
+- **Feature Flags & Telemetry:** Supports `ENABLE_IDE` and `ENABLE_TERMINAL`
+  (default: `true`) with sidebar shortcuts; `BLOCK_TELEMETRY=true` sinkholes
+  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-outs.
+- **Storage, Lifecycle & Defaults:** Subcommand `setup` handles auth with
+  mounted `~/.gemini`. `entrypoint.sh` initializes
+  `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Persistent
+  state (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and
+  `cli.log` reside in `$GEMINI_DIR/antigravity-cli/`. Enforces sandbox
+  policies: `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
+  `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Enforces 256-bit session tokens, in-memory session
@@ -39,8 +38,8 @@ confidence: 0.95
   centralized body parsing in `proxy/lib/security.js`. Serves unauthenticated
   `/status` health checks.
 - **Reverse Proxy & Streaming:** Enforces `useWebSocket=true` for `/` and
-  `/c/...`, disables pro
-<truncated 227 bytes>
+  `/c/...`, disables proxy bufferin
+<truncated 127 bytes>
 viders:** Managed via `/models` UI
   (`proxy/lib/models-manager.js`), persisting configurations with masked API
   keys to `~/.gemini/config/custom_models.json`.
@@ -53,10 +52,10 @@ viders:** Managed via `/models` UI
   directly upstream to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across unary and streaming calls, coercing
-  stringified booleans and integers into native types. Strips `ArtifactMetadata`
-  outside `.gemini/antigravity-cli/brain/` (synthesizing `UserFacing: false`)
-  and defaults `Overwrite: true` on non-artifact `write_to_file` calls when
-  omitted by third-party models.
+  stringified booleans and integers into native types. Strips
+  `ArtifactMetadata` outside `.gemini/antigravity-cli/brain/` (synthesizing
+  `UserFacing: false`) and defaults `Overwrite: true` on non-artifact
+  `write_to_file` calls when omitted by third-party models.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - **Supervisor Engine:** Authenticated `/sidecars` REST API and UI manages
