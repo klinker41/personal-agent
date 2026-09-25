@@ -2,28 +2,28 @@
 topic: gemini-api-safety-diagnostics
 category: knowledge
 tags: [knowledge, gemini-api-safety-diagnostics]
-updated_at: 2026-09-06T00:01:23.716612+00:00
+updated_at: 2026-09-25T00:37:03.043267+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Gemini-Api-Safety-Diagnostics
 
-- When Gemini blocks output due to safety or policy filters (e.g., SAFETY,
-BLOCKLIST, PROHIBITED_CONTENT), accessing response.text can return an empty
-string without throwing a direct API error.
-- To diagnose empty model outputs, inspect candidate finishReason,
-safetyRatings, and promptFeedback.blockReason rather than assuming a successful
-text generation.
-
-- When Gemini API filters content due to copyright or safety policies, it
-returns candidates with empty content and finishReason 'OTHER' rather than
-inlineData; client services expecting media payloads must defensively handle
-missing inlineData and retry or handle the part failure gracefully.
-
-- `BlockReason: PROHIBITED_CONTENT` with zero candidates indicates gateway-level
-input prompt filtering before generation starts, commonly triggered by
-trademarked franchise names and combat/violence descriptors in concatenated
-prompts.
-- In `@google/genai`, configuring permissive safety settings to
-`BLOCK_ONLY_HIGH` requires setting all five harm categories, including
-`HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY`.
+- **Empty Outputs and Safety Diagnostics**: When Gemini filters output due to
+  safety, copyright, or policy constraints (`SAFETY`, `BLOCKLIST`,
+  `PROHIBITED_CONTENT`, `OTHER`), `response.text` can return an empty string,
+  and media payloads (`inlineData`) may be omitted without throwing errors.
+  Client applications should inspect `candidate.finishReason`,
+  `safetyRatings`, and `promptFeedback.blockReason` rather than assuming
+  successful generation, and defensively handle missing media parts.
+- **Gateway-Level Prompt Filtering**: A `promptFeedback.blockReason` of
+  `PROHIBITED_CONTENT` with zero candidates indicates pre-generation
+  gateway-level input filtering, commonly triggered by concatenated prompts
+  combining trademarked franchise names with combat/violence descriptors.
+- **Candidate Parsing and Validation**: When parsing responses (especially
+  with thinking enabled), iterate and concatenate all non-thought text parts
+  rather than indexing `candidates[0].content.parts[0].text`. Reject
+  responses terminated by `MAX_TOKENS` (truncation) or `SAFETY`, and enforce
+  `responseMimeType: 'application/json'` on structured configurations.
+- **Safety Setting Configuration**: In `@google/genai`, configuring
+  permissive safety settings via `BLOCK_ONLY_HIGH` requires setting all five
+  harm categories, including `HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY`.

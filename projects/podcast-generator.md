@@ -2,35 +2,34 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-23T00:32:45.850575+00:00
+updated_at: 2026-09-25T00:33:40.107265+00:00
 confidence: 0.95
 ---
 
 # Project: Podcast-Generator
 
 ## Architecture & Storage
-- **Single-Container Runtime**: Consolidated legacy services (Postgres,
-  Redis, Celery, FastAPI, Nginx, ComfyUI, Ntfy) into an `oven/bun:alpine`
-  container. Runs Bun, Hono, and FFmpeg for React SPA, REST APIs, streaming,
-  and movie generation (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`).
-  Minimal dependencies: `hono`, `jsonwebtoken`, `cron-parser@4.9.0`, native
-  `hono/cors`, `Bun.password`, and `bun test`.
+- **Single-Container Runtime**: Consolidated legacy services (Postgres, Redis,
+  Celery, FastAPI, Nginx, ComfyUI, Ntfy) into an `oven/bun:alpine` container.
+  Runs Bun, Hono, and FFmpeg for React SPA, REST APIs, streaming, and movie
+  generation (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`). Minimal
+  dependencies: `hono`, `jsonwebtoken`, `cron-parser@4.9.0`, native `hono/cors`,
+  `Bun.password`, and `bun test`.
 - **Filesystem Persistence & Tenancy**: Filesystem JSON manifests
   (`data/users.json`, `data/podcasts/`, `data/outputs/`) enforce per-user
-  tenancy (`PodcastStore.list(user.id)` on `GET /api/podcasts`; episodes
-  inherit tenancy). Managed by in-process `JobQueue` and `PodcastScheduler`.
+  tenancy (`PodcastStore.list(user.id)` on `GET /api/podcasts`; episodes inherit
+  tenancy). Managed by in-process `JobQueue` and `PodcastScheduler`.
   `fileStore.ts` provides atomic writes (`writeText`, `writeJson`), directory
   validation, and date matching. `EpisodeStore.autoDiscoverEpisodes` backfills
   missing `episode.json` on `GET /api/podcasts/:id` (omitted from list
   endpoints to avoid latency).
 
 ## Media Pipeline & Integrations
-- **Generation & Ad Placement**: Synthesizes episodes via Gemini
-  (`TEXT_MODEL`, `IMAGE_MODEL`, `AUDIO_MODEL` for script, 1:1 cover art,
-  multi-speaker TTS) and FFmpeg ID3v2 tagging. Distributes optional ad reads
-  (`ad_reads?: string[] | null` from `PodcastForm.tsx` / `podcasts.ts`) evenly
-  across dialogue at intervals `k / (N + 1)` via `formatAdReads()` in
-  `generator.ts`.
+- **Generation & Ad Placement**: Synthesizes episodes via Gemini (`TEXT_MODEL`,
+  `IMAGE_MODEL`, `AUDIO_MODEL` for script, 1:1 cover art, multi-speaker TTS)
+  and FFmpeg ID3v2 tagging. Evenly distributes optional ad reads (`ad_reads?:
+  string[] | null` from `PodcastForm.tsx` / `podcasts.ts`) across dialogue at
+  intervals `k / (N + 1)` via `formatAdReads()` in `generator.ts`.
 - **Deduplication & Matching**: `EpisodeStore.deduplicate()` in
   `backend/src/index.ts` prunes duplicate records by audio path or title,
   preferring entries with `prompt_used` and longer scripts.

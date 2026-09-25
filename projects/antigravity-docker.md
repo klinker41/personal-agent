@@ -2,47 +2,48 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-24T00:32:14.158785+00:00
+updated_at: 2026-09-25T00:31:57.464259+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Container Runtime & Isolation
-- **Security & Execution:** Runs headless `jklinker/antigravity-docker:latest`
+- **Headless Execution & Security:** Runs `jklinker/antigravity-docker:latest`
   as non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
   passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
-  `annotations/`). Employs an isolated SSH web terminal gateway (`ttyd`)
-  rather than mounting `/var/run/docker.sock`.
+  `annotations/`).
+- **Host Execution Gateway:** Replaces direct `/var/run/docker.sock` mounting
+  with an isolated SSH-based web terminal gateway (`ttyd` on port 7681) to
+  execute host commands securely.
 
 ## Configuration & Environment
 - **Networking & Access:** Exposes `AGY_PORT=4400` (web interface/auth proxy)
   and `AGY_HUB_PORT=4402` (`agy --remote-control --hub-port` for deterministic
   hub discovery). Configurable via `RC_NAME`, `AUTH_PASSWORD`, and
   `HOST_SSH_DIR`.
-- **Feature Flags & Telemetry:** Supports `ENABLE_IDE` and `ENABLE_TERMINAL`
-  (default: `true`) with sidebar shortcuts; `BLOCK_TELEMETRY=true` sinkholes
-  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-outs.
-- **Storage, Lifecycle & Defaults:** Subcommand `setup` handles auth with
-  mounted `~/.gemini`. `entrypoint.sh` initializes
-  `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Persistent
-  state (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and
-  `cli.log` reside in `$GEMINI_DIR/antigravity-cli/`. Enforces sandbox
-  policies: `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
-  `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
+- **Feature Flags & Privacy:** `ENABLE_IDE` and `ENABLE_TERMINAL` (default:
+  `true`) provide sidebar shortcuts for VS Code and terminal.
+  `BLOCK_TELEMETRY=true` sinkholes telemetry endpoints to `0.0.0.0` via
+  `/etc/hosts` and sets OpenTelemetry opt-out variables.
+- **Storage & Lifecycle Management:** The `setup` subcommand handles initial
+  auth with mounted `~/.gemini`. `entrypoint.sh` initializes
+  `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Persistent state
+  (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
+  reside in `$GEMINI_DIR/antigravity-cli/`.
+- **Default Policies:** Enforces `enableTerminalSandbox: true`,
+  `nonWorkspaceFiles: ALLOW`, and `autoExecutionPolicy:
+  CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Enforces 256-bit session tokens, in-memory session
   cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
-  centralized body parsing in `proxy/lib/security.js`. Serves unauthenticated
-  `/status` health checks.
-- **Reverse Proxy & Streaming:** Enforces `useWebSocket=true` for `/` and
-  `/c/...`, disables proxy bufferin
-<truncated 127 bytes>
-viders:** Managed via `/models` UI
-  (`proxy/lib/models-manager.js`), persisting configurations with masked API
-  keys to `~/.gemini/config/custom_models.json`.
+  centralized body parsing in `proxy/lib/security.js`. Serves unauthent
+<truncated 586 bytes>
+s are managed via the
+  `/models` UI (`proxy/lib/models-manager.js`), persisting configurations with
+  masked API keys to `~/.gemini/config/custom_models.json`.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js

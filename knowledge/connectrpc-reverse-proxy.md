@@ -2,7 +2,7 @@
 topic: connectrpc-reverse-proxy
 category: knowledge
 tags: [knowledge, connectrpc-reverse-proxy]
-updated_at: 2026-09-23T00:35:48.117300+00:00
+updated_at: 2026-09-25T00:36:42.916873+00:00
 confidence: 0.95
 ---
 
@@ -21,10 +21,10 @@ confidence: 0.95
 - **Socket Lifecycle & Disconnects**: Explicitly terminate upstream sockets on
   client disconnects to prevent orphaned connections and bloated TCP buffers
   (Send-Q/Recv-Q). Avoid unconditionally destroying sockets on
-  `res.on("close")` (which triggers on both completions and disconnects) to
-  prevent TCP RST packets from aborting active upstream contexts.
-- **Protocol Translation & Tool Sanitization**: Map Anthropic streaming
-  deltas to `agy` Protobuf events (`thinking_delta` to the UI thinking drawer;
+  `res.on("close")` (triggers on both completions and disconnects) to prevent
+  TCP RST packets from aborting active upstream contexts.
+- **Protocol Translation & Tool Sanitization**: Map Anthropic streaming deltas
+  to `agy` Protobuf events (`thinking_delta` to the UI thinking drawer;
   `tool_use` and `input_json_delta` to `GetChatMessageResponse` frames). When
   proxying tool calls to external providers (OpenAI, Anthropic), sanitize
   arguments by coercing stringified booleans and numbers to native types,
