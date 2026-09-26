@@ -2,7 +2,7 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-09-25T00:32:35.851352+00:00
+updated_at: 2026-09-26T00:34:02.825981+00:00
 confidence: 0.95
 ---
 
@@ -13,7 +13,7 @@ confidence: 0.95
   using native `Bun.password`, `bun test`, and `app.request()`. Route
   `/assets/*` enforces path-traversal protection, serving
   `generated_assets/` with fallback to `frontend/dist/assets/`.
-- **RBAC & Ownership**: Movies restrict access via `created_by === user.id`.
+- **RBAC & Ownership**: Restricts movie access via `created_by === user.id`.
   Admin access strictly requires both `"role": "admin"` and
   `"is_admin": true` in `data/users.json` (legacy or unspecified accounts
   default to standard).

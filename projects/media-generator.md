@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-25T00:35:06.966631+00:00
+updated_at: 2026-09-26T00:36:10.635858+00:00
 confidence: 0.95
 ---
 
@@ -31,32 +31,35 @@ confidence: 0.95
   (`gemini-3.1-flash-tts-preview`), `DEFAULT_VIDEO_MODEL`
   (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
   (`lyria-3-clip-preview`).
-- **Model Selection & Update Policies**: Model IDs must strip `models/` prefixes
-  and use non-experimental Gemini models (Lyria for music), strictly excluding
-  experimental tags (`exp`, `experimental`, `latest`) while permitting preview
-  releases. Tier rules mandate Flash for text, audio, and video, and Pro for
-  images. Automated model updates via sidecar commit locally and notify via
-  Slack; pushing requires explicit user approval.
+- **Model Selection & Update Policies**: Model IDs must strip `models/`
+  prefixes and use non-experimental Gemini models (Lyria for music), strictly
+  excluding experimental tags (`exp`, `experimental`, `latest`) while
+  permitting preview releases. Tier rules mandate Flash for text, audio, and
+  video, and Pro for images. Automated model updates via sidecar commit locally
+  and notify via Slack; pushing requires explicit user approval.
 
 ## Media Pipelines & Storage
-- **Cinematic Movie Pipeline**: 7-stage workflow (prompting, plot formulati
-<truncated 3953 bytes>
-n layout (65%
-  creations feed, 35% operations sidebar); mobile (`<sm`): Single column with a
-  2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`), in-flight
-  pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer links, and
-  creations feed (`MediaCreationsFeed.tsx`). Reference screenshots reside in
-  `docs/images/` (`dashboard-desktop.jpg`, `dashboard-mobile.jpg`).
+- **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
+  formulation
+<truncated 2353 bytes>
+yout (65%
+  creations feed, 35% operations sidebar); mobile (`<sm`): Single column with
+  a 2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`),
+  in-flight pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer
+  links, and creations feed (`MediaCreationsFeed.tsx`). Reference screenshots
+  reside in `docs/images/` (`dashboard-desktop.jpg`,
+  `dashboard-mobile.jpg`).
 - **Podcasts List UI**: Mobile layout replaces nested container padding
-  (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards with
-  top-right status toggles, metadata badges, and expanded bottom action footers.
+  (`max-w-7xl px-4 py-8`) with `space-y-6 w-full`, using responsive cards
+  with top-right status toggles, metadata badges, and expanded bottom action
+  footers.
 - **Form Validation & State Immutability**: `PodcastForm` validates against
   empty or whitespace-only titles across all submit triggers prior to invoking
   backend APIs. `StepInspector` preserves prop immutability during prompt
   editing, resolution switching, and video regeneration by dispatching object
   copies rather than mutating props in place.
-- **UI Cleanup**: Pruned duplicate `Dashboard.tsx` and legacy `LoginPage.tsx`,
-  migrating test coverage to `pages/MoviesList.tsx`.
+- **UI Cleanup**: Pruned duplicate `Dashboard.tsx` and legacy
+  `LoginPage.tsx`, migrating test coverage to `pages/MoviesList.tsx`.
 
 ## Performance & Testing
 - **Workspace Tooling & Commands**: Root scripts coordinate build, lint,
@@ -71,6 +74,6 @@ n layout (65%
   Added a 5-second mutation-invalidated in-memory cache to `EpisodeStore`.
 - **Test Coverage & Known Issues**: Critical test coverage gaps exist in
   `JobQueue` (`backend/src/services/queue.ts`) and startup cleanup
-  `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`). Frontend
-  Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to unmocked
-  fetch calls in `setupTests.ts`.
+  `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
+  Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
+  unmocked fetch calls in `setupTests.ts`.
