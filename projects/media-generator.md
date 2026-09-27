@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-26T00:36:10.635858+00:00
+updated_at: 2026-09-27T00:35:48.875097+00:00
 confidence: 0.95
 ---
 
@@ -40,8 +40,8 @@ confidence: 0.95
 
 ## Media Pipelines & Storage
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
-  formulation
-<truncated 2353 bytes>
+ 
+<truncated 2882 bytes>
 yout (65%
   creations feed, 35% operations sidebar); mobile (`<sm`): Single column with
   a 2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`),
@@ -74,6 +74,6 @@ yout (65%
   Added a 5-second mutation-invalidated in-memory cache to `EpisodeStore`.
 - **Test Coverage & Known Issues**: Critical test coverage gaps exist in
   `JobQueue` (`backend/src/services/queue.ts`) and startup cleanup
-  `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`).
-  Frontend Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to
-  unmocked fetch calls in `setupTests.ts`.
+  `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`). Frontend
+  Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to unmocked
+  fetch calls in `setupTests.ts`.

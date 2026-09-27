@@ -2,17 +2,17 @@
 topic: connectrpc-reverse-proxy
 category: knowledge
 tags: [knowledge, connectrpc-reverse-proxy]
-updated_at: 2026-09-26T00:36:23.259152+00:00
+updated_at: 2026-09-27T00:36:36.600968+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Connectrpc-Reverse-Proxy
 
 - **Traffic Interception & Model Injection**: Intercept Connect-RPC HTTP and
-  WebSocket traffic, routing model calls to external providers while passing
+  WebSocket traffic to route model calls to external providers while passing
   native traffic through. Augment `GetCascadeModelConfigData` responses to
   inject custom frontend model options.
-- **Framing, Trailers & Buffering**: Avoid `.pipe()` (causes client hangs);
+- **Framing, Trailers & Buffering**: Avoid `.pipe()` (causes client hangs) and
   invoke `res.flushHeaders()` immediately after `res.writeHead()` to prevent
   stalled streams. Strip hop-by-hop `Transfer-Encoding: chunked` to prevent
   double-chunking, and forward HTTP trailers (`TE: trailers` on requests;

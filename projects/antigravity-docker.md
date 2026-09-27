@@ -2,31 +2,31 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-26T00:32:06.708906+00:00
+updated_at: 2026-09-27T00:32:01.156718+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Container Runtime & Isolation
-- **Runtime Security:** Headless `jklinker/antigravity-docker:latest` runs as
-  non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
-  passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
-  `annotations/`).
-- **Host Execution Gateway:** Replaces `/var/run/docker.sock` mounting with an
-  isolated SSH web terminal gateway (`ttyd` on port 7681) to execute host
-  commands securely without socket exposure.
+- **Runtime Security & Isolation:** Headless
+  `jklinker/antigravity-docker:latest` runs as non-root `developer` via `gosu`
+  (dynamic `PUID`/`PGID`, disabled passwordless sudo, `umask 0002` across
+  `conversations/`, `brain/`, and `annotations/`). Replaces
+  `/var/run/docker.sock` mounting with an isolated SSH web terminal gateway
+  (`ttyd` on port 7681) to execute host commands securely without container
+  socket exposure.
 
 ## Configuration & Environment
 - **Networking & Access:** Exposes `AGY_PORT=4400` (web interface/auth proxy)
-  and `AGY_HUB_PORT=4402` (via `agy --remote-control --hub-port` for
-  deterministic discovery). Configurable via `RC_NAME`, `AUTH_PASSWORD`, and
+  and `AGY_HUB_PORT=4402` (deterministic discovery via `agy --remote-control
+  --hub-port`). Configurable via `RC_NAME`, `AUTH_PASSWORD`, and
   `HOST_SSH_DIR`.
-- **Feature Flags & Privacy:** `ENABLE_IDE` and `ENABLE_TERMINAL` (default
+- **Feature Flags & Telemetry:** `ENABLE_IDE` and `ENABLE_TERMINAL` (default
   `true`) provide sidebar shortcuts for VS Code and terminal.
   `BLOCK_TELEMETRY=true` sinkholes telemetry endpoints to `0.0.0.0` via
   `/etc/hosts` and sets OpenTelemetry opt-out variables.
-- **Storage & Lifecycle:** Initial auth handled via `setup` subcommand with
+- **Storage & Lifecycle:** Initial auth is handled via `setup` subcommand with
   mounted `~/.gemini`. `entrypoint.sh` initializes
   `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Persistent state
   (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
@@ -40,9 +40,9 @@ confidence: 0.95
   session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
-- **Protocol
-<truncated 490 bytes>
-articles. Model providers are managed via `/models` UI
+- **Protocol & Re
+<truncated 541 bytes>
+GE_CSS`). Model providers are managed via `/models` UI
   (`proxy/lib/models-manager.js`), persisting masked API keys to
   `~/.gemini/config/custom_models.json`.
 

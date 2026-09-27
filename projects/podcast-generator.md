@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-26T00:34:26.464571+00:00
+updated_at: 2026-09-27T00:34:04.879800+00:00
 confidence: 0.95
 ---
 
@@ -33,27 +33,27 @@ confidence: 0.95
   `backend/src/index.ts` prunes duplicates by audio path or title, favoring
   entries with `prompt_used` and longer scripts. `buildTitlePatterns` compiles
   regexes (exact, Unicode NFC preserving `[\p{L}\p{N}\p{M}]` for diacritics,
-  stripped ASCII), guarding against empty patterns from invalid characters.
+  and stripped ASCII), guarding against empty patterns from invalid characters.
 - **Library Sync & Metadata**: Copies finished MP3s to `EXTERNAL_OUTPUTS_DIR`,
   maps disc numbers via `TITLE_TO_DISC_MAPPING`, appends `<track>` entries to
   `album.nfo`, and updates Jellyfin metadata (`POST /Items/{itemId}`) using an
   admin user ID resolved from `GET /Users`.
 
 ## Resilience, Security & Testing
-- **Auth Hardening & Traversal Defense**: Startup fails fast in production if
-  `JWT_SECRET` is unset or default in `authMiddleware.ts`. Registration is
-  toggleable via `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`); settings
-  UI is limited to account/security. Media streaming prevents path traversal
-  via `path.sep` boundaries and non-blocking `Bun.file(path).exists()`. Purge
-  Git history (`git-filter-repo` or squashed commit) before release to remove
-  leaked secrets (Gemini keys, Jellyfin tokens, private domains).
+- **Auth, Traversal & Secret Hygiene**: Startup fails fast in production if
+  `JWT_SECRET` is unset or default in `authMiddleware.ts`. Registration toggles
+  via `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`); settings UI is limited
+  to account/security. Media streaming prevents path traversal via `path.sep`
+  boundaries and non-blocking `Bun.file(path).exists()`. Git history must be
+  purged (`git-filter-repo` or squashed commit) before release to remove leaked
+  credentials (Gemini keys, Jellyfin tokens, private domains).
 - **Error Handling & Retries**: `postWithRetry` (`gemini.ts`) provides
   centralized exponential backoff; queue errors standardize on `failJob`
   (`queue.ts`). `GeminiService.generateAudioPart` retries up to 3 times on
   non-200 responses or API filtering (returns false without throwing).
   `PodcastGenerator.generateAudio` aborts when `failedParts >= 5`.
-- **Alerts & Test Requirements**: Sends Slack alerts via `SLACK_WEBHOOK` or
-  `SLACK_WEBHOOK_URL` (default user `podcast-generator`). Completion alerts
+- **Alerts & Test Isolation**: Sends Slack alerts via `SLACK_WEBHOOK` or
+  `SLACK_WEBHOOK_URL` (default user `podcast-generator`); completion alerts
   include canonical RSS feed URLs from `BASE_URL` or fallback port. Generator
   and notification unit tests must mock `NotificationManager.prototype.notify`
   to avoid live Slack webhook calls.
