@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-27T00:32:01.156718+00:00
+updated_at: 2026-09-28T00:31:44.491296+00:00
 confidence: 0.95
 ---
 
@@ -26,32 +26,31 @@ confidence: 0.95
   `true`) provide sidebar shortcuts for VS Code and terminal.
   `BLOCK_TELEMETRY=true` sinkholes telemetry endpoints to `0.0.0.0` via
   `/etc/hosts` and sets OpenTelemetry opt-out variables.
-- **Storage & Lifecycle:** Initial auth is handled via `setup` subcommand with
-  mounted `~/.gemini`. `entrypoint.sh` initializes
+- **Storage, Lifecycle & Defaults:** Initial auth is handled via `setup`
+  subcommand with mounted `~/.gemini`. `entrypoint.sh` initializes
   `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Persistent state
   (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
-  reside in `$GEMINI_DIR/antigravity-cli/`.
-- **Default Policies:** Enforces `enableTerminalSandbox: true`,
-  `nonWorkspaceFiles: ALLOW`, and `autoExecutionPolicy:
-  CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
+  reside in `$GEMINI_DIR/antigravity-cli/`. Enforces sandbox policies:
+  `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
+  `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Enforces dynamic 256-bit session tokens, in-memory
   session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
   centralized body parsing via `proxy/lib/security.js`.
-- **Protocol & Re
-<truncated 541 bytes>
-GE_CSS`). Model providers are managed via `/models` UI
-  (`proxy/lib/models-manager.js`), persisting masked API keys to
-  `~/.gemini/config/custom_models.json`.
+- **Protocol 
+<truncated 537 bytes>
+E_CSS`).
+- **Model Providers:** Managed via `/models` UI (`proxy/lib/models-manager.js`),
+  persisting masked API keys to `~/.gemini/config/custom_models.json`.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js
   streaming transcoder conditionally enabled by `entrypoint.sh` only when
-  custom models are configured. Unregistered placeholder models in `M500`-`M649`
-  return `null` immediately, routing built-in models (Claude, GPT-OSS)
-  directly upstream to Google when Astra is active.
+  custom models are configured. Unregistered placeholder models in
+  `M500`-`M649` return `null` immediately, routing built-in models (Claude,
+  GPT-OSS) directly upstream to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across unary and streaming calls, coercing
   stringified booleans and integers into native types. Strips

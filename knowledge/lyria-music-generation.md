@@ -2,7 +2,7 @@
 topic: lyria-music-generation
 category: knowledge
 tags: [knowledge, lyria-music-generation]
-updated_at: 2026-09-14T00:38:38.216270+00:00
+updated_at: 2026-09-28T00:00:27.654810+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,7 @@ confidence: 0.95
   the full 30s duration with a tail safety fade
   (`atrim=0:30,afade=t=in:ss=0:d=1,afade=t=out:st=27:d=3`) maintains
   musicality while preventing waveform pops or clicks.
+
+- Lyria music models in Google's Generative Language v1beta API catalog use the
+`models/lyria-` prefix (e.g. `lyria-3-clip-preview`) and appear alongside Gemini
+models when querying the models list endpoint.
