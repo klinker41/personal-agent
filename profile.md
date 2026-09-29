@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-09-12T00:02:55.703475+00:00
+updated_at: 2026-09-29T00:01:12.777149+00:00
 confidence: 1.0
 ---
 
@@ -60,3 +60,6 @@ models.ts) rather than baking default values into Dockerfiles.
 - Prefers correcting underlying data and permissions on disk rather than
 introducing permissive fallback logic or compatibility workarounds in
 application code.
+
+- Homelab environment utilizes Slack as a centralized notification hub for
+self-hosted services and personal agent alerts.

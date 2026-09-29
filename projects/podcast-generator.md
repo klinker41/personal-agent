@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-28T00:33:08.994487+00:00
+updated_at: 2026-09-29T00:35:51.378714+00:00
 confidence: 0.95
 ---
 
@@ -18,10 +18,10 @@ confidence: 0.95
   `data/podcasts/`, `data/outputs/`) enforce per-user tenancy
   (`PodcastStore.list(user.id)` on `GET /api/podcasts`; episodes inherit
   tenancy), managed by in-process `JobQueue` and `PodcastScheduler`.
-- **File & Episode Store**: `fileStore.ts` provides atomic writes (`writeText`,
-  `writeJson`), directory validation, and date matching.
-  `EpisodeStore.autoDiscoverEpisodes` backfills missing `episode.json` on
-  `GET /api/podcasts/:id` (omitted from list endpoints to avoid latency).
+  `fileStore.ts` provides atomic writes (`writeText`, `writeJson`), directory
+  validation, and date matching. `EpisodeStore.autoDiscoverEpisodes` backfills
+  missing `episode.json` on `GET /api/podcasts/:id` (omitted from list
+  endpoints to avoid latency).
 
 ## Media Pipeline & Integrations
 - **Synthesis & Ad Placement**: Synthesizes scripts, 1:1 cover art, and
@@ -40,14 +40,13 @@ confidence: 0.95
   admin user ID resolved from `GET /Users`.
 
 ## Security, Resilience & Testing
-- **Auth & Access Control**: Startup fails in production if `JWT_SECRET` is
+- **Security & Access Control**: Startup fails in production if `JWT_SECRET` is
   unset or default in `authMiddleware.ts`. Registration toggles via
   `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`); settings UI is limited to
   account/security. Streaming checks `path.sep` boundaries and non-blocking
-  `Bun.file(path).exists()` to prevent path traversal.
-- **Secret Hygiene**: Git history must be purged (`git-filter-repo` or squash)
-  before release to remove leaked Gemini keys, Jellyfin tokens, and private
-  domains.
+  `Bun.file(path).exists()` to prevent path traversal. Git history must be
+  purged (`git-filter-repo` or squash) before release to remove leaked Gemini
+  keys, Jellyfin tokens, and private domains.
 - **Error Handling & Retries**: `postWithRetry` (`gemini.ts`) provides
   exponential backoff; queue errors standardize on `failJob` (`queue.ts`).
   `GeminiService.generateAudioPart` retries up to 3 times on non-200 responses

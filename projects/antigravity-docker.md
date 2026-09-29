@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-28T00:31:44.491296+00:00
+updated_at: 2026-09-29T00:33:04.983101+00:00
 confidence: 0.95
 ---
 
@@ -22,7 +22,7 @@ confidence: 0.95
   and `AGY_HUB_PORT=4402` (deterministic discovery via `agy --remote-control
   --hub-port`). Configurable via `RC_NAME`, `AUTH_PASSWORD`, and
   `HOST_SSH_DIR`.
-- **Feature Flags & Telemetry:** `ENABLE_IDE` and `ENABLE_TERMINAL` (default
+- **Feature Flags & Privacy:** `ENABLE_IDE` and `ENABLE_TERMINAL` (default
   `true`) provide sidebar shortcuts for VS Code and terminal.
   `BLOCK_TELEMETRY=true` sinkholes telemetry endpoints to `0.0.0.0` via
   `/etc/hosts` and sets OpenTelemetry opt-out variables.
@@ -38,16 +38,15 @@ confidence: 0.95
 - **Security & Hardening:** Enforces dynamic 256-bit session tokens, in-memory
   session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
-  centralized body parsing via `proxy/lib/security.js`.
-- **Protocol 
-<truncated 537 bytes>
-E_CSS`).
-- **Model Providers:** Managed via `/models` UI (`proxy/lib/models-manager.js`),
-  persisting masked API keys to `~/.gemini/config/custom_models.json`.
+  centralized body parsing via `proxy/lib/security.js`. Serves unauthen
+<truncated 571 bytes>
+S`. Model providers are managed via
+  `/models` UI (`proxy/lib/models-manager.js`), persisting masked API keys to
+  `~/.gemini/config/custom_models.json`.
 
 ## Translation Proxy & Transcoding
-- **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js
-  streaming transcoder conditionally enabled by `entrypoint.sh` only when
+- **Activation & Routing (`proxy/translation-proxy.js`):** Native streaming
+  transcoder on port 4405, conditionally enabled by `entrypoint.sh` only when
   custom models are configured. Unregistered placeholder models in
   `M500`-`M649` return `null` immediately, routing built-in models (Claude,
   GPT-OSS) directly upstream to Google when Astra is active.
