@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-29T00:35:51.378714+00:00
+updated_at: 2026-09-30T00:34:21.669178+00:00
 confidence: 0.95
 ---
 
@@ -17,7 +17,7 @@ confidence: 0.95
 - **Tenancy & Persistence**: Filesystem JSON manifests (`data/users.json`,
   `data/podcasts/`, `data/outputs/`) enforce per-user tenancy
   (`PodcastStore.list(user.id)` on `GET /api/podcasts`; episodes inherit
-  tenancy), managed by in-process `JobQueue` and `PodcastScheduler`.
+  tenancy), coordinated by in-process `JobQueue` and `PodcastScheduler`.
   `fileStore.ts` provides atomic writes (`writeText`, `writeJson`), directory
   validation, and date matching. `EpisodeStore.autoDiscoverEpisodes` backfills
   missing `episode.json` on `GET /api/podcasts/:id` (omitted from list
@@ -40,10 +40,10 @@ confidence: 0.95
   admin user ID resolved from `GET /Users`.
 
 ## Security, Resilience & Testing
-- **Security & Access Control**: Startup fails in production if `JWT_SECRET` is
-  unset or default in `authMiddleware.ts`. Registration toggles via
-  `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`); settings UI is limited to
-  account/security. Streaming checks `path.sep` boundaries and non-blocking
+- **Security & Access Control**: Startup fails in production if `JWT_SECRET`
+  is unset or default in `authMiddleware.ts`. Registration toggles via
+  `ALLOW_REGISTRATION` (`GET /api/v1/auth/config`); settings UI is limited
+  to account/security. Streaming checks `path.sep` boundaries and non-blocking
   `Bun.file(path).exists()` to prevent path traversal. Git history must be
   purged (`git-filter-repo` or squash) before release to remove leaked Gemini
   keys, Jellyfin tokens, and private domains.
@@ -54,6 +54,6 @@ confidence: 0.95
   `failedParts >= 5`.
 - **Alerts & Test Isolation**: Sends Slack alerts via `SLACK_WEBHOOK` or
   `SLACK_WEBHOOK_URL` (default user `podcast-generator`); completion alerts
-  include canonical RSS feed URLs from `BASE_URL` or fallback port. Generator
-  and notification unit tests must mock `NotificationManager.prototype.notify`
-  to avoid live webhook calls.
+  include canonical RSS feed URLs from `BASE_URL` or fallback port.
+  Generator and notification unit tests must mock
+  `NotificationManager.prototype.notify` to avoid live webhook calls.

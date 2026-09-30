@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-29T00:01:18.582475+00:00
+updated_at: 2026-09-30T00:00:54.960846+00:00
 confidence: 0.95
 ---
 
@@ -80,3 +80,6 @@ n layout (65%
 (`DEFAULT_TEXT_MODEL`), image (`DEFAULT_IMAGE_MODEL`), audio
 (`DEFAULT_AUDIO_MODEL`), video (`DEFAULT_VIDEO_MODEL`), and music
 (`DEFAULT_MUSIC_MODEL`).
+
+- Default model IDs for text, image, audio, video, and music generation are
+configured and centralized in shared/models.ts.
