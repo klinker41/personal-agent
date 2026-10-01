@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-09-30T00:34:21.669178+00:00
+updated_at: 2026-10-01T00:36:05.179671+00:00
 confidence: 0.95
 ---
 
@@ -47,13 +47,11 @@ confidence: 0.95
   `Bun.file(path).exists()` to prevent path traversal. Git history must be
   purged (`git-filter-repo` or squash) before release to remove leaked Gemini
   keys, Jellyfin tokens, and private domains.
-- **Error Handling & Retries**: `postWithRetry` (`gemini.ts`) provides
+- **Resilience, Alerts & Testing**: `postWithRetry` (`gemini.ts`) provides
   exponential backoff; queue errors standardize on `failJob` (`queue.ts`).
   `GeminiService.generateAudioPart` retries up to 3 times on non-200 responses
-  or API filtering (returns false without throwing). Generation aborts when
-  `failedParts >= 5`.
-- **Alerts & Test Isolation**: Sends Slack alerts via `SLACK_WEBHOOK` or
-  `SLACK_WEBHOOK_URL` (default user `podcast-generator`); completion alerts
-  include canonical RSS feed URLs from `BASE_URL` or fallback port.
-  Generator and notification unit tests must mock
+  or API filtering (returns false without throwing); generation aborts when
+  `failedParts >= 5`. Slack alerts via `SLACK_WEBHOOK` or `SLACK_WEBHOOK_URL`
+  (default user `podcast-generator`) include canonical RSS feed URLs from
+  `BASE_URL` or fallback port. Generator and notification unit tests must mock
   `NotificationManager.prototype.notify` to avoid live webhook calls.

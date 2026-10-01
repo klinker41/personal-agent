@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-09-30T00:32:51.644440+00:00
+updated_at: 2026-10-01T00:33:55.111061+00:00
 confidence: 0.95
 ---
 
@@ -39,17 +39,17 @@ confidence: 0.95
   session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
   centralized 
-<truncated 665 bytes>
-del providers are managed via `/models` UI
-  (`proxy/lib/models-manager.js`), persisting masked API keys to
-  `~/.gemini/config/custom_models.json`.
+<truncated 698 bytes>
+~/.gemini/config/custom_models.json`.
 
 ## Translation Proxy & Transcoding
-- **Activation & Routing (`proxy/translation-proxy.js`):** Native streaming
-  transcoder on port 4405, conditionally enabled by `entrypoint.sh` only when
-  custom models are configured. Unregistered placeholder models in
-  `M500`-`M649` return `null` immediately, routing built-in models (Claude,
-  GPT-OSS) directly upstream to Google when Astra is active.
+- **Activation & Routing (`proxy/translation-proxy.js`):** Native Node.js
+  streaming transcoder on port 4405 (no LiteLLM dependency) transcoding
+  Connect-RPC Protobuf streams to Anthropic and OpenAI endpoints. Conditionally
+  enabled by `entrypoint.sh` only when custom models are configured.
+  Unregistered placeholder models in `M500`-`M649` return `null` immediately,
+  routing built-in models (Claude, GPT-OSS) directly upstream to Google when
+  Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across unary and streaming calls, coercing
   stringified booleans and integers into native types. Strips

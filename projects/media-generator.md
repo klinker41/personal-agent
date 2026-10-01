@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-09-30T00:00:54.960846+00:00
+updated_at: 2026-10-01T00:00:31.756618+00:00
 confidence: 0.95
 ---
 
@@ -83,3 +83,8 @@ n layout (65%
 
 - Default model IDs for text, image, audio, video, and music generation are
 configured and centralized in shared/models.ts.
+
+- Current default model IDs in shared/models.ts and .env.example are confirmed
+up to date: gemini-3.8-flash (text), gemini-3-pro-image (image),
+gemini-3.8-flash-tts (audio), gemini-omni-1.1-flash (video), and
+lyria-3-clip-preview (music).
