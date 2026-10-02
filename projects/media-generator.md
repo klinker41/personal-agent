@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-01T00:00:31.756618+00:00
+updated_at: 2026-10-02T00:00:19.359177+00:00
 confidence: 0.95
 ---
 
@@ -27,9 +27,8 @@ confidence: 0.95
 - **Centralized Model Defaults**: Centralized in `shared/models.ts` and mirrored
   in `.env.example` across five constants without `models/` prefix:
   `DEFAULT_TEXT_MODEL` (`gemini-3.8-flash`), `DEFAULT_IMAGE_MODEL`
-  (`gemini-3-pro-image`), `DEFAULT_AUDIO_MODEL`
-  (`gemini-3.1-flash-tts-preview`), `DEFAULT_VIDEO_MODEL`
-  (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
+  (`gemini-3-pro-image`), `DEFAULT_AUDIO_MODEL` (`gemini-3.8-flash-tts`),
+  `DEFAULT_VIDEO_MODEL` (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
   (`lyria-3-clip-preview`).
 - **Model Selection & Update Policies**: Model IDs must strip `models/`
   prefixes and use non-experimental Gemini models (Lyria for music), strictly
@@ -40,9 +39,45 @@ confidence: 0.95
 
 ## Media Pipelines & Storage
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
- 
-<truncated 1943 bytes>
-n layout (65%
+  formulation, screenplay breakdown, character casting with reference
+  portraits, scene chunking with camera setups/plates, Gemini Omni video
+  generation with temporal continuity, and FFmpeg stitching with single-chunk
+  regeneration and upscaling. In `movieGemini.ts`, scene chunking enforces
+  shot/reverse-shot continuity where speaker alternations mandate `new_shot`.
+  Continuous shots are reserved for extended single-speaker dialogue exceeding
+  chunk limits (10s or 18–20 words) or sustained shared staging. Concat
+  demuxer lists require quote escaping, temp paths, and re-encode fallback
+  handling.
+- **Episodic Podcast Pipeline**: Synthesizes multi-speaker dialogue via Gemini
+  TTS with celestial voice profiles, ID3v2-tagged MP3 mastering, automated cron
+  releases, Jellyfin/Emby triggers, and RSS 2.0 feeds with iTunes tags. In
+  `formatSpeakerGuidelines`, one host must always announce the podcast name at
+  the start regardless of banter setting. Theme music uses Google Lyria 3 Clip
+  (`lyria-3-clip-preview`), stored in `data/podcasts/music/` and served via
+  HTTP Range with a 15s intro (2s fade-in, 3s fade-out) and 30s outro
+  (1s fade-in, 3s tail fade). Supports ad reads via `ad_reads` on `Podcast`.
+- **Novel & Audiobook Pipelines**: Scoped to generating books or creating
+  audiobooks from generated books (not text file uploads/parsing). Book
+  generation uses Gemini output validation, rolling chapter memory, story bible
+  digests, copyeditor truncation protection, and chapter preservation during
+  outline replanning. Audiobooks process via asynchronous `BookQueue` jobs,
+  isolating audio state from book status, with downstream audio invalidation on
+  text edits, safe Gemini response extraction, speaker roster matching, and
+  audio chunk retries.
+- **Asset Storage & Environment**: Podcast assets are consolidated under
+  `data/podcasts/` (`episodes`, `outputs`, `speaker_previews`, `music`),
+  eliminating `OUTPUTS_DIR` and legacy directory fallback logic.
+  `RESERVED_PODCAST_DIRS` in `fileStore.ts` prevents collisions with podcast
+  UUID folders during listing, lookup, and deletion. `EXTERNAL_OUTPUTS_DIR`
+  defaults to `/app/data/outputs-external` in Docker and is disabled if unset.
+
+## Frontend & UI Architecture
+- **Auth Resilience & Stream Lifecycle**: `AuthContext` preserves sessions
+  during network outages and 5xx errors using decoded JWT data (switching to an
+  offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
+  responses, supporting both `token` and `auth_token` keys. `EventSource` SSE
+  streams terminate cleanly on unmount and disconnect.
+- **Dashboard Layout**: Desktop (`lg:`): Asymmetric 2-column layout (65%
   creations feed, 35% operations sidebar); mobile (`<sm`): Single column with
   a 2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`), in-flight
   pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer links, and
@@ -75,16 +110,3 @@ n layout (65%
   `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`). Frontend
   Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to unmocked
   fetch calls in `setupTests.ts`.
-
-- Default generative model IDs are maintained in `shared/models.ts` across text
-(`DEFAULT_TEXT_MODEL`), image (`DEFAULT_IMAGE_MODEL`), audio
-(`DEFAULT_AUDIO_MODEL`), video (`DEFAULT_VIDEO_MODEL`), and music
-(`DEFAULT_MUSIC_MODEL`).
-
-- Default model IDs for text, image, audio, video, and music generation are
-configured and centralized in shared/models.ts.
-
-- Current default model IDs in shared/models.ts and .env.example are confirmed
-up to date: gemini-3.8-flash (text), gemini-3-pro-image (image),
-gemini-3.8-flash-tts (audio), gemini-omni-1.1-flash (video), and
-lyria-3-clip-preview (music).

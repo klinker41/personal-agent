@@ -2,7 +2,7 @@
 topic: lyria-music-generation
 category: knowledge
 tags: [knowledge, lyria-music-generation]
-updated_at: 2026-09-28T00:00:27.654810+00:00
+updated_at: 2026-10-02T00:00:19.361306+00:00
 confidence: 0.95
 ---
 
@@ -28,3 +28,6 @@ confidence: 0.95
 - Lyria music models in Google's Generative Language v1beta API catalog use the
 `models/lyria-` prefix (e.g. `lyria-3-clip-preview`) and appear alongside Gemini
 models when querying the models list endpoint.
+
+- The current Lyria music generation model identifier available in the
+Generative Language v1beta API is `lyria-3-clip-preview`.

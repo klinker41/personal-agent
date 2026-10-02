@@ -2,7 +2,7 @@
 topic: gemini-omni-api
 category: knowledge
 tags: [knowledge, gemini-omni-api]
-updated_at: 2026-09-11T00:00:14.897432+00:00
+updated_at: 2026-10-02T00:00:19.361801+00:00
 confidence: 0.95
 ---
 
@@ -16,3 +16,6 @@ camera motion continuity across shots.
 
 - gemini-omni-1.1-flash serves as the stable release model for video generation
 workloads queried via the Gemini REST API.
+
+- `gemini-omni-1.1-flash` is available in the Generative Language v1beta API for
+video generation tasks.
