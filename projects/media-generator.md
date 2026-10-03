@@ -2,17 +2,17 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-02T00:00:19.359177+00:00
+updated_at: 2026-10-03T00:36:55.395789+00:00
 confidence: 0.95
 ---
 
 # Project: Media-Generator
 
 ## Platform & Architecture
-- **Branding & Stack**: Branded as 'Media Studio' in the top app bar (not 'AI
-  Media Studio' or 'Podcast Generator'). Unified Bun and Hono web service with
-  JWT authentication, uniting cinematic movie generation, episodic podcast
-  synthesis, novel generation, and audiobook creation.
+- **Branding & Stack**: Branded as 'Media Studio' in the top app bar (not
+  'AI Media Studio' or 'Podcast Generator'). Unified Bun and Hono web service
+  with JWT authentication, uniting cinematic movie generation, episodic
+  podcast synthesis, novel generation, and audiobook creation.
 - **RBAC & User Management**: Multi-user role-based access control requires an
   admin role in `users.json` on disk to access and manage legacy creations;
   standard users can view only their own creations.
@@ -24,8 +24,8 @@ confidence: 0.95
   book/audiobook generator services.
 
 ## Model Configuration & Standards
-- **Centralized Model Defaults**: Centralized in `shared/models.ts` and mirrored
-  in `.env.example` across five constants without `models/` prefix:
+- **Centralized Model Defaults**: Centralized in `shared/models.ts` and
+  mirrored in `.env.example` across five constants without `models/` prefix:
   `DEFAULT_TEXT_MODEL` (`gemini-3.8-flash`), `DEFAULT_IMAGE_MODEL`
   (`gemini-3-pro-image`), `DEFAULT_AUDIO_MODEL` (`gemini-3.8-flash-tts`),
   `DEFAULT_VIDEO_MODEL` (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
@@ -39,45 +39,9 @@ confidence: 0.95
 
 ## Media Pipelines & Storage
 - **Cinematic Movie Pipeline**: 7-stage workflow spanning prompting, plot
-  formulation, screenplay breakdown, character casting with reference
-  portraits, scene chunking with camera setups/plates, Gemini Omni video
-  generation with temporal continuity, and FFmpeg stitching with single-chunk
-  regeneration and upscaling. In `movieGemini.ts`, scene chunking enforces
-  shot/reverse-shot continuity where speaker alternations mandate `new_shot`.
-  Continuous shots are reserved for extended single-speaker dialogue exceeding
-  chunk limits (10s or 18–20 words) or sustained shared staging. Concat
-  demuxer lists require quote escaping, temp paths, and re-encode fallback
-  handling.
-- **Episodic Podcast Pipeline**: Synthesizes multi-speaker dialogue via Gemini
-  TTS with celestial voice profiles, ID3v2-tagged MP3 mastering, automated cron
-  releases, Jellyfin/Emby triggers, and RSS 2.0 feeds with iTunes tags. In
-  `formatSpeakerGuidelines`, one host must always announce the podcast name at
-  the start regardless of banter setting. Theme music uses Google Lyria 3 Clip
-  (`lyria-3-clip-preview`), stored in `data/podcasts/music/` and served via
-  HTTP Range with a 15s intro (2s fade-in, 3s fade-out) and 30s outro
-  (1s fade-in, 3s tail fade). Supports ad reads via `ad_reads` on `Podcast`.
-- **Novel & Audiobook Pipelines**: Scoped to generating books or creating
-  audiobooks from generated books (not text file uploads/parsing). Book
-  generation uses Gemini output validation, rolling chapter memory, story bible
-  digests, copyeditor truncation protection, and chapter preservation during
-  outline replanning. Audiobooks process via asynchronous `BookQueue` jobs,
-  isolating audio state from book status, with downstream audio invalidation on
-  text edits, safe Gemini response extraction, speaker roster matching, and
-  audio chunk retries.
-- **Asset Storage & Environment**: Podcast assets are consolidated under
-  `data/podcasts/` (`episodes`, `outputs`, `speaker_previews`, `music`),
-  eliminating `OUTPUTS_DIR` and legacy directory fallback logic.
-  `RESERVED_PODCAST_DIRS` in `fileStore.ts` prevents collisions with podcast
-  UUID folders during listing, lookup, and deletion. `EXTERNAL_OUTPUTS_DIR`
-  defaults to `/app/data/outputs-external` in Docker and is disabled if unset.
-
-## Frontend & UI Architecture
-- **Auth Resilience & Stream Lifecycle**: `AuthContext` preserves sessions
-  during network outages and 5xx errors using decoded JWT data (switching to an
-  offline fallback user) and only purges tokens upon explicit HTTP 401 or 403
-  responses, supporting both `token` and `auth_token` keys. `EventSource` SSE
-  streams terminate cleanly on unmount and disconnect.
-- **Dashboard Layout**: Desktop (`lg:`): Asymmetric 2-column layout (65%
+  formulation, scr
+<truncated 2666 bytes>
+n layout (65%
   creations feed, 35% operations sidebar); mobile (`<sm`): Single column with
   a 2x2 telemetry grid. Components: KPI cards (`DashboardCards.tsx`), in-flight
   pipeline banner (`InFlightPipelineBanner.tsx`) with visualizer links, and

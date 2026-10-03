@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-02T00:33:03.567011+00:00
+updated_at: 2026-10-03T00:34:09.785676+00:00
 confidence: 1.0
 ---
 
@@ -38,11 +38,10 @@ skills, lifecycle hooks, background sidecars (`sidecar.json`), and
   via `save-memory`.
 - **Pipeline & Lifecycle:** Turn-1 injection (`hooks/inject_memory.py`) triggers
   on `initialNumSteps == 0` and `invocationNum == 1`. Nightly operations:
-  - `00:00`: Dreamer extracts updates (persists watermarks in `state.json`,
-    checks topics via `memory_utils.get_existing_topics`, skips subagents and
-    `rules/*.md`, purges ephemeral sessions).
-  - `00:30`: Tiered chronicle compaction.
-  - `01:00`: Git sync with secret scrubbing.
+  `00:00` Dreamer extraction (saves watermarks to `state.json`, checks topics
+  via `memory_utils.get_existing_topics`, skips subagents and `rules/*.md`,
+  purges ephemeral sessions), `00:30` tiered chronicle compaction, and `01:00`
+  Git sync with secret scrubbing.
 - **Bridge & Discovery (`utils/memory_utils.py`):** `AgentApiBridge` executes
   `agentapi` subprocesses with auth retry, resolving projects in
   `~/.gemini/config/projects/` by name, UUID, or path (defaults to
@@ -56,8 +55,8 @@ skills, lifecycle hooks, background sidecars (`sidecar.json`), and
 ## Sidecars & Integrations
 - **Scheduled Tasks (`sidecar.json`):** Recurring jobs using
   `agentapi new-conversation` with `--model`: `model-updater` (Gemini defaults
-  daily at 15:00 UTC) and `submodule-updater` (`vendor/agent-skills` Mondays
-  at 15:00 UTC).
+  daily at 15:00 UTC) and `submodule-updater` (`vendor/agent-skills` Mondays at
+  15:00 UTC).
 - **Slack Integration (`sidecars/slack-chat/`):** Connects Slack Socket Mode to
   `agentapi` via `AgentApiBridge`, mapping `thread_ts` to conversation IDs with
   `conversations_replies` backfill. Verified by `prep-slack-chat-sidecar`

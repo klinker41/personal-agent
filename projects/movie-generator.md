@@ -2,15 +2,15 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-10-02T00:34:20.424478+00:00
+updated_at: 2026-10-03T00:35:12.508236+00:00
 confidence: 0.95
 ---
 
 # Project: Movie-Generator
 
 ## Architecture & Access Control
-- **Stack & Routing**: Built on `oven/bun:alpine` with Hono, CLI `ffmpeg`,
-  native `Bun.password`, and `bun test` via `app.request()`. Route `/assets/*`
+- **Stack & Routing**: `oven/bun:alpine` with Hono, CLI `ffmpeg`, native
+  `Bun.password`, and `bun test` via `app.request()`. Route `/assets/*`
   guards against path traversal, serving `generated_assets/` with fallback to
   `frontend/dist/assets/`.
 - **RBAC & Isolation**: Enforces tenant movie isolation via
@@ -20,14 +20,14 @@ confidence: 0.95
 
 ## Generation Pipeline & Continuity
 - **Pipeline & Tiers**: Orchestrated by `gemini-3.7-flash` with video
-  generation via `gemini-omni-1.1-flash`. Stitches chunks into `scene.mp4` and
-  `movie.mp4` across 4 resolution tiers (360p Draft, 720p HD, 1080p FHD, 4K
-  UHD), skipping existing or upscaled chunks.
+  generation via `gemini-omni-1.1-flash`. Stitches chunks into `scene.mp4`
+  and `movie.mp4` across 4 resolution tiers (360p Draft, 720p HD, 1080p FHD,
+  4K UHD), skipping existing or upscaled chunks.
 - **Continuity & Plates**: Stage 4.8A generates concept plate prompts via
   `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
   `generateSceneChunks` evaluates `camera_continuity` (`continuous` vs
-  `new_shot`); continuous shots attach prior `video.mp4` with temporal cues as
-  multimodal references.
+  `new_shot`); continuous shots attach prior `video.mp4` with temporal cues
+  as multimodal references.
 
 ## Safety, Diagnostics & Serialization
 - **Safety & Sanitization**: Sets `BLOCK_ONLY_HIGH` across all categories in

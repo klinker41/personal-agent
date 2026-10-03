@@ -2,7 +2,7 @@
 topic: lyria-music-generation
 category: knowledge
 tags: [knowledge, lyria-music-generation]
-updated_at: 2026-10-02T00:00:19.361306+00:00
+updated_at: 2026-10-03T00:37:28.059840+00:00
 confidence: 0.95
 ---
 
@@ -12,22 +12,15 @@ confidence: 0.95
   stereo MP3 audio clips via the Google GenAI Interactions API
   (`https://generativelanguage.googleapis.com/v1beta/interactions` or
   `@google/genai`) using the standard `generateContent` method.
-- Lyria models are cataloged alongside Gemini models under the `models/lyria-*`
-  namespace (e.g., `models/lyria-*-clip`, `lyria-3-clip-preview`) via the
+- Lyria models are cataloged alongside Gemini models under the
+  `models/lyria-*` namespace (e.g., `models/lyria-3-clip-preview`) via the
   Generative Language REST API (`GET /v1beta/models?pageSize=200`) with
   specific `supportedGenerationMethods`.
-- Directional prompt tailoring allows generating cohesive paired tracks (e.g.,
-  an intro motif with energetic lead-in vs. an outro with reflective resolution
-  fading into silence) from a single thematic description.
+- Directional prompt tailoring allows generating cohesive paired tracks
+  (e.g., an intro motif with energetic lead-in vs. an outro with reflective
+  resolution fading into silence) from a single thematic description.
 - When assembling Lyria-generated music with FFmpeg, trimming outro clips
   prematurely cuts off natural resolving chords and musical codas; preserving
   the full 30s duration with a tail safety fade
   (`atrim=0:30,afade=t=in:ss=0:d=1,afade=t=out:st=27:d=3`) maintains
   musicality while preventing waveform pops or clicks.
-
-- Lyria music models in Google's Generative Language v1beta API catalog use the
-`models/lyria-` prefix (e.g. `lyria-3-clip-preview`) and appear alongside Gemini
-models when querying the models list endpoint.
-
-- The current Lyria music generation model identifier available in the
-Generative Language v1beta API is `lyria-3-clip-preview`.
