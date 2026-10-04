@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-03T00:36:55.395789+00:00
+updated_at: 2026-10-04T00:01:01.264223+00:00
 confidence: 0.95
 ---
 
@@ -74,3 +74,7 @@ n layout (65%
   `EpisodeStore.deduplicate()` (`backend/src/services/fileStore.ts`). Frontend
   Vitest execution logs unhandled `ERR_INVALID_URL` warnings due to unmocked
   fetch calls in `setupTests.ts`.
+
+- Default Gemini and Lyria model identifiers for text, image, audio, video, and
+music generation are centralized in shared/models.ts and mirrored in
+.env.example.
