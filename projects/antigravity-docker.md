@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-02T00:32:26.854818+00:00
+updated_at: 2026-10-05T00:01:04.484593+00:00
 confidence: 0.95
 ---
 
@@ -75,3 +75,15 @@ sked API keys
   environment variables and filesystem fixtures in `finally` blocks (e.g.,
   `tests/test-sidecar-manager.js`) to prevent CSRF token or state leakage
   between test suites.
+
+- The mobile gateway (`/gateway/v1`) is designed to run directly within
+`auth-proxy.js` (`proxy/gateway/`) rather than as a standalone process on an
+extra port, allowing direct port 4402 hub communication and shared custom-model
+tracking.
+- Mobile gateway uses standalone bearer token authentication decoupled from web
+browser cookies, allowing mobile pairing without credentials if `AUTH_PASSWORD`
+is unset.
+- Conversation list synchronization follows a hybrid schedule: passive polling
+every 60 seconds, 2-second burst polling for 10 seconds following state-altering
+events or untitled conversations, and immediate push upon agent turn completion
+to clear spinners.

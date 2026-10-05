@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-03T00:34:09.785676+00:00
+updated_at: 2026-10-05T00:34:21.075511+00:00
 confidence: 1.0
 ---
 
@@ -15,30 +15,30 @@ skills, lifecycle hooks, background sidecars (`sidecar.json`), and
 `vendor/agent-skills`.
 
 ## Development Rules & Invariants
-- **Web Applications:** Bun runtime/package manager, Hono framework, minimal
-  dependencies (`rules/web-app-architecture.md`), and port 4401 routed via
-  `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
-- **Coding Standards:** Kebab-case naming for rules and skills
-  (`rules/rule-naming.md`, `rules/skill-naming.md`), `Model: "flash"` for
-  coding and test subagents (`rules/coding-subagent-model.md`), minimal diffs
-  (`rules/simplify-changes.md`), README updates on architectural changes
-  (`rules/readme-updates.md`), and 80-character line wrap on Markdown files
-  (`rules/markdown-formatting.md`).
-- **Git & Quality Gates:** Tests must pass non-verbosely before committing
-  (`rules/non-verbose-tests.md`, `rules/tests-must-pass-before-commit.md`), zero
-  secrets in diffs (`rules/no-secrets-in-commits.md`), mandatory
-  `self-review-commit` loop (`Model: "pro"` reviewer;
-  `rules/self-review-before-commit.md`), and user approval required before
+- **Web Applications:** Bun runtime and package manager, Hono framework,
+  minimal dependencies (`rules/web-app-architecture.md`), and port 4401 routed
+  via `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
+- **Coding Standards:** Kebab-case rule/skill naming (`rules/rule-naming.md`,
+  `rules/skill-naming.md`), `Model: "flash"` for coding/test subagents
+  (`rules/coding-subagent-model.md`), minimal diffs
+  (`rules/simplify-changes.md`), 80-character line wrap on Markdown files
+  (`rules/markdown-formatting.md`), and README updates on architectural changes
+  (`rules/readme-updates.md`).
+- **Git & Quality Gates:** Non-verbose passing tests
+  (`rules/non-verbose-tests.md`, `rules/tests-must-pass-before-commit.md`) and
+  zero secret leaks (`rules/no-secrets-in-commits.md`) required before commit.
+  Mandatory iterative `self-review-commit` loop (`Model: "pro"`;
+  `rules/self-review-before-commit.md`); user approval required before
   `git push` (`rules/git-push.md`).
 
 ## Memory System (`sidecars/memory-daemon`)
 - **Structure & Access:** Progressive disclosure store at `$MEMORY_DIRECTORY`
   (`profile.md`, `index.md`, `projects/`, `knowledge/`, and tiered chronicles in
-  `daily/`, `monthly/`, `yearly/`). Queried via `lookup-memory` and persisted
-  via `save-memory`.
-- **Pipeline & Lifecycle:** Turn-1 injection (`hooks/inject_memory.py`) triggers
-  on `initialNumSteps == 0` and `invocationNum == 1`. Nightly operations:
-  `00:00` Dreamer extraction (saves watermarks to `state.json`, checks topics
+  `daily/`, `monthly/`, `yearly/`), accessed via `lookup-memory` and
+  `save-memory`.
+- **Pipeline & Lifecycle:** Turn-1 injection on `initialNumSteps == 0` and
+  `invocationNum == 1` (`hooks/inject_memory.py`). Nightly daemon schedule:
+  `00:00` Dreamer extraction (persists watermarks to `state.json`, checks topics
   via `memory_utils.get_existing_topics`, skips subagents and `rules/*.md`,
   purges ephemeral sessions), `00:30` tiered chronicle compaction, and `01:00`
   Git sync with secret scrubbing.
@@ -48,15 +48,15 @@ skills, lifecycle hooks, background sidecars (`sidecar.json`), and
   `personal-agent` UUID `6b1d3dc5-a020-4710-94f5-79b34fc1b9fc` or
   `$ANTIGRAVITY_PROJECT_ID`). Strips caller session environment variables
   (`ANTIGRAVITY_SOURCE_METADATA`, `ANTIGRAVITY_CONVERSATION_ID`, and
-  `ANTIGRAVITY_TRAJECTORY_ID`) to prevent project mismatch; recovers
+  `ANTIGRAVITY_TRAJECTORY_ID`) to avoid project mismatch; recovers
   `ANTIGRAVITY_LS_ADDRESS` and CSRF tokens (`window.__APP_CONFIG__.csrfToken`)
   from `cli.log` and runtime state.
 
 ## Sidecars & Integrations
-- **Scheduled Tasks (`sidecar.json`):** Recurring jobs using
-  `agentapi new-conversation` with `--model`: `model-updater` (Gemini defaults
-  daily at 15:00 UTC) and `submodule-updater` (`vendor/agent-skills` Mondays at
-  15:00 UTC).
+- **Scheduled Maintenance (`sidecar.json`):** Recurring jobs via `agentapi`
+  (`new-conversation --model`): daily `model-updater` (Gemini defaults at 15:00
+  UTC) and weekly `submodule-updater` (`vendor/agent-skills` Mondays at 15:00
+  UTC).
 - **Slack Integration (`sidecars/slack-chat/`):** Connects Slack Socket Mode to
   `agentapi` via `AgentApiBridge`, mapping `thread_ts` to conversation IDs with
   `conversations_replies` backfill. Verified by `prep-slack-chat-sidecar`
