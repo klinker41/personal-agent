@@ -2,59 +2,61 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-05T00:01:04.484593+00:00
+updated_at: 2026-10-07T00:32:44.519402+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Container Runtime & Isolation
-- **Runtime Security:** Headless image `jklinker/antigravity-docker:latest` runs
-  non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled passwordless
-  sudo, `umask 0002` across `conversations/`, `brain/`, and `annotations/`).
-  Configurations remain platform-agnostic.
-- **Host Execution:** Replaces `/var/run/docker.sock` exposure with an isolated
-  SSH web terminal (`ttyd` on port 7681) to execute host commands securely.
+- **Runtime Security:** Headless image `jklinker/antigravity-docker:latest`
+  runs non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
+  passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
+  `annotations/`). Configurations remain platform-agnostic.
+- **Host Execution:** Replaces `/var/run/docker.sock` exposure with an
+  isolated SSH web terminal (`ttyd` on port 7681) to execute host commands
+  securely.
 
 ## Configuration & Environment
 - **Networking & Discovery:** Exposes `AGY_PORT=4400` (auth proxy gateway) and
   `AGY_HUB_PORT=4402` (deterministic upstream discovery via `agy
-  --remote-control --hub-port`). Configured via `RC_NAME`, `AUTH_PASSWORD`, and
-  `HOST_SSH_DIR`.
+  --remote-control --hub-port`). Configured via `RC_NAME`, `AUTH_PASSWORD`,
+  and `HOST_SSH_DIR`.
 - **Feature Flags & Privacy:** `ENABLE_IDE` (port 8080 `code-server`) and
   `ENABLE_TERMINAL` (port 7681 `ttyd`) default to `true`, injecting sidebar
   shortcuts into the UI. `BLOCK_TELEMETRY=true` (default) sinkholes Google
-  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out flags.
+  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out
+  flags.
 - **Storage, Lifecycle & Defaults:** Auth initialized via `setup` subcommand
   with mounted `~/.gemini`. `entrypoint.sh` initializes individual project
   configs under `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens.
   State (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and
-  `cli.log` reside in `$GEMINI_DIR/antigravity-cli/`. Default sandbox policies:
-  `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
+  `cli.log` reside in `$GEMINI_DIR/antigravity-cli/`. Default sandbox
+  policies: `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
   `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
-- **Security & Hardening:** Dynamic 256-bit session tokens, in-memory session
-  cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path traversal
-  protection, security headers (CSP, frame/content-type options), and
-  centralized body par
-<truncated 641 bytes>
-sked API keys
-  to `~/.gemini/config/custom_models.json`.
+- **Security & Hardening:** Employs dynamic 256-bit session tokens, in-memory
+  session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
+  traversal protection, centralized body parsing, and security headers (CSP,
+  frame/content-ty
+<truncated 708 bytes>
+ate push on agent turn completion to
+  clear UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
   transcoder on port 4405 (no LiteLLM dependency) converting Connect-RPC
-  Protobuf streams to Anthropic and OpenAI endpoints. Conditionally enabled by
-  `entrypoint.sh` only when custom models are configured. Unregistered
+  Protobuf streams to Anthropic and OpenAI endpoints. Conditionally enabled
+  by `entrypoint.sh` only when custom models are configured. Unregistered
   placeholders in `M500`-`M649` return `null` immediately, routing built-in
   models (Claude, GPT-OSS) directly upstream to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across streaming and unary calls, coercing
-  stringified booleans and integers into native types. Strips `ArtifactMetadata`
-  outside `.gemini/antigravity-cli/brain/` (setting `UserFacing: false`) and
-  defaults `Overwrite: true` on non-artifact `write_to_file` calls when omitted
-  by third-party models.
+  stringified booleans and integers into native types. Strips
+  `ArtifactMetadata` outside `.gemini/antigravity-cli/brain/` (setting
+  `UserFacing: false`) and defaults `Overwrite: true` on non-artifact
+  `write_to_file` calls when omitted by third-party models.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
 - **Supervisor Engine:** Authenticated `/sidecars` REST API and UI manages
@@ -65,25 +67,13 @@ sked API keys
 - **Sidecar Types:**
   - *Standalone:* Defined in `~/.gemini/config/sidecars/<id>/sidecar.json`,
     toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
-  - *Plugin:* Defined in `<plugin>/sidecars/<name>/sidecar.json`, namespaced as
-    `<plugin-name>/<sidecar-name>`, executed with isolated `cwd`, prepended
-    `PATH`, `PLUGIN` UI badge, and isolated config resets.
+  - *Plugin:* Defined in `<plugin>/sidecars/<name>/sidecar.json`, namespaced
+    as `<plugin-name>/<sidecar-name>`, executed with isolated `cwd`,
+    prepended `PATH`, `PLUGIN` UI badge, and isolated config resets.
 
 ## Testing & Quality
-- **Test Suite & State Isolation:** Native Node test runner
-  (`node --test tests/*.js`). Maintains state isolation by cleaning up mock
-  environment variables and filesystem fixtures in `finally` blocks (e.g.,
+- **Test Suite & State Isolation:** Native Node test runner (`node --test
+  tests/*.js`). Maintains state isolation by cleaning up mock environment
+  variables and filesystem fixtures in `finally` blocks (e.g.,
   `tests/test-sidecar-manager.js`) to prevent CSRF token or state leakage
   between test suites.
-
-- The mobile gateway (`/gateway/v1`) is designed to run directly within
-`auth-proxy.js` (`proxy/gateway/`) rather than as a standalone process on an
-extra port, allowing direct port 4402 hub communication and shared custom-model
-tracking.
-- Mobile gateway uses standalone bearer token authentication decoupled from web
-browser cookies, allowing mobile pairing without credentials if `AUTH_PASSWORD`
-is unset.
-- Conversation list synchronization follows a hybrid schedule: passive polling
-every 60 seconds, 2-second burst polling for 10 seconds following state-altering
-events or untitled conversations, and immediate push upon agent turn completion
-to clear spinners.
