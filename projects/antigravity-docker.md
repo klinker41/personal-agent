@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-07T00:32:44.519402+00:00
+updated_at: 2026-10-08T00:33:52.646240+00:00
 confidence: 0.95
 ---
 
@@ -13,42 +13,39 @@ confidence: 0.95
   runs non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
   passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
   `annotations/`). Configurations remain platform-agnostic.
-- **Host Execution:** Replaces `/var/run/docker.sock` exposure with an
-  isolated SSH web terminal (`ttyd` on port 7681) to execute host commands
-  securely.
+- **Host Execution:** Replaces `/var/run/docker.sock` exposure with an isolated
+  SSH web terminal (`ttyd` on port 7681) to execute host commands securely.
 
 ## Configuration & Environment
 - **Networking & Discovery:** Exposes `AGY_PORT=4400` (auth proxy gateway) and
   `AGY_HUB_PORT=4402` (deterministic upstream discovery via `agy
-  --remote-control --hub-port`). Configured via `RC_NAME`, `AUTH_PASSWORD`,
-  and `HOST_SSH_DIR`.
+  --remote-control --hub-port`). Configured via `RC_NAME`, `AUTH_PASSWORD`, and
+  `HOST_SSH_DIR`.
 - **Feature Flags & Privacy:** `ENABLE_IDE` (port 8080 `code-server`) and
   `ENABLE_TERMINAL` (port 7681 `ttyd`) default to `true`, injecting sidebar
   shortcuts into the UI. `BLOCK_TELEMETRY=true` (default) sinkholes Google
-  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out
-  flags.
+  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out flags.
 - **Storage, Lifecycle & Defaults:** Auth initialized via `setup` subcommand
-  with mounted `~/.gemini`. `entrypoint.sh` initializes individual project
-  configs under `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens.
-  State (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and
-  `cli.log` reside in `$GEMINI_DIR/antigravity-cli/`. Default sandbox
-  policies: `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
+  with mounted `~/.gemini`. `entrypoint.sh` initializes project configs under
+  `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Runtime state
+  (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
+  reside in `$GEMINI_DIR/antigravity-cli/`. Default sandbox policies:
+  `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
   `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Employs dynamic 256-bit session tokens, in-memory
   session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
-  traversal protection, centralized body parsing, and security headers (CSP,
-  frame/content-ty
-<truncated 708 bytes>
-ate push on agent turn completion to
-  clear UI spinners.
+  traversal protection, security headers (CSP, frame/content-type options), and
+  centrali
+<truncated 1232 bytes>
+ate pushes on agent turn completion to clear UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
   transcoder on port 4405 (no LiteLLM dependency) converting Connect-RPC
-  Protobuf streams to Anthropic and OpenAI endpoints. Conditionally enabled
-  by `entrypoint.sh` only when custom models are configured. Unregistered
+  Protobuf streams to Anthropic and OpenAI endpoints. Conditionally enabled by
+  `entrypoint.sh` only when custom models are configured. Unregistered
   placeholders in `M500`-`M649` return `null` immediately, routing built-in
   models (Claude, GPT-OSS) directly upstream to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
@@ -67,9 +64,9 @@ ate push on agent turn completion to
 - **Sidecar Types:**
   - *Standalone:* Defined in `~/.gemini/config/sidecars/<id>/sidecar.json`,
     toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
-  - *Plugin:* Defined in `<plugin>/sidecars/<name>/sidecar.json`, namespaced
-    as `<plugin-name>/<sidecar-name>`, executed with isolated `cwd`,
-    prepended `PATH`, `PLUGIN` UI badge, and isolated config resets.
+  - *Plugin:* Defined in `<plugin>/sidecars/<name>/sidecar.json`, namespaced as
+    `<plugin-name>/<sidecar-name>`, executed with isolated `cwd`, prepended
+    `PATH`, `PLUGIN` UI badge, and isolated config resets.
 
 ## Testing & Quality
 - **Test Suite & State Isolation:** Native Node test runner (`node --test
