@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-08T00:00:38.444236+00:00
+updated_at: 2026-10-09T00:00:28.363267+00:00
 ---
 
 Wait for the grep command to complete.
@@ -20,3 +20,9 @@ and excluding experimental or `latest` tags.
 - Default Gemini and Lyria model IDs are centralized in shared/models.ts
 (DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
 DEFAULT_VIDEO_MODEL, and DEFAULT_MUSIC_MODEL).
+
+- Default model IDs are defined in `shared/models.ts` (`DEFAULT_TEXT_MODEL`,
+`DEFAULT_IMAGE_MODEL`, `DEFAULT_AUDIO_MODEL`, `DEFAULT_VIDEO_MODEL`,
+`DEFAULT_MUSIC_MODEL`) without the `models/` prefix.
+- Default model selection criteria restrict models to Gemini variants (or Lyria
+for music) while excluding `exp`, `experimental`, and `latest` aliases.

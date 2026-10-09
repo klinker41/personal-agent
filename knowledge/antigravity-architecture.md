@@ -2,19 +2,19 @@
 topic: antigravity-architecture
 category: knowledge
 tags: [knowledge, antigravity-architecture]
-updated_at: 2026-10-08T00:38:14.318557+00:00
+updated_at: 2026-10-09T00:41:30.785436+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Antigravity-Architecture
 
-- **Daemon IPC & Hub State**: The Web UI interacts with the `agy` daemon via
-  Connect-RPC and WebSockets. Endpoint `SetCloudCodeURL` strictly requires
-  parameter `url` (never `cloudCodeUrl`); mismatches leave it empty and crash
-  the session (`Post "/v1internal:loadCodeAssist": unsupported protocol
-  scheme ""`) until the container restarts. The hub stream
-  `StreamAgentStateUpdates` emits plain JSON step snapshots with incrementally
-  growing thinking text, avoiding binary protobuf diff decoding.
+- **Daemon IPC & Hub State**: The Web UI interacts with `agy` via Connect-RPC
+  and WebSockets. Endpoint `SetCloudCodeURL` strictly requires parameter `url`
+  (never `cloudCodeUrl`); mismatches leave it empty and crash the session
+  (`Post "/v1internal:loadCodeAssist": unsupported protocol scheme ""`) until
+  a container restart. Hub stream `StreamAgentStateUpdates` emits plain JSON
+  step snapshots with incrementally growing thinking text, avoiding binary
+  protobuf diff decoding.
 - **Cloud Code Protocol & Translation Proxy**: `agy` connects to internal Cloud
   Code endpoints (`/v1internal:streamGenerateContent` and
   `/v1internal:fetchAvailableModels`) via HTTP/2 Protobuf
@@ -27,5 +27,5 @@ confidence: 0.95
   M599, M605) denote built-in models; proxies must pass unregistered IDs in
   this range to Cloud Code rather than custom sessions. `agy` enforces a single
   unified stream (`thought -> text -> functionCall`) with tools attached nearly
-  every turn; split-model routing or fallback delegation (e.g., to Gemini Flash)
-  bypasses model reasoning and introduces severe latency.
+  every turn; split-model routing or fallback delegation (e.g., to Gemini
+  Flash) bypasses model reasoning and introduces severe latency.

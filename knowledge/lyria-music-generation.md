@@ -2,7 +2,7 @@
 topic: lyria-music-generation
 category: knowledge
 tags: [knowledge, lyria-music-generation]
-updated_at: 2026-10-07T00:38:14.853542+00:00
+updated_at: 2026-10-09T00:00:28.364197+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,6 @@ confidence: 0.95
   the full 30s duration with a tail safety fade
   (`atrim=0:30,afade=t=in:ss=0:d=1,afade=t=out:st=27:d=3`) maintains
   musicality while preventing waveform pops or clicks.
+
+- Lyria music models in the Gemini REST API appear under `models/lyria-*` (e.g.,
+`lyria-3-clip-preview`) when queried via `v1beta/models`.

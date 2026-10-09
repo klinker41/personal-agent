@@ -2,17 +2,17 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-08T00:33:52.646240+00:00
+updated_at: 2026-10-09T00:32:29.000000+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
 ## Container Runtime & Isolation
-- **Runtime Security:** Headless image `jklinker/antigravity-docker:latest`
-  runs non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled
-  passwordless sudo, `umask 0002` across `conversations/`, `brain/`, and
-  `annotations/`). Configurations remain platform-agnostic.
+- **Runtime Security:** Headless image `jklinker/antigravity-docker:latest` runs
+  non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled passwordless
+  sudo, `umask 0002` across `conversations/`, `brain/`, and `annotations/`).
+  Configurations remain platform-agnostic.
 - **Host Execution:** Replaces `/var/run/docker.sock` exposure with an isolated
   SSH web terminal (`ttyd` on port 7681) to execute host commands securely.
 
@@ -37,9 +37,25 @@ confidence: 0.95
 - **Security & Hardening:** Employs dynamic 256-bit session tokens, in-memory
   session cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
-  centrali
-<truncated 1232 bytes>
-ate pushes on agent turn completion to clear UI spinners.
+  centralized body/JSON parsing in `proxy/lib/security.js`.
+- **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` on root and
+  `/c/...` routes, sets `X-Accel-Buffering: no`, flushes headers immediately,
+  strips hop-by-hop headers, preserves gRPC streaming headers (`TE: trailers`,
+  `Trailer`, `grpc-status`), and suppresses upstream TCP RST packets on socket
+  cleanup.
+- **Endpoints & UI:** Unauthenticated `/status` health check (`200`/`503`),
+  persistent favicon injection via `MutationObserver`, and shared glassmorphic
+  cosmic UI with 2D canvas particle simulation (`renderPageLayout`,
+  `BASE_PAGE_CSS`).
+- **Model Providers:** Managed by `proxy/lib/models-manager.js` via `/models`
+  UI, persisting masked API keys to `~/.gemini/config/custom_models.json`.
+- **Mobile Gateway (`proxy/gateway/`):** Runs directly in `auth-proxy.js`
+  (`/gateway/v1`) for port 4402 hub access and shared model tracking. Uses
+  bearer token auth decoupled from browser cookies (permits pairing without
+  credentials when `AUTH_PASSWORD` is unset). Synchronizes conversations via
+  hybrid scheduling: 60s passive polling, 2s burst polling for 10s following
+  state changes or untitled chats, and immediate push on turn completion to
+  clear UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
