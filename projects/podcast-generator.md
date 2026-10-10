@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-10-08T00:36:24.804913+00:00
+updated_at: 2026-10-10T00:38:44.441722+00:00
 confidence: 0.95
 ---
 
@@ -12,24 +12,24 @@ confidence: 0.95
 - **Stack & Runtime**: Runs on `oven/bun:alpine` with Bun, Hono, and FFmpeg,
   serving a React SPA, REST APIs, audio streaming, and movie pipelines
   (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`). Minimal dependencies
-  include `hono`, `jsonwebtoken`, and `cron-parser@4.9.0`, alongside built-in
+  include `jsonwebtoken` and `cron-parser@4.9.0`, alongside built-in
   `hono/cors`, `Bun.password`, and `bun test`.
-- **Tenancy & File Storage**: Manifest-backed per-user isolation
-  (`data/users.json`, `data/podcasts/`, `data/outputs/`) queried via
-  `PodcastStore.list(user.id)` on `GET /api/podcasts` (episodes inherit user
-  tenancy). `fileStore.ts` guarantees atomic writes (`writeText`, `writeJson`),
-  path safety, and date matching.
-- **Background Tasks & Discovery**: In-process `JobQueue` and `PodcastScheduler`
-  handle background jobs. `EpisodeStore.autoDiscoverEpisodes` backfills
-  missing `episode.json` on `GET /api/podcasts/:id` (omitted from listings to
-  prevent latency).
+- **Tenancy & Storage**: Manifest-backed user isolation (`data/users.json`,
+  `data/podcasts/`, `data/outputs/`) with inherited episode tenancy queried
+  via `PodcastStore.list(user.id)` on `GET /api/podcasts`. `fileStore.ts`
+  guarantees path-safe atomic writes (`writeText`, `writeJson`) and date
+  matching.
+- **Background Tasks & Discovery**: In-process `JobQueue` and
+  `PodcastScheduler` handle background jobs.
+  `EpisodeStore.autoDiscoverEpisodes` backfills missing `episode.json` on
+  `GET /api/podcasts/:id` (omitted from listings to prevent latency).
 
 ## Media Pipeline & Integrations
 - **Generation & Ads**: Gemini (`TEXT_MODEL`, `IMAGE_MODEL`, `AUDIO_MODEL`)
   creates scripts, 1:1 cover art, and multi-speaker TTS tagged with FFmpeg
-  ID3v2. Spaced ad reads (`ad_reads?: string[] | null` via `PodcastForm.tsx` /
-  `podcasts.ts`) are placed evenly at `k / (N + 1)` intervals via
-  `formatAdReads()` in `generator.ts`.
+  ID3v2. `formatAdReads()` (`generator.ts`) places spaced ad reads
+  (`ad_reads?: string[] | null` via `PodcastForm.tsx` / `podcasts.ts`) evenly
+  at `k / (N + 1)` intervals.
 - **Deduplication & Matching**: `EpisodeStore.deduplicate()`
   (`backend/src/index.ts`) drops duplicate paths/titles, favoring entries with
   `prompt_used` and longer scripts. `buildTitlePatterns` compiles exact,
@@ -41,7 +41,7 @@ confidence: 0.95
   `GET /Users`.
 
 ## Security, Resilience & Testing
-- **Auth & Traversal**: Startup halts if `JWT_SECRET` is unset or default
+- **Auth & Security**: Startup halts if `JWT_SECRET` is unset or default
   (`authMiddleware.ts`). `ALLOW_REGISTRATION` toggles signups
   (`GET /api/v1/auth/config`); settings UI is restricted to account/security.
   Streaming validates `path.sep` boundaries via non-blocking
