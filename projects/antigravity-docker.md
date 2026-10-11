@@ -12,9 +12,9 @@ confidence: 0.95
 - **Runtime Security:** Headless image `jklinker/antigravity-docker:latest` runs
   non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled passwordless
   sudo, `umask 0002` across `conversations/`, `brain/`, and `annotations/`).
-  Configurations remain platform-agnostic. Host commands execute via an
-  isolated SSH web terminal (`ttyd` on port 7681) instead of exposing
-  `/var/run/docker.sock`.
+  Configurations remain platform-agnostic, replacing `/var/run/docker.sock`
+  mounting with an isolated SSH web terminal (`ttyd` on port 7681) to execute
+  host commands securely.
 
 ## Configuration & Environment
 - **Networking & Ports:** Exposes `AGY_PORT=4400` (auth proxy gateway) and
@@ -25,24 +25,37 @@ confidence: 0.95
   `ENABLE_TERMINAL` (port 7681 `ttyd`) default to `true` with UI sidebar
   shortcuts. `BLOCK_TELEMETRY=true` (default) sinkholes Google telemetry to
   `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out flags.
-- **Storage & Lifecycle:** Auth initialized via `setup` subcommand with mounted
-  `~/.gemini`. `entrypoint.sh` initializes project configs under
+- **Storage, Lifecycle & Sandboxing:** Auth initialized via `setup` subcommand
+  with mounted `~/.gemini`. `entrypoint.sh` initializes project configs under
   `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Runtime state
   (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
-  reside in `$GEMINI_DIR/antigravity-cli/`.
-- **Sandbox Defaults:** `enableTerminalSandbox: true`, `nonWorkspaceFiles:
-  ALLOW`, and `autoExecutionPolicy:
-  CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
+  reside in `$GEMINI_DIR/antigravity-cli/`. Sandbox defaults:
+  `enableTerminalSandbox: true`, `nonWorkspaceFiles: ALLOW`, and
+  `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
 - **Security & Hardening:** Employs dynamic 256-bit session tokens, in-memory
   cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
   traversal protection, security headers (CSP, frame/content-type options), and
   centralized body/JSON parsing in `proxy/lib/security.js`.
-- **Reverse Proxy Pr
-<truncated 1020 bytes>
-t polling for 10s following state changes or
-  untitled chats, and immediate push on turn completion to clear UI spinners.
+- **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` on root and
+  `/c/...` routes, sets `X-Accel-Buffering: no`, flushes headers immediately,
+  strips hop-by-hop headers, preserves gRPC streaming headers (`TE: trailers`,
+  `Trailer`, `grpc-status`), and suppresses upstream TCP RST packets on socket
+  cleanup.
+- **Endpoints & UI:** Unauthenticated `/status` health check (`200`/`503`),
+  persistent favicon injection via `MutationObserver`, and shared glassmorphic
+  cosmic UI with 2D canvas particle simulation (`renderPageLayout`,
+  `BASE_PAGE_CSS`). Model providers managed via `/models` UI
+  (`proxy/lib/models-manager.js`), persisting masked keys to
+  `~/.gemini/config/custom_models.json`.
+- **Mobile Gateway (`proxy/gateway/`):** Integrated in `auth-proxy.js`
+  (`/gateway/v1`) for port 4402 hub access and shared model tracking. Uses
+  bearer token auth decoupled from browser cookies (allows pairing without
+  credentials when `AUTH_PASSWORD` is unset). Synchronizes conversations via
+  hybrid scheduling: 60s passive polling, 2s burst polling for 10s following
+  state changes or untitled chats, and immediate push on turn completion to
+  clear UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming

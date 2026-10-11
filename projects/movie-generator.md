@@ -2,7 +2,7 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-10-10T00:37:41.751251+00:00
+updated_at: 2026-10-11T00:37:56.143790+00:00
 confidence: 0.95
 ---
 
@@ -13,7 +13,7 @@ confidence: 0.95
   `Bun.password`, and `bun test` via `app.request()`. Route `/assets/*` guards
   against directory traversal, serving `generated_assets/` with fallback to
   `frontend/dist/assets/`.
-- **Tenant Isolation & RBAC**: Enforces boundary via `created_by === user.id`.
+- **Tenant Isolation & RBAC**: Boundary enforced via `created_by === user.id`.
   Admin access strictly requires both `"role": "admin"` and `"is_admin": true`
   in `data/users.json` (defaults to standard user).
 
@@ -34,7 +34,7 @@ confidence: 0.95
   failures or `PROHIBITED_CONTENT` trigger Flash sanitization
   (`sanitizeSceneContent` / `sanitizeAndFixPrompt`), writing revised `setting`
   and `action_summary` to `prompt.txt` and `chunk_manifest.json`.
-- **Diagnostics & Formatting**: In `backend/src/utils/jsonParser.ts`,
+- **Diagnostics & Serialization**: In `backend/src/utils/jsonParser.ts`,
   `extractGeminiResponseText` inspects `finishReason`, `safetyRatings`, and
   `blockReason` on empty outputs. `formatTimelineBeat` and
   `formatTimelineAndAudio` explicitly format timeline beats to prevent

@@ -2,7 +2,7 @@
 topic: lyria-music-generation
 category: knowledge
 tags: [knowledge, lyria-music-generation]
-updated_at: 2026-10-09T00:00:28.364197+00:00
+updated_at: 2026-10-11T00:00:41.196857+00:00
 confidence: 0.95
 ---
 
@@ -27,3 +27,7 @@ confidence: 0.95
 
 - Lyria music models in the Gemini REST API appear under `models/lyria-*` (e.g.,
 `lyria-3-clip-preview`) when queried via `v1beta/models`.
+
+- Lyria music models (such as `lyria-3-clip-preview`) are enumerated directly in
+the Google Generative Language API model catalog via `GET /v1beta/models`
+alongside Gemini models.
