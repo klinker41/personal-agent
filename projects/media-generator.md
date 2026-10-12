@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-11T00:41:44.984960+00:00
+updated_at: 2026-10-12T00:00:46.737262+00:00
 ---
 
 # Project: Media-Generator
@@ -19,3 +19,8 @@ updated_at: 2026-10-11T00:41:44.984960+00:00
 - **Selection Criteria:** Project defaults restrict models to Gemini variants
   (or Lyria for music) and permit preview models, while explicitly excluding
   experimental (`exp`, `experimental`) and `latest` aliases.
+
+- shared/models.ts centralizes default model constants across modalities
+(DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
+DEFAULT_VIDEO_MODEL, DEFAULT_MUSIC_MODEL) stripped of the 'models/' prefix and
+mirrored in .env.example.

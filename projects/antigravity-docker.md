@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-10T00:34:53.150808+00:00
+updated_at: 2026-10-12T00:34:44.905605+00:00
 confidence: 0.95
 ---
 
@@ -12,20 +12,18 @@ confidence: 0.95
 - **Runtime Security:** Headless image `jklinker/antigravity-docker:latest` runs
   non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled passwordless
   sudo, `umask 0002` across `conversations/`, `brain/`, and `annotations/`).
-  Configurations remain platform-agnostic, replacing `/var/run/docker.sock`
-  mounting with an isolated SSH web terminal (`ttyd` on port 7681) to execute
-  host commands securely.
+  Platform-agnostic isolation replaces `/var/run/docker.sock` mounting with an
+  SSH web terminal (`ttyd` on port 7681 via `HOST_SSH_DIR`) for host commands.
 
 ## Configuration & Environment
-- **Networking & Ports:** Exposes `AGY_PORT=4400` (auth proxy gateway) and
-  `AGY_HUB_PORT=4402` (deterministic upstream discovery via `agy
-  --remote-control --hub-port`). Configured via `RC_NAME`, `AUTH_PASSWORD`, and
-  `HOST_SSH_DIR`.
-- **Feature Flags & Privacy:** `ENABLE_IDE` (port 8080 `code-server`) and
-  `ENABLE_TERMINAL` (port 7681 `ttyd`) default to `true` with UI sidebar
-  shortcuts. `BLOCK_TELEMETRY=true` (default) sinkholes Google telemetry to
-  `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out flags.
-- **Storage, Lifecycle & Sandboxing:** Auth initialized via `setup` subcommand
+- **Networking & Services:** Exposes `AGY_PORT=4400` (auth proxy gateway),
+  `AGY_HUB_PORT=4402` (hub discovery via `agy --remote-control --hub-port`), and
+  port 4405 (translation proxy). Configured via `RC_NAME` and `AUTH_PASSWORD`.
+  Auxiliary services `ENABLE_IDE` (port 8080 `code-server`) and
+  `ENABLE_TERMINAL` (port 7681 `ttyd`) default to `true` with UI shortcuts.
+- **Privacy & Telemetry:** `BLOCK_TELEMETRY=true` (default) sinkholes Google
+  telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out flags.
+- **Storage & Sandboxing Lifecycle:** Auth initialized via `setup` subcommand
   with mounted `~/.gemini`. `entrypoint.sh` initializes project configs under
   `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Runtime state
   (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
@@ -34,28 +32,14 @@ confidence: 0.95
   `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
-- **Security & Hardening:** Employs dynamic 256-bit session tokens, in-memory
-  cleanup, IP rate-limiting on `/__auth/login`, 16 KB body limit, path
-  traversal protection, security headers (CSP, frame/content-type options), and
-  centralized body/JSON parsing in `proxy/lib/security.js`.
-- **Protocol & Reverse Proxy:** Enforces `useWebSocket=true` on root and
-  `/c/...` routes, sets `X-Accel-Buffering: no`, flushes headers immediately,
-  strips hop-by-hop headers, preserves gRPC streaming headers (`TE: trailers`,
-  `Trailer`, `grpc-status`), and suppresses upstream TCP RST packets on socket
-  cleanup.
-- **Endpoints & UI:** Unauthenticated `/status` health check (`200`/`503`),
-  persistent favicon injection via `MutationObserver`, and shared glassmorphic
-  cosmic UI with 2D canvas particle simulation (`renderPageLayout`,
-  `BASE_PAGE_CSS`). Model providers managed via `/models` UI
-  (`proxy/lib/models-manager.js`), persisting masked keys to
-  `~/.gemini/config/custom_models.json`.
-- **Mobile Gateway (`proxy/gateway/`):** Integrated in `auth-proxy.js`
-  (`/gateway/v1`) for port 4402 hub access and shared model tracking. Uses
-  bearer token auth decoupled from browser cookies (allows pairing without
-  credentials when `AUTH_PASSWORD` is unset). Synchronizes conversations via
-  hybrid scheduling: 60s passive polling, 2s burst polling for 10s following
-  state changes or untitled chats, and immediate push on turn completion to
-  clear UI spinners.
+- **Security & Hardening:** Managed by `proxy/lib/security.js` using dynamic
+  256-bit session tokens, in-memory cleanup, IP rate-limiting on
+  `/__auth/login`, 16 KB body limit, path traversal protection, and security
+  headers (CSP, frame/content-type). Centralizes body and JSON parsing.
+- **Protocol & Reve
+<truncated 1021 bytes>
+urst polling for 10s following state changes or
+  untitled chats, and immediate turn-completion push to clear UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
