@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-12T00:00:46.737262+00:00
+updated_at: 2026-10-13T00:01:09.561758+00:00
 ---
 
 # Project: Media-Generator
@@ -24,3 +24,7 @@ updated_at: 2026-10-12T00:00:46.737262+00:00
 (DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL, DEFAULT_AUDIO_MODEL,
 DEFAULT_VIDEO_MODEL, DEFAULT_MUSIC_MODEL) stripped of the 'models/' prefix and
 mirrored in .env.example.
+
+- Default model constants (DEFAULT_TEXT_MODEL, DEFAULT_IMAGE_MODEL,
+DEFAULT_AUDIO_MODEL, DEFAULT_VIDEO_MODEL, DEFAULT_MUSIC_MODEL) are maintained in
+shared/models.ts.
