@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-09-29T00:01:12.777149+00:00
+updated_at: 2026-10-14T00:03:29.535101+00:00
 confidence: 1.0
 ---
 
@@ -63,3 +63,12 @@ application code.
 
 - Homelab environment utilizes Slack as a centralized notification hub for
 self-hosted services and personal agent alerts.
+
+- Homelab environment includes three Unraid servers (NAS, Seedbox, and AIBox),
+Emporia Vue energy monitoring, Airthings air quality sensors (Estes and Boulder
+locations), and Tesla solar monitoring via Teslemetry, deployed via Portainer
+and Docker Compose under Docker Hub user 'jklinker'.
+
+- Homelab Unraid server runs at 192.168.1.95, with container application data
+mapped under `/mnt/user/docker/` (including Portainer data at
+`/mnt/user/docker/portainer` ).

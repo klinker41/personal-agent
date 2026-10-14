@@ -2,7 +2,7 @@
 topic: eventsource-stream-lifecycle
 category: knowledge
 tags: [knowledge, eventsource-stream-lifecycle]
-updated_at: 2026-09-12T00:02:09.026888+00:00
+updated_at: 2026-10-14T00:02:26.908000+00:00
 confidence: 0.95
 ---
 
@@ -17,3 +17,11 @@ browser runaway reconnection loops upon stream failure.
 
 - Fatal EventSource stream errors must explicitly call `es.close()` to prevent
 native browser infinite reconnection storms.
+
+- Server-Sent Events (SSE) streams require periodic heartbeat or comment pings
+(e.g., ': ping\n\n') to keep connections alive through intermediate reverse
+proxies and prevent premature timeouts.
+
+- Send periodic comment frames (such as ': ping\n\n') as SSE heartbeats to
+prevent proxies and browsers from timing out without triggering client-side
+message listeners.

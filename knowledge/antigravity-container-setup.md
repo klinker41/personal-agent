@@ -2,7 +2,7 @@
 topic: antigravity-container-setup
 category: knowledge
 tags: [knowledge, antigravity-container-setup]
-updated_at: 2026-09-14T00:01:40.239071+00:00
+updated_at: 2026-10-14T00:03:29.535857+00:00
 confidence: 0.95
 ---
 
@@ -19,3 +19,8 @@ tofu glyphs unless TrueType fonts are bundled directly.
 - Without sudo access in the container, standalone static binaries such as
 FFmpeg can be installed into /home/developer/.local/bin, which is already
 present on PATH.
+
+- Antigravity accesses the host Docker daemon and Portainer volumes without
+mounting `/var/run/docker.sock` by leveraging host environment variables
+(`HOST_SSH_HOST`, `HOST_SSH_USER` , `HOST_SSH_PORT` ) and an authorized SSH key
+bind-mounted at `/home/developer/.ssh` from `/mnt/user/docker/antigravity/ssh` .
