@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-14T00:38:07.801778+00:00
+updated_at: 2026-10-15T00:40:17.890082+00:00
 ---
 
 # Project: Media-Generator
@@ -21,11 +21,10 @@ updated_at: 2026-10-14T00:38:07.801778+00:00
   experimental (`exp`, `experimental`) and alias (`latest`) models.
 
 ## Frontend Architecture & Authentication
-- **Routing & Setup:** Authentication redirects to `/` instead of a dedicated
-  `/login` route, managing first-time admin setup completion via `App.tsx`
-  state.
-- **Auth Provider:** A single `AuthProvider` wraps `App.tsx` internally rather
-  than duplicating it in `main.tsx`.
+- **Authentication & Setup Routing:** Authentication redirects to `/` instead
+  of a dedicated `/login` route, managing first-time admin setup completion
+  via `App.tsx` state. A single `AuthProvider` wraps `App.tsx` internally
+  rather than duplicating it in `main.tsx`.
 
 ## Backend Task Queues & Concurrency
 - **Unified Queue Processing:** `JobQueue`, `AudiobookQueue`, and `BookQueue`

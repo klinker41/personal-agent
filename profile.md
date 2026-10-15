@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-10-14T00:03:29.535101+00:00
+updated_at: 2026-10-15T00:01:11.183961+00:00
 confidence: 1.0
 ---
 
@@ -72,3 +72,8 @@ and Docker Compose under Docker Hub user 'jklinker'.
 - Homelab Unraid server runs at 192.168.1.95, with container application data
 mapped under `/mnt/user/docker/` (including Portainer data at
 `/mnt/user/docker/portainer` ).
+
+- Prefers Slack bot replies in direct messages (DMs) to be posted inline at the
+top level rather than in threads.
+- Prefers a cautious 'diagnose and ask first' workflow for automated homelab
+alert remediation before executing container restarts or destructive actions.

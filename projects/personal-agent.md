@@ -2,7 +2,7 @@
 topic: personal-agent
 category: project
 tags: [project, personal-agent]
-updated_at: 2026-08-30T11:29:40.438718+00:00
+updated_at: 2026-10-15T00:01:11.186689+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,7 @@ confidence: 0.95
   at 02:00 UTC, Tiered Compaction at 02:30 UTC, and Git Synchronization at 03:00
   UTC using `agy agentapi`, logging to:
   `~/.gemini/antigravity/sidecar_data/antigravity-plugin/memory-daemon/logs/worker.log`.
+
+- Slack sidecar architecture features two-stage message triage to distinguish
+non-actionable homelab notifications from actionable alerts (e.g., Uptime Kuma
+downtimes).
