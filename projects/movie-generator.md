@@ -2,17 +2,17 @@
 topic: movie-generator
 category: project
 tags: [project, movie-generator]
-updated_at: 2026-10-15T00:37:01.440075+00:00
+updated_at: 2026-10-16T00:36:40.167711+00:00
 confidence: 0.95
 ---
 
 # Project: Movie-Generator
 
 ## Architecture & Security
-- **Stack & Routing**: Containerized on `oven/bun:alpine` using Hono, CLI
-  `ffmpeg`, `Bun.password`, and `bun test` (`app.request()`). Route `/assets/*`
-  guards against directory traversal, serving `generated_assets/` with fallback
-  to `frontend/dist/assets/`.
+- **Runtime Stack & Routing**: Containerized on `oven/bun:alpine` using Hono,
+  CLI `ffmpeg`, `Bun.password`, and `bun test` (`app.request()`). Route
+  `/assets/*` guards against directory traversal, serving `generated_assets/`
+  with fallback to `frontend/dist/assets/`.
 - **Tenant Isolation & RBAC**: Boundary checks enforce `created_by === user.id`.
   Admin rights strictly require both `"role": "admin"` and `"is_admin": true` in
   `data/users.json` (defaults to standard user).
@@ -25,13 +25,13 @@ confidence: 0.95
 - **Shot Continuity & Plates**: Stage 4.8A creates concept plates with
   `generateCameraSetupImagePrompt`. In `backend/src/services/gemini.ts`,
   `generateSceneChunks` branches on `camera_continuity` (`continuous` vs
-  `new_shot`); continuous shots attach prior `video.mp4` with temporal cues as
-  multimodal references.
+  `new_shot`), attaching prior `video.mp4` with temporal cues as multimodal
+  references for continuous shots.
 
 ## Safety, Diagnostics & Serialization
 - **Safety & Sanitization**: Sets `BLOCK_ONLY_HIGH` across all categories in
-  `DEFAULT_SAFETY_SETTINGS` (including `HARM_CATEGORY_CIVIC_INTEGRITY`). Blocked
-  prompts or `PROHIBITED_CONTENT` trigger Flash sanitization
+  `DEFAULT_SAFETY_SETTINGS` (including `HARM_CATEGORY_CIVIC_INTEGRITY`).
+  Blocked prompts or `PROHIBITED_CONTENT` trigger Flash sanitization
   (`sanitizeSceneContent` / `sanitizeAndFixPrompt`), saving updated `setting`
   and `action_summary` to `prompt.txt` and `chunk_manifest.json`.
 - **Diagnostics & Formatting**: In `backend/src/utils/jsonParser.ts`,

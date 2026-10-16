@@ -2,7 +2,7 @@
 topic: llm-plays-pokemon
 category: project
 tags: [project, llm-plays-pokemon]
-updated_at: 2026-10-04T00:01:44.730952+00:00
+updated_at: 2026-10-16T00:01:13.745140+00:00
 ---
 
 Notice: The task '5b10366d-be8f-420a-a415-eef99de286d7/task-60' has completed.
@@ -31,3 +31,10 @@ ensuring system prompts remain byte-identical when narration is disabled.
 and UI supporting write-only API key validation, voice design caching via source
 hashing, upstream 502 error sanitization to prevent credential leaks, and
 narrator failure resets.
+
+- TTS settings in AppDatabase conditionally encrypt API keys using
+STREAM_ENCRYPTION_KEY when present, falling back to plaintext SQLite storage
+when stream encryption is not configured.
+- Admin TTS endpoints (/api/admin/tts/voice and /api/admin/tts/test) accept form
+input overrides (api_key, endpoint_url, model_name) to allow testing credentials
+before saving.
