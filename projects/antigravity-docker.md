@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-12T00:34:44.905605+00:00
+updated_at: 2026-10-17T00:33:30.788090+00:00
 confidence: 0.95
 ---
 
@@ -32,22 +32,23 @@ confidence: 0.95
   `autoExecutionPolicy: CASCADE_COMMANDS_AUTO_EXECUTION_PROCEED_IN_SANDBOX`.
 
 ## Auth Proxy & Gateway (`proxy/auth-proxy.js`)
-- **Security & Hardening:** Managed by `proxy/lib/security.js` using dynamic
-  256-bit session tokens, in-memory cleanup, IP rate-limiting on
-  `/__auth/login`, 16 KB body limit, path traversal protection, and security
-  headers (CSP, frame/content-type). Centralizes body and JSON parsing.
-- **Protocol & Reve
-<truncated 1021 bytes>
-urst polling for 10s following state changes or
-  untitled chats, and immediate turn-completion push to clear UI spinners.
+- **Security & Protocol Proxy:** Hardened via `proxy/lib/security.js` with
+  dynamic 256-bit session tokens, in-memory cleanup, IP rate-limiting on
+  `/__auth/login`, 16 KB body limit, path traversal defense, and security
+  headers. Enforces `useWebSocket=true` on root and `/c/...` routes, sets
+  `X-Accel-Buf
+<truncated 1042 bytes>
+mpletion push to clear
+  UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
   transcoder on port 4405 (no LiteLLM) translating Connect-RPC Protobuf to
-  Anthropic and OpenAI endpoints. Conditionally enabled by `entrypoint.sh` only
-  when custom models are configured. Placeholders `M500`-`M649` return `null`
-  immediately, routing built-in models (Claude, GPT-OSS) upstream to Google
-  when Astra is active.
+  Anthropic and OpenAI endpoints, intercepting API traffic between the daemon
+  and Google backend to map model tiers. Conditionally enabled by
+  `entrypoint.sh` only when custom models are configured. Placeholders
+  `M500`-`M649` return `null` immediately, routing built-in models (Claude,
+  GPT-OSS) upstream to Google when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across streaming and unary calls, coercing
   stringified booleans and integers into native types. Strips

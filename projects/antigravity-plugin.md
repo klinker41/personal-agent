@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-16T00:35:00.967526+00:00
+updated_at: 2026-10-17T00:34:54.997887+00:00
 confidence: 1.0
 ---
 
@@ -59,7 +59,9 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
   jobs run daily Gemini `model-updater` (15:00 UTC) and weekly
   `vendor/agent-skills` `submodule-updater` (Mondays at 15:00 UTC). Slack
   daemon (`sidecars/slack-chat/`, validated via `prep-slack-chat-sidecar`)
-  maps Socket Mode threads to `agentapi` conversations with backfill; outbound
-  alerts use `notify-the-user`.
+  maps Socket Mode threads to `agentapi` conversations with backfill, reads
+  model tier configuration (e.g., `model: 'pro'`) from `sidecar.json`, and
+  invokes `agy agentapi new-conversation --model=<tier>` to create new
+  threads; outbound alerts use `notify-the-user`.
 - **External AI Skills:** `ollama-chat` queries Gemma models hosted at
   `https://ollama.klinker-cabin.computer` using `$OLLAMA_API_KEY`.

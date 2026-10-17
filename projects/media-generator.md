@@ -2,13 +2,13 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-16T00:39:54.598047+00:00
+updated_at: 2026-10-17T00:39:27.169798+00:00
 ---
 
 # Project: Media-Generator
 
 ## Model Configuration & Selection
-- **Centralized Model IDs & Selection:** Modal defaults in `shared/models.ts`
+- **Centralized Model IDs & Selection:** Model defaults in `shared/models.ts`
   and `.env.example` omit `models/` prefixes: `DEFAULT_TEXT_MODEL`
   (`gemini-3.8-flash`), `DEFAULT_IMAGE_MODEL` (`gemini-3-pro-image`),
   `DEFAULT_AUDIO_MODEL` (`gemini-3.8-flash-tts`), `DEFAULT_VIDEO_MODEL`
