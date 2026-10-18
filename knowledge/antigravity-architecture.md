@@ -2,30 +2,37 @@
 topic: antigravity-architecture
 category: knowledge
 tags: [knowledge, antigravity-architecture]
-updated_at: 2026-10-11T00:42:04.145613+00:00
+updated_at: 2026-10-18T06:43:50.510288+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Antigravity-Architecture
 
 - **Daemon IPC & Hub State**: The Web UI communicates with `agy` via
-  Connect-RPC and WebSockets. RPC `SetCloudCodeURL` strictly requires `url`
-  (not `cloudCodeUrl`); mismatches leave it empty and crash the session
-  (`Post "/v1internal:loadCodeAssist": unsupported protocol scheme ""`),
+  Connect-RPC and WebSockets. The `SetCloudCodeURL` RPC strictly requires `url`
+  (not `cloudCodeUrl`); mismatches leave it empty and crash the session with
+  `Post "/v1internal:loadCodeAssist": unsupported protocol scheme ""`,
   requiring a container restart. Hub stream `StreamAgentStateUpdates` emits
   plain JSON step snapshots with incremental thinking text, avoiding binary
   protobuf diff decoding.
-- **Cloud Code Protocol & Translation Proxy**: `agy` connects to internal
-  Cloud Code endpoints (`/v1internal:streamGenerateContent` and
-  `/v1internal:fetchAvailableModels`) via HTTP/2 Protobuf
-  (`JetskiService`/`GetChatMessageRequest`). Integrating external LLMs
-  requires a bidirectional proxy converting streaming SSE chunks into
+- **Cloud Code Protocol & Translation Proxy**: `agy` connects to internal Cloud
+  Code endpoints (`/v1internal:streamGenerateContent` and
+  `/v1internal:fetchAvailableModels`) via HTTP/2 Protobuf (`JetskiService` /
+  `GetChatMessageRequest`). Integrating external LLMs requires a bidirectional
+  proxy converting streaming SSE chunks into
   `{"response": {"candidates": [...]}}` (not Gemini AI Studio schemas) and
   injecting missing required tool parameters (e.g., `Overwrite: true` and
   `ArtifactMetadata.UserFacing` for `write_to_file`).
 - **Model Routing & Stream Execution**: Placeholder IDs in range M500–M649
-  (e.g., M599, M605) denote built-in models; proxies must route
-  unregistered IDs in this range directly to Cloud Code. `agy` enforces a
-  single unified stream (`thought -> text -> functionCall`) with tools
-  attached almost every turn; split-model routing or fallback delegation
-  (e.g., to Gemini Flash) bypasses reasoning and introduces severe latency.
+  (e.g., M599, M605) denote built-in models; proxies must route unregistered
+  IDs in this range directly to Cloud Code. `agy` enforces a single unified
+  stream (`thought -> text -> functionCall`) with tools attached almost every
+  turn; split-model routing or fallback delegation (e.g., to Gemini Flash)
+  bypasses reasoning and introduces severe latency.
+- **OAuth & API Scopes**: Standalone Google OAuth tokens are stored at
+  `~/.gemini/jetski-standalone-oauth-token`. Scopes are strictly limited to
+  Google Cloud Platform, AI Code, CCLog, experiments/configs, and identity
+  (`cloud-platform`, `aicode`, `cclog`, `experimentsandconfigs`, `openid`,
+  `email`, `profile`). Workspace scopes (`gmail.readonly`, `calendar.readonly`)
+  are not requested; calls to Gmail or Calendar APIs return 403 Insufficient
+  Permission.

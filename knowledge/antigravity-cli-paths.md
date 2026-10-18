@@ -2,7 +2,7 @@
 topic: antigravity-cli-paths
 category: knowledge
 tags: [knowledge, antigravity-cli-paths]
-updated_at: 2026-08-29T11:57:50.434013+00:00
+updated_at: 2026-10-18T06:03:07.939210+00:00
 confidence: 0.95
 ---
 
@@ -10,3 +10,6 @@ confidence: 0.95
 
 - Antigravity CLI expects its state file 'antigravity_state.pbtxt' and runtime
 logs 'cli.log' inside the '~/.gemini/antigravity-cli/' directory.
+
+- Antigravity CLI stores its standalone Google OAuth login token at
+'~/.gemini/jetski-standalone-oauth-token'.
