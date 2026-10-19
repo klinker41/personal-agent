@@ -2,7 +2,7 @@
 topic: jellyfin-api-v12
 category: knowledge
 tags: [knowledge, jellyfin-api-v12]
-updated_at: 2026-09-12T00:35:11.214211+00:00
+updated_at: 2026-10-19T06:03:44.599227+00:00
 confidence: 0.95
 ---
 
@@ -29,3 +29,6 @@ parameter even with a server API key, returning HTTP 400 if omitted.
 
 - Image uploads (`POST /Items/{itemId}/Images/{imageType}`) require raw binary
 buffer data (`format: binary`) in the request body rather than base64 strings.
+
+- In Jellyfin audio item metadata, disc numbers map to 'ParentIndexNumber' and
+track numbers map to 'IndexNumber'.

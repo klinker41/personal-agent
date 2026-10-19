@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-10-15T00:01:11.183961+00:00
+updated_at: 2026-10-19T06:02:24.929605+00:00
 confidence: 1.0
 ---
 
@@ -77,3 +77,5 @@ mapped under `/mnt/user/docker/` (including Portainer data at
 top level rather than in threads.
 - Prefers a cautious 'diagnose and ask first' workflow for automated homelab
 alert remediation before executing container restarts or destructive actions.
+
+- Homelab environment includes three Unraid servers: aibox, nas, and seedbox.

@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-17T00:34:54.997887+00:00
+updated_at: 2026-10-19T06:36:34.133820+00:00
 confidence: 1.0
 ---
 
@@ -19,26 +19,25 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
 - **Container Safety & Web Apps:** Never terminate `auth-proxy.js`, infra
   ports (4400, 4402, 4405, 7681, 8080), or run blanket `pkill bun`
   (`rules/docker-container-environment.md`). Web apps require Bun, Hono,
-  minimal dependencies (`rules/web-app-architecture.md`), and port 4401
-  routed to `https://prototype.klinker-cabin.computer`
-  (`rules/web-service-port.md`).
-- **Standards & Model Selection:** Rules and skills use kebab-case. Wrap
-  Markdown at 80 columns, keep diffs minimal (`rules/simplify-changes.md`),
+  minimal dependencies (`rules/web-app-architecture.md`), and port 4401 routed
+  to `https://prototype.klinker-cabin.computer` (`rules/web-service-port.md`).
+- **Coding Standards & Model Tiers:** Use kebab-case for rules and skills,
+  wrap Markdown at 80 columns, keep diffs minimal (`rules/simplify-changes.md`),
   and update README on structural changes (`rules/readme-updates.md`).
   Subagents use `Model: "flash"` for coding/testing
   (`rules/coding-subagent-model.md`) and `Model: "pro"` for self-reviews.
-- **Git & Quality Gates:** All non-verbose tests must pass before committing
-  (`rules/tests.md`, `rules/non-verbose-tests.md`), with zero secrets
-  (`rules/no-secrets-in-commits.md`). Requires executing `self-review-commit`
-  prior to creating commits (`rules/self-review-before-commit.md`) and
-  explicit user approval before running `git push` (`rules/git-push.md`).
+- **Git & Quality Gates:** Pass all non-verbose tests (`rules/tests.md`,
+  `rules/non-verbose-tests.md`) with zero secrets
+  (`rules/no-secrets-in-commits.md`) and run `self-review-commit`
+  (`rules/self-review-before-commit.md`) before committing. Never run `git push`
+  without explicit user approval (`rules/git-push.md`).
 
 ## Memory System (`sidecars/memory-daemon`)
-- **Architecture & Injection:** Progressive disclosure store at
-  `$MEMORY_DIRECTORY` (`profile.md`, `index.md`, `projects/`, `knowledge/`,
-  tiered `daily/`, `monthly/`, `yearly/` chronicles) queried via
-  `lookup-memory` and `save-memory`. First-turn memory is injected when
-  `initialNumSteps == 0` and `invocationNum == 1` (`hooks/inject_memory.py`).
+- **Architecture & Injection:** Progressive disclosure store under
+  `$MEMORY_DIRECTORY` (`profile.md`, `index.md`, `projects/`, `knowledge/`, and
+  tiered `daily/`, `monthly/`, `yearly/` chronicles) queried via `lookup-memory`
+  and `save-memory`. First-turn memory is injected when `initialNumSteps == 0`
+  and `invocationNum == 1` (`hooks/inject_memory.py`).
 - **Nightly Maintenance Pipeline:** Automated three-stage sequence in
   `memory-daemon`: 00:00 Dreamer session extraction (records watermarks in
   `state.json`, checks topics via `get_existing_topics`, filters subagents
@@ -46,7 +45,7 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
   consolidation and semantic note refinement (`compactor.py`); and 01:00 Git
   sync with secret scrubbing (`git_sync.py`).
 
-## Sidecars & Integrations
+## Sidecars & Platform Integrations
 - **Agent API Bridge (`utils/memory_utils.py`):** Subprocess runner with auth
   retries, resolving projects in `~/.gemini/config/projects/` by name, UUID,
   or path (defaults to `personal-agent`, UUID
