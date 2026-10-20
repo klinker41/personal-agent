@@ -2,7 +2,7 @@
 topic: podcast-generator
 category: project
 tags: [project, podcast-generator]
-updated_at: 2026-10-19T06:39:29.092869+00:00
+updated_at: 2026-10-20T06:39:25.184165+00:00
 confidence: 0.95
 ---
 
@@ -11,17 +11,17 @@ confidence: 0.95
 ## Architecture & Storage
 - **Stack & Runtime**: Built on `oven/bun:alpine` with Bun, Hono, and FFmpeg,
   serving a React SPA, REST APIs, audio streaming, and movie pipelines
-  (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`). Uses minimal external
-  dependencies (`jsonwebtoken`, `cron-parser@4.9.0`) alongside `hono/cors`,
+  (`movieGemini.ts`, `moviePipeline.ts`, `MovieStore`). Dependencies are kept
+  minimal (`jsonwebtoken`, `cron-parser@4.9.0`), using `hono/cors`,
   `Bun.password`, and `bun test`.
 - **Tenancy & Persistence**: Isolated via `data/users.json`, `data/podcasts/`,
-  and `data/outputs/`. `GET /api/podcasts` resolves tenancy through
-  `PodcastStore.list(user.id)`. `fileStore.ts` provides date matching and
-  atomic writes (`writeText`, `writeJson`).
-- **Scheduling & Discovery**: In-process `JobQueue` and `PodcastScheduler`
-  handle tasks. `EpisodeStore.autoDiscoverEpisodes` backfills missing
-  `episode.json` on `GET /api/podcasts/:id` (omitted from listings to prevent
-  latency).
+  and `data/outputs/` (`GET /api/podcasts` resolves tenancy via
+  `PodcastStore.list(user.id)`). `fileStore.ts` provides atomic writes
+  (`writeText`, `writeJson`) and date matching.
+- **Scheduling & Discovery**: Tasks run via in-process `JobQueue` and
+  `PodcastScheduler`. `EpisodeStore.autoDiscoverEpisodes` lazily backfills
+  missing `episode.json` on `GET /api/podcasts/:id` (omitted from listings to
+  prevent latency).
 
 ## Media Pipeline & Integrations
 - **Generation & Ad Insertion**: Gemini (`TEXT_MODEL`, `IMAGE_MODEL`,
@@ -47,7 +47,7 @@ confidence: 0.95
   `Bun.file(path).exists()`. Scrub git history (`git-filter-repo` or squash)
   before release to remove secrets and internal domains.
 - **Retries & Error Handling**: `postWithRetry` (`gemini.ts`) applies
-  exponential backoff, and queue failures invoke `failJob` (`queue.ts`).
+  exponential backoff; queue failures invoke `failJob` (`queue.ts`).
   `GeminiService.generateAudioPart` retries up to 3 times on non-200 responses
   or content filtering (returns false without throwing), aborting if
   `failedParts >= 5`.
