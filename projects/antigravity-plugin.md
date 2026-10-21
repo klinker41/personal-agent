@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-20T06:36:37.175208+00:00
+updated_at: 2026-10-21T06:36:01.081594+00:00
 confidence: 1.0
 ---
 
@@ -16,35 +16,35 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
 `vendor/agent-skills`.
 
 ## Development Rules & Invariants
-- **Container & Web Services:** Protect container runtime by never killing
-  `auth-proxy.js`, infra ports (4400, 4402, 4405, 7681, 8080), or executing
-  blanket `pkill bun` (`rules/docker-container-environment.md`). Web apps must
-  use Bun, Hono, minimal dependencies (`rules/web-app-architecture.md`), and
-  port 4401 routed to `https://prototype.klinker-cabin.computer`
+- **Container & Services:** Protect container runtime: never kill
+  `auth-proxy.js`, infra ports (4400, 4402, 4405, 7681, 8080), or run blanket
+  `pkill bun` (`rules/docker-container-environment.md`). Web apps require Bun,
+  Hono, minimal dependencies (`rules/web-app-architecture.md`), and port 4401
+  routed to `https://prototype.klinker-cabin.computer`
   (`rules/web-service-port.md`).
-- **Coding, Review & Model Tiers:** Enforce kebab-case names, 80-column Markdown
-  wrapping, minimal diffs (`rules/simplify-changes.md`), and README updates
+- **Coding & Models:** Use kebab-case naming, 80-column Markdown wrapping,
+  minimal diffs (`rules/simplify-changes.md`), and README updates
   (`rules/readme-updates.md`). Subagents use `Model: "flash"` for coding/tests
   (`rules/coding-subagent-model.md`) and `Model: "pro"` for self-reviews.
-- **Git Quality Gates:** All non-verbose tests must pass (`rules/tests.md`,
+- **Git Quality Gates:** Tests must pass non-verbosely (`rules/tests.md`,
   `rules/non-verbose-tests.md`), commits must be secret-free
-  (`rules/no-secrets-in-commits.md`) and pass `self-review-commit`
-  (`rules/self-review-before-commit.md`). Never run `git push` without explicit
-  user approval (`rules/git-push.md`).
+  (`rules/no-secrets-in-commits.md`) and vetted by `self-review-commit`
+  (`rules/self-review-before-commit.md`). Never `git push` without explicit
+  approval (`rules/git-push.md`).
 
 ## Memory System (`sidecars/memory-daemon`)
-- **Architecture & Injection:** Progressive disclosure store under
+- **Store & Injection:** Progressive disclosure hierarchy under
   `$MEMORY_DIRECTORY` (`profile.md`, `index.md`, `projects/`, `knowledge/`, and
-  tiered `daily/`, `monthly/`, `yearly/` chronicles) accessed via
-  `lookup-memory` and `save-memory`. First-turn memory is injected when
-  `initialNumSteps == 0` and `invocationNum == 1` (`hooks/inject_memory.py`).
-- **Nightly Maintenance Pipeline:** Automated sequence in `memory-daemon`:
-  00:00 Dreamer session extraction (watermarks in `state.json`, topic resolution
-  via `get_existing_topics`, subagent/rule filtering, ephemeral session purge);
-  00:30 Compactor chronicle consolidation and semantic refinement
-  (`compactor.py`); 01:00 Git sync with secret scrubbing (`git_sync.py`).
+  chronicles `daily/`, `monthly/`, `yearly/`) via `lookup-memory` and
+  `save-memory`. First turn injects memory on `initialNumSteps == 0` and
+  `invocationNum == 1` (`hooks/inject_memory.py`).
+- **Nightly Pipeline:** Automated sequence: 00:00 Dreamer session extraction
+  (watermarks in `state.json`, topic resolution via `get_existing_topics`,
+  subagent/rule filtering, ephemeral session purge); 00:30 Compactor chronicle
+  consolidation and semantic refinement (`compactor.py`); 01:00 Git sync with
+  secret scrubbing (`git_sync.py`).
 
-## Sidecars & Platform Integrations
+## Sidecars & Integrations
 - **Agent API Bridge (`utils/memory_utils.py`):** Subprocess runner with auth
   retries resolving projects in `~/.gemini/config/projects/` by name, UUID,
   or path (defaults to `personal-agent`, UUID
@@ -55,9 +55,9 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
 - **Scheduled Tasks & Slack Daemon (`sidecar.json`):** Recurring cron jobs run
   daily Gemini `model-updater` (15:00 UTC) and weekly `vendor/agent-skills`
   `submodule-updater` (Mondays 15:00 UTC). Slack daemon (`sidecars/slack-chat/`,
-  validated via `prep-slack-chat-sidecar`) bridges Socket Mode threads to
-  `agentapi` (`agy agentapi new-conversation --model=<tier>`) using model tiers
-  configured in `sidecar.json` (e.g., `model: 'pro'`) with backfill; outbound
-  alerts use `notify-the-user`.
+  prepped via `prep-slack-chat-sidecar`) bridges Socket Mode threads to
+  `agentapi` (`agy agentapi new-conversation --model=<tier>`) using tiers in
+  `sidecar.json` (e.g., `model: 'pro'`) with backfill; outbound alerts use
+  `notify-the-user`.
 - **External AI Skills:** `ollama-chat` queries Gemma models hosted at
   `https://ollama.klinker-cabin.computer` using `$OLLAMA_API_KEY`.

@@ -2,7 +2,7 @@
 topic: media-generator
 category: project
 tags: [project, media-generator]
-updated_at: 2026-10-20T06:39:44.356030+00:00
+updated_at: 2026-10-21T06:41:00.822526+00:00
 ---
 
 # Project: Media-Generator
@@ -16,7 +16,8 @@ updated_at: 2026-10-20T06:39:44.356030+00:00
   `DEFAULT_VIDEO_MODEL` (`gemini-omni-1.1-flash`), and `DEFAULT_MUSIC_MODEL`
   (`lyria-3-clip-preview`). Model selection permits preview models matching
   `gemini-*` or `lyria-*`, but strictly excludes experimental (`exp`,
-  `experimental`) and alias (`latest`) models.
+  `experimental`) and alias (`latest`) models in favor of stable or preview
+  releases.
 
 ## Architecture & Concurrency
 - **Auth & Setup Routing:** Authentication redirects to `/` instead of a
