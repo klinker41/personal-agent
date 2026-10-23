@@ -3,6 +3,7 @@ topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
 updated_at: 2026-10-23T06:30:32.610214+00:00
+compacted_at: 2026-10-23T06:30:32.610214+00:00
 confidence: 0.95
 ---
 
@@ -36,9 +37,15 @@ confidence: 0.95
   dynamic 256-bit session tokens, in-memory cleanup, IP rate-limiting on
   `/__auth/login`, 16 KB body limit, path traversal defense, and security
   headers. Enforces `useWebSocket=true` on root and `/c/...` routes, sets
-  `X-Accel-Buf
-<truncated 27 bytes>
-mpletion pushes to clear UI spinners.
+  `X-Accel-Buffering: no`, flushes headers immediately, preserves gRPC
+  streaming headers (`TE: trailers`, `Trailer`, `grpc-status`), and suppresses
+  upstream TCP RST packets on socket cleanup.
+- **Endpoints, UI & Mobile Gateway:** Exposes unauthenticated `/status` health
+  check (`200`/`503`), cosmic glassmorphic UI (`renderPageLayout`), and
+  `/models` provider manager (`~/.gemini/config/custom_models.json`). Mobile
+  Gateway (`/gateway/v1`) uses bearer token auth decoupled from browser cookies
+  with hybrid polling (60s passive, 2s burst for 10s) and immediate turn
+  completion pushes to clear UI spinners.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
