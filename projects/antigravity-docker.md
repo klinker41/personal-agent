@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-22T06:31:03.842751+00:00
+updated_at: 2026-10-23T06:30:32.610214+00:00
 confidence: 0.95
 ---
 
@@ -36,8 +36,8 @@ confidence: 0.95
   dynamic 256-bit session tokens, in-memory cleanup, IP rate-limiting on
   `/__auth/login`, 16 KB body limit, path traversal defense, and security
   headers. Enforces `useWebSocket=true` on root and `/c/...` routes, sets
-  `X-Accel-Buffering:
-<truncated 18 bytes>
+  `X-Accel-Buf
+<truncated 27 bytes>
 mpletion pushes to clear UI spinners.
 
 ## Translation Proxy & Transcoding

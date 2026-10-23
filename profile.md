@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-10-19T06:02:24.929605+00:00
+updated_at: 2026-10-23T06:04:32.409918+00:00
 confidence: 1.0
 ---
 
@@ -79,3 +79,7 @@ top level rather than in threads.
 alert remediation before executing container restarts or destructive actions.
 
 - Homelab environment includes three Unraid servers: aibox, nas, and seedbox.
+
+- Homelab includes three Unraid OS hosts (nas, seedbox, and aibox) and runs
+speedtest-tracker (LinuxServer Laravel/PHP-FPM container) on the NAS with
+Watchtower managing automatic container updates.
