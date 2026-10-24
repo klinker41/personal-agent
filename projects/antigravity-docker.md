@@ -2,8 +2,8 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-23T06:30:32.610214+00:00
-compacted_at: 2026-10-23T06:30:32.610214+00:00
+updated_at: 2026-10-24T06:30:55.846573+00:00
+compacted_at: 2026-10-24T06:30:55.846573+00:00
 confidence: 0.95
 ---
 
@@ -46,6 +46,13 @@ confidence: 0.95
   Gateway (`/gateway/v1`) uses bearer token auth decoupled from browser cookies
   with hybrid polling (60s passive, 2s burst for 10s) and immediate turn
   completion pushes to clear UI spinners.
+- **UI Injection (`proxy/lib/ui-injection.js`):** In unfolded (50/50 split)
+  mode on foldable devices, `handleUnfoldedEnterKeyDownCapture` intercepts
+  capture-phase `keydown` events and sets `shiftKey = true` on unmodified
+  `Enter` presses in prompt inputs so the Lexical editor inserts a line break
+  instead of submitting, preserving normal `Enter` behavior for typeahead menus
+  (`aria-expanded="true"` or `[aria-label="Typeahead menu"]`) and single-line
+  `<input>` elements.
 
 ## Translation Proxy & Transcoding
 - **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
