@@ -2,7 +2,7 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-10-24T06:01:43.132708+00:00
+updated_at: 2026-10-25T06:01:49.213802+00:00
 confidence: 0.95
 ---
 
@@ -28,3 +28,19 @@ replaces Watchtower and Shepherd.
 - When deploying Komodo with its native MongoDB backend on resource-constrained
 hosts, pass `--quiet --wiredTigerCacheSizeGB 0.25` to the `mongo` container to
 cap WiredTiger cache memory around 250 MB.
+
+- When syncing Swarm and Stack resources in Komodo (`CreateSwarm` /
+`CreateStack` ), `komodo-core` immediately marks the Swarm resource as unhealthy
+(`Failed to request from Swarm: No managers connected`) and triggers alerts if
+no `komodo-periphery` agent is actively connected as a Swarm manager for that
+cluster.
+
+- Executing a Komodo Resource Sync (`CommitSync`) that imports `Swarm` , `Stack`
+, and `Alerter` definitions before the swarm's manager nodes have connected to
+`komodo-core` results in `Failed to request from Swarm: No managers connected`
+warnings and immediately fires a critical `Swarm <name> is unhealthy` alert.
+
+- Komodo resource syncs (`ResourceSync` / `gitops-deploy` ) report an overall
+procedure failure when stacks target offline or disabled servers (`Cannot send
+command when Server is unreachable or disabled`) or disconnected swarms (`No
+managers connected`), even when stacks targeting online hosts deploy cleanly.

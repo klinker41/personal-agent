@@ -15,6 +15,7 @@ Top-level catalog mapping memory topics to structured notes.
   habits, conventions, and global guidelines.
 
 ## Projects
+- [Homelab-Stacks](file:///workspace/personal-agent/projects/homelab-stacks.md)
 - [Antigravity
   Plugin](file:///workspace/personal-agent/projects/antigravity-plugin.md):
   Plugin architecture, sidecars, rules, skills, and configuration.
