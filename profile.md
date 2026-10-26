@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-10-23T06:04:32.409918+00:00
+updated_at: 2026-10-26T06:02:05.441328+00:00
 confidence: 1.0
 ---
 
@@ -83,3 +83,16 @@ alert remediation before executing container restarts or destructive actions.
 - Homelab includes three Unraid OS hosts (nas, seedbox, and aibox) and runs
 speedtest-tracker (LinuxServer Laravel/PHP-FPM container) on the NAS with
 Watchtower managing automatic container updates.
+
+- Homelab includes a Raspberry Pi 5 NAS device (`pi-lab-nas` / `pi-lab-nas-1` at
+`192.168.1.113` ) equipped with a Pod Bay 3 ATX Power Management HAT and managed
+via Ansible Semaphore (`semaphore-estes` and `ansible-boulder` ).
+
+- Relocated the Pi Lab hardware (`pi-lab` / `pi-swarm` ) to Estes while keeping
+`pi-studio` (hosting Uptime Kuma) in Boulder without a site-to-site VPN.
+
+- Replaced Portainer Agent (`portainer_agent`) with Komodo Periphery
+(`komodo_periphery` pinned to the Swarm manager node) across Raspberry Pi Docker
+Swarm clusters (`Pi Swarm` and `Pi Lab` ).
+
+- `unraid-nas` is powered by an Intel Core Ultra 7 265K processor (20 threads).

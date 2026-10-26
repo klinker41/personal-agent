@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-21T06:36:01.081594+00:00
+updated_at: 2026-10-26T06:04:18.313095+00:00
 confidence: 1.0
 ---
 
@@ -61,3 +61,9 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
   `notify-the-user`.
 - **External AI Skills:** `ollama-chat` queries Gemma models hosted at
   `https://ollama.klinker-cabin.computer` using `$OLLAMA_API_KEY`.
+
+- Continuous Python sidecar workers (`slack_daemon.py` and `memory_daemon.py` )
+managed by `sidecar-manager.js` (`restart_policy: "always"`) can be reloaded
+with updated shared library code (`utils/memory_utils.py`) by terminating their
+individual processes so `sidecar-manager.js` respawns them, without needing to
+restart or redeploy `antigravity-docker` .

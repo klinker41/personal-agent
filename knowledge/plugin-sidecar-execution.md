@@ -2,7 +2,7 @@
 topic: plugin-sidecar-execution
 category: knowledge
 tags: [knowledge, plugin-sidecar-execution]
-updated_at: 2026-09-13T00:20:29.620489+00:00
+updated_at: 2026-10-26T06:04:18.314431+00:00
 confidence: 0.95
 ---
 
@@ -33,3 +33,8 @@ causes rpc error: project_id is required when providing project_env_config.
 - Scheduled sidecars (`builtin: 'schedule'`) execute `agentapi new-conversation`
 with cron expressions and command arguments defined in `sidecar.json`,
 supporting explicit model selection via `--model=<flash_lite|flash|pro>`.
+
+- Long-running sidecar processes configured with `restart_policy: "always"`
+retain imported modules in memory; terminating the worker process directly
+triggers `sidecar-manager.js` to respawn it with the latest code on disk without
+restarting the container.

@@ -2,7 +2,7 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics]
-updated_at: 2026-10-23T06:05:50.331628+00:00
+updated_at: 2026-10-26T06:01:33.103114+00:00
 confidence: 0.95
 ---
 
@@ -19,3 +19,8 @@ WireGuard tunnel outages even when the local container and
 inter-site connectivity drops cause 48,000ms probe timeout alerts for
 `.klinker-cabin.computer` services even when the local containers and endpoints
 are healthy.
+
+- Uptime Kuma API keys (`UPTIME_KUMA_API_KEY`) only authenticate the read-only
+Prometheus `/metrics` endpoint; mutating monitors or status pages
+(`deleteMonitor`, `saveStatusPage` ) requires authenticating via Uptime Kuma's
+Socket.IO WebSocket with an admin username and password.
