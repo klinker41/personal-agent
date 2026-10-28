@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-10-26T06:31:43.724967+00:00
-compacted_at: 2026-10-26T06:31:43.724967+00:00
+updated_at: 2026-10-28T06:31:41.538142+00:00
+compacted_at: 2026-10-28T06:31:41.538142+00:00
 confidence: 1.0
 ---
 
@@ -75,14 +75,25 @@ confidence: 1.0
 
 ## Host-Specific Stack Notes
 
-- **`unraid-nas`**: `jenkins-docker-agent`
-  (`stacks/unraid-nas/buildbox/compose.yaml`) mounts the host Docker socket,
-  spawning intermediate `docker build` containers directly on the NAS host.
+- **`unraid-nas`**:
+  - `jenkins-docker-agent` (`stacks/unraid-nas/buildbox/compose.yaml`) mounts
+    the host Docker socket, spawning intermediate `docker build` containers
+    directly on the NAS host.
+  - `nas-reverse-proxy` runs `nginx-proxy-manager`, `cloudflare-ddns`,
+    `crowdsec`, and `cs-unifi-bouncer`. When `crowdsec` restarts or updates,
+    its Local API (LAPI on port `8080`) takes ~9 seconds to initialize, causing
+    `cs-unifi-bouncer` (`http://crowdsec:8080/v1/decisions/stream`) to briefly
+    restart-loop and trigger a transient Komodo stack unhealthy alert.
+- **`unraid-seedbox` (`192.168.1.46`)**: `seedbox-torrent` runs `qbittorrent`,
+  `qbittorrent-private`, `qui` (healthcheck on `localhost:7476`), `mousetrap`
+  (healthcheck on `127.0.0.1:39842`), and `upload-assistant`.
 - **`unraid-aibox`**: Runs `aibox-ai` (including `Strata`) and `aibox-gaming`.
   In `aibox-gaming`, `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`;
   `wolf-den` requires `/var/run/wolf:rw` and write permissions on `wolf.sock`
   for its ASP.NET Core process to connect to the Wolf API.
-- **`pi-studio` (Boulder)**: Runs `uptime-kuma`
-  (`stacks/pi-studio/dashboard/compose.yaml`) with its SQLite database at
-  `/home/jklinker/uptime/kuma.db`; it has no site-to-site WireGuard route to
-  Estes LAN devices.
+- **`pi-studio` (Boulder)**: Runs `pi-studio-files` (`filebrowser-quantum`,
+  `rsync-backup`), `pi-studio-dashboard` (`uptime-kuma` with SQLite DB at
+  `/home/jklinker/uptime/kuma.db`, `glances`), and `pi-studio-reverse-proxy`
+  (`cloudflare-ddns`, `nginx-proxy-manager`). Polled hourly by Komodo
+  (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`) and has no site-to-site WireGuard
+  route to Estes LAN devices.

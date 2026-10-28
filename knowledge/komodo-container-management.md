@@ -2,8 +2,8 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-10-26T06:31:56.366481+00:00
-compacted_at: 2026-10-26T06:31:56.366481+00:00
+updated_at: 2026-10-28T06:31:53.165847+00:00
+compacted_at: 2026-10-28T06:31:53.165847+00:00
 confidence: 0.95
 ---
 
@@ -42,11 +42,15 @@ confidence: 0.95
   reports down while the host remains reachable via SSH/Ansible, check
   `docker info` and `journalctl -u docker` on the manager node for Swarm
   certificate expiration or `Swarm: error` states preventing service startup.
-- Because Komodo polls container states periodically, containers in a
-  `(health: starting)` window during redeploy/restart (e.g., `homepage` in
-  `nas-dashboard`) may briefly flag the stack as `unhealthy`, while containers
-  in a ~15-second crash loop cause the parent stack to flap between `Running`
-  and `unhealthy`.
+- Periodic polling can cause transient state anomalies:
+  - Containers in a `(health: starting)` window during redeploy/restart (e.g.,
+    `homepage` in `nas-dashboard`) may briefly flag the stack as `unhealthy`,
+    while containers in a ~15-second crash loop cause the parent stack to flap
+    between `Running` and `unhealthy`.
+  - Scheduled resource polls (`KOMODO_RESOURCE_POLL_INTERVAL`) trigger
+    concurrent SSH `git pull` operations across stacks and ResourceSyncs that
+    can hit transient connection resets, falsely flipping a stack's state to
+    `down` until the next poll cycle while containers remain healthy.
 - Transient 100% CPU alerts on `unraid-nas` accompanied by ephemeral
   random-named containers using `sha256:...` images and `--log-driver=none`
   typically indicate an active `docker build` triggered by
