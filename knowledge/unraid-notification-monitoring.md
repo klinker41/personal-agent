@@ -2,7 +2,7 @@
 topic: unraid-notification-monitoring
 category: knowledge
 tags: [knowledge, unraid-notification-monitoring]
-updated_at: 2026-10-28T06:01:59.242453+00:00
+updated_at: 2026-10-29T06:00:56.305146+00:00
 confidence: 0.95
 ---
 
@@ -29,3 +29,8 @@ host or network crash.
 `apcupsd` ; during a utility power outage, `seedbox` is configured with a
 ~10-minute time-on-battery threshold to perform an early graceful shutdown and
 conserve UPS battery runtime for `nas` and core network equipment.
+
+- On the Cabin Unraid servers, `seedbox` monitors the UPS hosted on `nas`
+(`unraid-server`) as a network slave; during a power outage, `nas` logs
+`Power failure on UPS unraid-server. Running on batteries.` followed shortly by
+`seedbox` logging `Power failure on UPS Not found. Running on batteries.` .
