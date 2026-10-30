@@ -2,7 +2,7 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics]
-updated_at: 2026-10-26T06:01:33.103114+00:00
+updated_at: 2026-10-30T06:01:29.852828+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,17 @@ are healthy.
 Prometheus `/metrics` endpoint; mutating monitors or status pages
 (`deleteMonitor`, `saveStatusPage` ) requires authenticating via Uptime Kuma's
 Socket.IO WebSocket with an admin username and password.
+
+- When `kuma_get_monitors` returns `HTTP 502 Bad Gateway` rather than `HTTP 0`
+(timeout), the `pi-studio` host and `pi-studio-reverse-proxy` (`openresty`) are
+online and reachable over WAN, isolating the failure to the upstream
+`uptime-kuma` container (`pi-studio-dashboard` stack) restarting or
+initializing.
+
+- When pruning millions of `heartbeat` rows or compacting a multi-gigabyte
+Uptime Kuma SQLite database (`kuma.db`) on slow SD card storage, a conditional
+`DELETE FROM heartbeat WHERE ...` causes heavy row-by-row B-tree/index updates
+and massive `.db-wal` growth; stashing retained rows in `/dev/shm` followed by
+an unconditional `DELETE FROM heartbeat` (`O(1)` table truncation) and
+`VACUUM INTO '/dev/shm/kuma_compact.db'` performs compaction in RAM without
+saturating SD card I/O.

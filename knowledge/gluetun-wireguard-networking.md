@@ -2,7 +2,7 @@
 topic: gluetun-wireguard-networking
 category: knowledge
 tags: [knowledge, gluetun-wireguard-networking]
-updated_at: 2026-10-26T06:03:17.122601+00:00
+updated_at: 2026-10-30T06:01:29.852380+00:00
 confidence: 0.95
 ---
 
@@ -21,3 +21,8 @@ to regain connectivity.
 dependent containers sharing its network namespace (such as `semaphore-boulder`
 ) cause reverse proxy `502 Bad Gateway` errors until those dependent containers
 are restarted to attach to the new network namespace.
+
+- Hosts on the remote Boulder LAN (such as `pi-studio` at `192.168.1.72` ) can
+be reached via SSH from the Cabin network by hopping through the
+`semaphore-boulder` container attached to the `gluetun-home` WireGuard network
+namespace on `unraid-nas` .

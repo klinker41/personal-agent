@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-10-28T06:31:41.538142+00:00
-compacted_at: 2026-10-28T06:31:41.538142+00:00
+updated_at: 2026-10-30T06:31:42.250749+00:00
+compacted_at: 2026-10-30T06:31:42.250749+00:00
 confidence: 1.0
 ---
 
@@ -91,9 +91,19 @@ confidence: 1.0
   In `aibox-gaming`, `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`;
   `wolf-den` requires `/var/run/wolf:rw` and write permissions on `wolf.sock`
   for its ASP.NET Core process to connect to the Wolf API.
-- **`pi-studio` (Boulder)**: Runs `pi-studio-files` (`filebrowser-quantum`,
-  `rsync-backup`), `pi-studio-dashboard` (`uptime-kuma` with SQLite DB at
-  `/home/jklinker/uptime/kuma.db`, `glances`), and `pi-studio-reverse-proxy`
-  (`cloudflare-ddns`, `nginx-proxy-manager`). Polled hourly by Komodo
-  (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`) and has no site-to-site WireGuard
-  route to Estes LAN devices.
+- **`pi-studio` (`192.168.1.72`, Boulder)**:
+  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd`, is
+    polled hourly by Komodo (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`) via
+    `komodo-periphery`, and has no site-to-site WireGuard route to Estes LAN
+    devices.
+  - Hosts `pi-studio-dashboard` (`uptime-kuma` at `uptime.klinker.computer`
+    with SQLite DB at `/home/jklinker/uptime/kuma.db`, and `glances`),
+    `pi-studio-reverse-proxy` (`nginx-proxy-manager` / `openresty`,
+    `cloudflare-ddns`, `crowdsec`, and `crowdsec-web-ui`), and `pi-studio-files`
+    (`filebrowser-quantum` and `rsync-backup`).
+  - `filebrowser-quantum` (`/home/jklinker/filebrowser-quantum/data/config.yaml`
+    with `/mnt/external_hdd`) configures sources (`/srv/home` and `/srv/backup`)
+    with `rules: [{ folderPath: "/", viewable: true }]` so directories are
+    browsed on-demand (`GetFsInfoViewableOnly`) without generating a
+    container-layer SQLite index (`/home/filebrowser/tmp/sql/index_all.db`) or
+    waking up the spun-down `/mnt/external_hdd` drive.
