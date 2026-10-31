@@ -9,7 +9,7 @@ confidence: 0.95
 # Knowledge: Qbittorrent-Config-Migration
 
 - qBittorrent 5.3.0 runs a config migration (MigrationVersion 8 -> 12,
-specifically Migration 11 `migrateWebUISettings` ) on `qBittorrent.conf` that
+specifically Migration 11 `migrateWebUISettings`) on `qBittorrent.conf` that
 moves all `WebUI\*` settings out of `[Preferences]` into a top-level `[WebUI]`
 section (stripping the `WebUI\` prefix). Downgrading to 5.2.x without reverting
 `qBittorrent.conf` causes 5.2.x to miss `WebUI\Password_PBKDF2` and fall back to

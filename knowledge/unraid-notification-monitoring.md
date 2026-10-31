@@ -26,11 +26,11 @@ batteries.`) distinguishes a graceful UPS shutdown of `unraid-seedbox` from a
 host or network crash.
 
 - At the Cabin site, `unraid-nas` and `unraid-seedbox` share UPS status via
-`apcupsd` ; during a utility power outage, `seedbox` is configured with a
+`apcupsd`; during a utility power outage, `seedbox` is configured with a
 ~10-minute time-on-battery threshold to perform an early graceful shutdown and
 conserve UPS battery runtime for `nas` and core network equipment.
 
 - On the Cabin Unraid servers, `seedbox` monitors the UPS hosted on `nas`
 (`unraid-server`) as a network slave; during a power outage, `nas` logs
 `Power failure on UPS unraid-server. Running on batteries.` followed shortly by
-`seedbox` logging `Power failure on UPS Not found. Running on batteries.` .
+`seedbox` logging `Power failure on UPS Not found. Running on batteries.`.

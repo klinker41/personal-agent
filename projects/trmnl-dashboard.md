@@ -21,7 +21,7 @@ missing movies matching GetHomepage behavior.
 e-ink dashboard image via Pillow, replacing a heavier Homepage + Playwright
 stack.
 - Asynchronously queries Sonarr, Radarr, qBittorrent, Tdarr
-(`StatisticsJSONDB`), Portainer (multi-environment), custom Home APIs (Energy,
+(`StatisticsJSONDB`), Komodo (multi-environment), custom Home APIs (Energy,
 Radon, Solar, unRAID), OpenWeatherMap, and Finnhub.
 - Packaged in a minimal Alpine Docker container running on a 15-minute refresh
 daemon loop (`--loop`) or single-shot execution via host cron.

@@ -20,7 +20,7 @@ tofu glyphs unless TrueType fonts are bundled directly.
 FFmpeg can be installed into /home/developer/.local/bin, which is already
 present on PATH.
 
-- Antigravity accesses the host Docker daemon and Portainer volumes without
-mounting `/var/run/docker.sock` by leveraging host environment variables
-(`HOST_SSH_HOST`, `HOST_SSH_USER` , `HOST_SSH_PORT` ) and an authorized SSH key
-bind-mounted at `/home/developer/.ssh` from `/mnt/user/docker/antigravity/ssh` .
+- Antigravity accesses the host Docker daemon and Komodo stacks and host volumes
+without mounting `/var/run/docker.sock` by leveraging host environment variables
+(`HOST_SSH_HOST`, `HOST_SSH_USER`, `HOST_SSH_PORT`) and an authorized SSH key
+bind-mounted at `/home/developer/.ssh` from `/mnt/user/docker/antigravity/ssh`.

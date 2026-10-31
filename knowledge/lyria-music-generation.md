@@ -25,5 +25,5 @@ confidence: 0.95
   (`atrim=0:30,afade=t=in:ss=0:d=1,afade=t=out:st=27:d=3`) maintains
   musicality while preventing waveform pops or clicks.
 
-- Lyria music models (e.g., `models/lyria-3-clip-preview` ) are cataloged under
+- Lyria music models (e.g., `models/lyria-3-clip-preview`) are cataloged under
 the Gemini REST API `v1beta/models` endpoint alongside Gemini models.

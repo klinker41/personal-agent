@@ -9,6 +9,6 @@ confidence: 0.95
 # Knowledge: Sonarr-Docker-Mounts
 
 - Mounting download and media directories as separate Docker bind mounts (e.g.,
-`/data/completed` and `/data/TV` ) prevents atomic hardlinks and forces Sonarr
+`/data/completed` and `/data/TV`) prevents atomic hardlinks and forces Sonarr
 to perform full file copies on import, which can trigger transient I/O and
 SQLite lock contention that stalls HTTP health checks.

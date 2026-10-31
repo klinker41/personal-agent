@@ -62,8 +62,8 @@ lifecycle hooks (`hooks.json`), sidecars (`sidecar.json`), MCP configuration
 - **External AI Skills:** `ollama-chat` queries Gemma models hosted at
   `https://ollama.klinker-cabin.computer` using `$OLLAMA_API_KEY`.
 
-- Continuous Python sidecar workers (`slack_daemon.py` and `memory_daemon.py` )
+- Continuous Python sidecar workers (`slack_daemon.py` and `memory_daemon.py`)
 managed by `sidecar-manager.js` (`restart_policy: "always"`) can be reloaded
 with updated shared library code (`utils/memory_utils.py`) by terminating their
 individual processes so `sidecar-manager.js` respawns them, without needing to
-restart or redeploy `antigravity-docker` .
+restart or redeploy `antigravity-docker`.
