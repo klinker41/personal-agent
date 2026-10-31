@@ -2,7 +2,7 @@
 topic: gluetun-wireguard-networking
 category: knowledge
 tags: [knowledge, gluetun-wireguard-networking]
-updated_at: 2026-10-30T06:01:29.852380+00:00
+updated_at: 2026-10-31T06:01:34.532812+00:00
 confidence: 0.95
 ---
 
@@ -26,3 +26,11 @@ are restarted to attach to the new network namespace.
 reached via SSH from the Cabin network by hopping through the
 `semaphore-boulder` container attached to the `gluetun-home` WireGuard network
 namespace on `unraid-nas`.
+
+- When a Docker container uses `--net=container:<name>` (such as attaching to a
+Gluetun container), Docker binds it to the target container's exact container ID
+at creation time; if the Gluetun container is recreated with a new ID, a
+standard `docker restart` (or `komodo_restart_container` ) on the dependent
+container fails with
+`joining network namespace of container: No such container: <old_id>` ,
+requiring the dependent container to be recreated rather than just restarted.

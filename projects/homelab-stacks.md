@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-10-30T06:31:42.250749+00:00
-compacted_at: 2026-10-30T06:31:42.250749+00:00
+updated_at: 2026-10-31T06:31:37.441200+00:00
+compacted_at: 2026-10-31T06:31:37.441200+00:00
 confidence: 1.0
 ---
 
@@ -40,11 +40,12 @@ confidence: 1.0
   `klinker.computer` into `/gluetun/wireguard/wg0.conf` at startup and every 5
   minutes, restarting `/gluetun-entrypoint` in-place without dropping the
   container network namespace.
-- Containers using `network_mode: service:gluetun-*` (such as
-  `semaphore-boulder` on `gluetun-home`, and `rsync-backup` on
-  `gluetun-home-backup` across `unraid-nas` and `unraid-seedbox`) must be
-  restarted whenever their parent Gluetun container is recreated so they rebind
-  to the new network namespace.
+- Dependent containers sharing a Gluetun network stack—such as
+  `semaphore-boulder` (Ansible Boulder) on `unraid-nas` (`gluetun-home`), and
+  `rsync-backup` (in the `files` stack across `unraid-nas` and `unraid-seedbox`
+  using `network_mode: service:gluetun-home-backup`)—must be restarted whenever
+  their parent Gluetun container is recreated so they rebind to the new network
+  namespace.
 
 ## Raspberry Pi Clusters & Ansible Management
 
