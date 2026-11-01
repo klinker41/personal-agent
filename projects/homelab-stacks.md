@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-10-31T06:31:37.441200+00:00
-compacted_at: 2026-10-31T06:31:37.441200+00:00
+updated_at: 2026-11-01T06:30:29.580631+00:00
+compacted_at: 2026-11-01T06:30:29.580631+00:00
 confidence: 1.0
 ---
 
@@ -88,10 +88,16 @@ confidence: 1.0
 - **`unraid-seedbox` (`192.168.1.46`)**: `seedbox-torrent` runs `qbittorrent`,
   `qbittorrent-private`, `qui` (healthcheck on `localhost:7476`), `mousetrap`
   (healthcheck on `127.0.0.1:39842`), and `upload-assistant`.
-- **`unraid-aibox`**: Runs `aibox-ai` (including `Strata`) and `aibox-gaming`.
-  In `aibox-gaming`, `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`;
-  `wolf-den` requires `/var/run/wolf:rw` and write permissions on `wolf.sock`
-  for its ASP.NET Core process to connect to the Wolf API.
+- **`unraid-aibox`**:
+  - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In `aibox-gaming`,
+    `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`; `wolf-den` requires
+    `/var/run/wolf:rw` and write permissions on `wolf.sock` for its ASP.NET
+    Core process to connect to the Wolf API.
+  - When syncing `unraid-aibox` backups via `rsync-backup` to
+    `192.168.1.72:/mnt/external_hdd/backup/aibox/` as `jklinker`, pass
+    `--omit-dir-times` (`-O`) if the destination top-level directory is owned
+    by `root:root` to prevent non-zero exit codes from directory timestamp
+    warnings.
 - **`pi-studio` (`192.168.1.72`, Boulder)**:
   - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd`, is
     polled hourly by Komodo (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`) via
