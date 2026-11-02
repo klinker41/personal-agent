@@ -27,6 +27,7 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Growatt-Modbus-Rtu](file:///workspace/personal-agent/knowledge/growatt-modbus-rtu.md)
 - [Android-Hinge-Sensor](file:///workspace/personal-agent/knowledge/android-hinge-sensor.md)
 - [Antigravity-Agentapi-Bridge](file:///workspace/personal-agent/knowledge/antigravity-agentapi-bridge.md)
 - [Antigravity-Architecture](file:///workspace/personal-agent/knowledge/antigravity-architecture.md)

@@ -2,8 +2,8 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-11-01T06:01:07.444883+00:00
-compacted_at: 2026-10-30T14:35:00+00:00
+updated_at: 2026-11-02T07:30:36.413074+00:00
+compacted_at: 2026-11-02T07:30:36.413074+00:00
 confidence: 1.0
 ---
 
@@ -57,8 +57,7 @@ global conventions across projects.
   containers.
 - **Media, Sensors & Display:** Runs Jellyfin 12, Sonarr, Radarr, qBittorrent,
   and Tdarr; monitors Emporia Vue energy, Airthings air quality/radon (Estes
-  and Boulder), and Tesla solar/Powerwall via Teslemetry; and displays homelab
-  status on a TRMNL 800x480 e-ink display refreshed every 15 minutes.
-
-- Homelab includes a Growatt SPF 3500 inverter (configured in Lithium mode)
-connected to unraid-nas via USB serial (/dev/ttyUSB0) using Modbus RTU.
+  and Boulder), Tesla solar/Powerwall via Teslemetry, and a Growatt SPF 3500
+  inverter (in Lithium mode, connected to `unraid-nas` at `/dev/ttyUSB0` via
+  USB serial Modbus RTU); and displays homelab status on a TRMNL 800x480 e-ink
+  display refreshed every 15 minutes.

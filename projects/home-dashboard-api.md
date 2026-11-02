@@ -2,7 +2,7 @@
 topic: home-dashboard-api
 category: project
 tags: [project, home-dashboard-api]
-updated_at: 2026-10-24T06:01:09.964414+00:00
+updated_at: 2026-11-02T07:01:22.055268+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,10 @@ port 5002 using exec-form `CMD ["python", "-u", "api_server.py"]`.
 Unraid GraphQL endpoints (such as `unraid-aibox.klinker-cabin.computer/graphql`)
 and degrades gracefully by returning `0` for unreachable hosts while continuing
 to serve `nas` and `seedbox` notification counts.
+
+- `home-dashboard-api` (`jklinker/home-api-server:latest`) is located at
+`/mnt/user/docker/homepage/api` on `unraid-nas` and is not built by Jenkins CI;
+any code changes must be manually built and pushed to Docker Hub
+(`docker push jklinker/home-api-server:latest`), otherwise Komodo's
+`auto_update = true` on `nas-dashboard` will pull the stale image from Docker
+Hub and overwrite local container builds.

@@ -2,8 +2,8 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-10-28T06:31:53.165847+00:00
-compacted_at: 2026-10-28T06:31:53.165847+00:00
+updated_at: 2026-11-02T07:31:07.253214+00:00
+compacted_at: 2026-11-02T07:31:07.253214+00:00
 confidence: 0.95
 ---
 
@@ -24,7 +24,10 @@ confidence: 0.95
 - Komodo Core includes built-in daily database backups (`BackupCoreDatabase`
   procedure), declarative TOML synchronization (`ResourceSync`), and native
   image update polling (`poll_for_updates` / `auto_update`) that replaces
-  Watchtower, Shepherd, and external backup containers.
+  Watchtower, Shepherd, and external backup containers. When a stack has
+  `auto_update = true` in `homelab.toml`, pushing changes to `homelab-stacks`
+  triggers Komodo to pull the remote image from the registry, overwriting any
+  locally built images not pushed upstream.
 - On resource-constrained hosts, pass `--quiet --wiredTigerCacheSizeGB 0.25` to
   Komodo's native `mongo` container to cap WiredTiger cache memory around
   250 MB.

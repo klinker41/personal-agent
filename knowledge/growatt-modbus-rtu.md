@@ -2,7 +2,7 @@
 topic: growatt-modbus-rtu
 category: knowledge
 tags: [knowledge, growatt-modbus-rtu]
-updated_at: 2026-11-01T06:01:07.445119+00:00
+updated_at: 2026-11-02T07:01:50.650838+00:00
 confidence: 0.95
 ---
 
@@ -16,3 +16,6 @@ to Utility SoC threshold, bat_low_to_uti), Holding Register 95 is Program 13
 (Back to Battery SoC threshold), Holding Register 82 is Program 21 (Low DC
 Cut-off SoC threshold), and Input Registers 17 and 18 report battery voltage and
 SoC.
+
+- Program 12 on the Growatt inverter maps to Holding Register 37 and stores the
+percentage value scaled in tenths of a percent (e.g., 450 = 45.0%, 500 = 50.0%).

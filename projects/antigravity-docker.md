@@ -2,8 +2,8 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-10-24T06:30:55.846573+00:00
-compacted_at: 2026-10-24T06:30:55.846573+00:00
+updated_at: 2026-11-02T07:30:55.576240+00:00
+compacted_at: 2026-11-02T07:30:55.576240+00:00
 confidence: 0.95
 ---
 
@@ -70,11 +70,13 @@ confidence: 0.95
   `write_to_file` calls when omitted.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
-- **Supervisor Engine:** Authenticated `/sidecars` REST API and UI manages
-  background workers and 5-field cron tasks. Coordinates restart policies,
-  unified env injection (`buildSidecarEnv`), upstream Language Server polling
-  (`waitForUpstream()`), and live CSRF token discovery at
-  `127.0.0.1:${AGY_HUB_PORT}`.
+- **Supervisor Engine:** Because running the Antigravity CLI in headless hub
+  mode (`agy --hub`) disables the native Go `SidecarManager` in the Language
+  Server, `proxy/sidecar-manager.js` provides a custom supervisor with an
+  authenticated `/sidecars` REST API and UI for background workers and 5-field
+  cron tasks. Coordinates restart policies, unified env injection
+  (`buildSidecarEnv`), upstream Language Server polling (`waitForUpstream()`),
+  and live CSRF token discovery at `127.0.0.1:${AGY_HUB_PORT}`.
 - **Sidecar Types:**
   - *Standalone:* Defined in `~/.gemini/config/sidecars/<id>/sidecar.json`,
     toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.

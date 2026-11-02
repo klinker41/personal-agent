@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-10-26T06:04:18.313095+00:00
+updated_at: 2026-11-02T07:01:30.933231+00:00
 confidence: 1.0
 ---
 
@@ -67,3 +67,7 @@ managed by `sidecar-manager.js` (`restart_policy: "always"`) can be reloaded
 with updated shared library code (`utils/memory_utils.py`) by terminating their
 individual processes so `sidecar-manager.js` respawns them, without needing to
 restart or redeploy `antigravity-docker`.
+
+- The `growatt-time-sync` scheduled sidecar
+(`sidecars/growatt-time-sync/sidecar.json`) runs weekly (`0 6 * * 0`) using
+`"model": "flash"`.
