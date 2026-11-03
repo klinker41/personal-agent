@@ -2,7 +2,7 @@
 topic: growatt-modbus-rtu
 category: knowledge
 tags: [knowledge, growatt-modbus-rtu]
-updated_at: 2026-11-02T07:01:50.650838+00:00
+updated_at: 2026-11-03T07:00:44.712725+00:00
 confidence: 0.95
 ---
 
@@ -19,3 +19,6 @@ SoC.
 
 - Program 12 on the Growatt inverter maps to Holding Register 37 and stores the
 percentage value scaled in tenths of a percent (e.g., 450 = 45.0%, 500 = 50.0%).
+
+- Program 12 on the Growatt inverter maps to Modbus Holding Register 37, where
+values are scaled in tenths of a percent (e.g., 520 = 52.0%, 450 = 45.0%).
