@@ -2,7 +2,7 @@
 topic: homelab-ops-mcp
 category: project
 tags: [project, homelab-ops-mcp]
-updated_at: 2026-10-19T06:03:44.598485+00:00
+updated_at: 2026-11-05T07:01:11.499633+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,8 @@ unraid_dismiss_notification.
 - Provides 'jellyfin_get_podcast_episodes' and 'jellyfin_update_podcast_episode'
 tools to query unformatted podcast episodes and update their titles, disc
 numbers, and track numbers.
+
+- komodo_list_environments only maps the three Unraid servers, so
+container-level Komodo MCP queries for Raspberry Pi hosts (such as pi-studio)
+return empty and must be verified via direct endpoint probes or Uptime Kuma
+monitors.

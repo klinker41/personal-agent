@@ -2,7 +2,7 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics, uptime-kuma, komodo, pi-studio]
-updated_at: 2026-10-30T14:35:00+00:00
+updated_at: 2026-11-05T07:00:58.685916+00:00
 compacted_at: 2026-10-30T14:35:00+00:00
 confidence: 0.95
 ---
@@ -43,3 +43,13 @@ so the dependent container must be recreated via
 docker exec -w /mnt/user/docker/komodo/periphery/stacks/nas-management/stacks/unraid-nas/management \
   komodo-periphery docker compose -p management --env-file .env up -d --force-recreate semaphore-boulder
 ```
+
+- Uptime Kuma `HTTP(s) - Json Query` monitors support JSONata expressions
+(`$number`, `$replace`, ternary `? :`), allowing string-formatted metrics (like
+percentages) to be parsed and threshold-checked directly without modifying the
+upstream API.
+- Using a ternary JSONata expression such as
+`$number($replace($[2].estes_battery, "%", "")) >= 50 ? "ok" :
+$[2].estes_battery` with an Expected Value of `ok` ensures that when the
+threshold check fails, Uptime Kuma includes the actual offending value in the
+alert message (`value was: [49%]`) instead of just `false`.

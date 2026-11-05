@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-01T06:30:29.580631+00:00
-compacted_at: 2026-11-01T06:30:29.580631+00:00
+updated_at: 2026-11-05T07:30:42.305032+00:00
+compacted_at: 2026-11-05T07:30:42.305032+00:00
 confidence: 1.0
 ---
 
@@ -27,6 +27,10 @@ confidence: 1.0
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15 seconds (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing
   all remote servers and Docker Swarms via declarative Resource Sync.
+- A scheduled `Global Auto Update` Komodo procedure (`syncs/homelab.toml`) runs
+  daily at 03:00 local time, briefly stopping and recreating stacks configured
+  with `poll_for_updates = true` and `auto_update = true` (e.g.,
+  `pi-studio-files`).
 
 ## Site-to-Site WireGuard VPN (`gluetun`)
 
@@ -107,7 +111,13 @@ confidence: 1.0
     with SQLite DB at `/home/jklinker/uptime/kuma.db`, and `glances`),
     `pi-studio-reverse-proxy` (`nginx-proxy-manager` / `openresty`,
     `cloudflare-ddns`, `crowdsec`, and `crowdsec-web-ui`), and `pi-studio-files`
-    (`filebrowser-quantum` and `rsync-backup`).
+    (`filebrowser-quantum` at `https://files.klinker.computer` and
+    `rsync-backup`).
+  - Uptime Kuma includes an `Estes Battery` monitor (ID `80`, under the
+    `Server` group and `all` status page) that polls
+    `https://home-api.klinker-cabin.computer/api/solar` every 120s (48s
+    timeout, 2 retries) via an `HTTP(s) - Json Query` monitor to alert Slack
+    when the Estes battery drops below 50%.
   - `filebrowser-quantum` (`/home/jklinker/filebrowser-quantum/data/config.yaml`
     with `/mnt/external_hdd`) configures sources (`/srv/home` and `/srv/backup`)
     with `rules: [{ folderPath: "/", viewable: true }]` so directories are

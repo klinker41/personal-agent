@@ -2,8 +2,8 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-11-02T07:31:07.253214+00:00
-compacted_at: 2026-11-02T07:31:07.253214+00:00
+updated_at: 2026-11-05T07:30:55.040938+00:00
+compacted_at: 2026-11-05T07:30:55.040938+00:00
 confidence: 0.95
 ---
 
@@ -45,7 +45,7 @@ confidence: 0.95
   reports down while the host remains reachable via SSH/Ansible, check
   `docker info` and `journalctl -u docker` on the manager node for Swarm
   certificate expiration or `Swarm: error` states preventing service startup.
-- Periodic polling can cause transient state anomalies:
+- Periodic polling and scheduled updates can cause transient state anomalies:
   - Containers in a `(health: starting)` window during redeploy/restart (e.g.,
     `homepage` in `nas-dashboard`) may briefly flag the stack as `unhealthy`,
     while containers in a ~15-second crash loop cause the parent stack to flap
@@ -54,6 +54,9 @@ confidence: 0.95
     concurrent SSH `git pull` operations across stacks and ResourceSyncs that
     can hit transient connection resets, falsely flipping a stack's state to
     `down` until the next poll cycle while containers remain healthy.
+  - Stacks with `auto_update = true` emit transient `running -> Down` alerts at
+    03:00 local time when the daily Global Auto Update procedure pulls new
+    images and recreates containers.
 - Transient 100% CPU alerts on `unraid-nas` accompanied by ephemeral
   random-named containers using `sha256:...` images and `--log-driver=none`
   typically indicate an active `docker build` triggered by

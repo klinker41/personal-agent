@@ -2,7 +2,7 @@
 topic: home-dashboard-api
 category: project
 tags: [project, home-dashboard-api]
-updated_at: 2026-11-02T07:01:22.055268+00:00
+updated_at: 2026-11-05T07:00:58.681117+00:00
 confidence: 0.95
 ---
 
@@ -31,3 +31,7 @@ any code changes must be manually built and pushed to Docker Hub
 (`docker push jklinker/home-api-server:latest`), otherwise Komodo's
 `auto_update = true` on `nas-dashboard` will pull the stale image from Docker
 Hub and overwrite local container builds.
+
+- The `/api/solar` endpoint
+(`https://home-api.klinker-cabin.computer/api/solar`) returns a JSON array where
+index 2 contains `{"estes_battery": "<N>%"}`.
