@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-05T07:30:42.305032+00:00
-compacted_at: 2026-11-05T07:30:42.305032+00:00
+updated_at: 2026-11-06T07:30:39.359204+00:00
+compacted_at: 2026-11-06T07:30:39.359204+00:00
 confidence: 1.0
 ---
 
@@ -80,15 +80,18 @@ confidence: 1.0
 
 ## Host-Specific Stack Notes
 
-- **`unraid-nas`**:
+- **`unraid-nas` (`192.168.1.95`)**:
   - `jenkins-docker-agent` (`stacks/unraid-nas/buildbox/compose.yaml`) mounts
     the host Docker socket, spawning intermediate `docker build` containers
     directly on the NAS host.
-  - `nas-reverse-proxy` runs `nginx-proxy-manager`, `cloudflare-ddns`,
-    `crowdsec`, and `cs-unifi-bouncer`. When `crowdsec` restarts or updates,
-    its Local API (LAPI on port `8080`) takes ~9 seconds to initialize, causing
-    `cs-unifi-bouncer` (`http://crowdsec:8080/v1/decisions/stream`) to briefly
-    restart-loop and trigger a transient Komodo stack unhealthy alert.
+  - `nas-reverse-proxy` (`stacks/unraid-nas/reverse-proxy/compose.yaml`) runs
+    `nginx-proxy-manager` (admin API on port `81`, SQLite DB persisted on the
+    host at `/mnt/user/docker/nginx-proxy-manager/data/database.sqlite`),
+    `cloudflare-ddns`, `crowdsec`, and `cs-unifi-bouncer`. When `crowdsec`
+    restarts or updates, its Local API (LAPI on port `8080`) takes ~9 seconds
+    to initialize, causing `cs-unifi-bouncer`
+    (`http://crowdsec:8080/v1/decisions/stream`) to briefly restart-loop and
+    trigger a transient Komodo stack unhealthy alert.
 - **`unraid-seedbox` (`192.168.1.46`)**: `seedbox-torrent` runs `qbittorrent`,
   `qbittorrent-private`, `qui` (healthcheck on `localhost:7476`), `mousetrap`
   (healthcheck on `127.0.0.1:39842`), and `upload-assistant`.
