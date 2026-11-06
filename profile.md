@@ -37,8 +37,10 @@ global conventions across projects.
 - Post Slack bot replies in direct messages (DMs) inline at the top level
   rather than in threads, while using Slack as the centralized notification hub
   for self-hosted services and personal agent alerts.
-- Follow a cautious "diagnose and ask first" workflow for automated homelab
-  alert remediation before executing container restarts or destructive actions.
+- Perform non-destructive remediation immediately without asking first during
+  automated homelab alert investigations (such as restarting containers/stacks
+  or fixing issues via MCP or SSH), and only ask for confirmation before
+  executing destructive actions.
 
 ## Homelab Infrastructure
 - **Unraid Hosts:** Operates three Unraid OS servers (`unraid-nas` at
