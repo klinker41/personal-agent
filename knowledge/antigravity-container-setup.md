@@ -2,7 +2,7 @@
 topic: antigravity-container-setup
 category: knowledge
 tags: [knowledge, antigravity-container-setup]
-updated_at: 2026-10-14T00:03:29.535857+00:00
+updated_at: 2026-11-07T07:03:08.125923+00:00
 confidence: 0.95
 ---
 
@@ -24,3 +24,9 @@ present on PATH.
 without mounting `/var/run/docker.sock` by leveraging host environment variables
 (`HOST_SSH_HOST`, `HOST_SSH_USER`, `HOST_SSH_PORT`) and an authorized SSH key
 bind-mounted at `/home/developer/.ssh` from `/mnt/user/docker/antigravity/ssh`.
+
+- Because `agy` is installed dynamically during `docker build` via
+`https://antigravity.google/cli/install.sh`, the shipped CLI version can be
+extracted post-build using `docker run --rm --entrypoint agy <image> --version |
+tr -d '[:space:]'` to tag release images (`<AGY_VERSION>` and
+`<AGY_VERSION>-slim`).

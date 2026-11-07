@@ -2,30 +2,38 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-11-02T07:30:55.576240+00:00
-compacted_at: 2026-11-02T07:30:55.576240+00:00
+updated_at: 2026-11-07T07:30:50.661760+00:00
+compacted_at: 2026-11-07T07:30:50.661760+00:00
 confidence: 0.95
 ---
 
 # Project: Antigravity-Docker
 
-## Container Runtime & Isolation
-- **Runtime Security:** Headless image `jklinker/antigravity-docker:latest` runs
-  non-root `developer` via `gosu` (dynamic `PUID`/`PGID`, disabled passwordless
-  sudo, `umask 0002` across `conversations/`, `brain/`, and `annotations/`).
-  Platform-agnostic isolation replaces `/var/run/docker.sock` mounting with an
-  SSH web terminal (`ttyd` on port 7681 via `HOST_SSH_DIR`) for host commands.
+## Container Runtime, Build & CI/CD
+- **Runtime Security:** Headless image runs non-root `developer` via `gosu`
+  (dynamic `PUID`/`PGID`, disabled passwordless sudo, `umask 0002` across
+  `conversations/`, `brain/`, and `annotations/`). Replaces
+  `/var/run/docker.sock` mounting with an SSH web terminal (`ttyd` on port 7681
+  via `HOST_SSH_DIR`) for host commands.
+- **CI/CD & Image Tags:** Jenkins job `antigravity-docker` on `unraid-nas`
+  (`/mnt/user/docker/jenkins/home/jobs/antigravity-docker/config.xml`) builds
+  `slim` and `full` multi-stage targets, extracts `AGY_VERSION` via
+  `docker run --rm --entrypoint agy jklinker/antigravity:slim --version | tr -d
+'[:space:]'`,
+  pushes `jklinker/antigravity:{latest,slim,<AGY_VERSION>,<AGY_VERSION>-slim}`
+  (legacy `jklinker/antigravity-docker:latest`), and triggers a Komodo
+  `DeployStack` call for `nas-ai` (`antigravity` service).
 
 ## Configuration & Environment
 - **Networking & Services:** Exposes `AGY_PORT=4400` (auth proxy gateway),
-  `AGY_HUB_PORT=4402` (hub discovery via `agy --remote-control --hub-port`), and
-  port 4405 (translation proxy). Configured via `RC_NAME` and `AUTH_PASSWORD`.
-  Auxiliary services `ENABLE_IDE` (port 8080 `code-server`) and
-  `ENABLE_TERMINAL` (port 7681 `ttyd`) default to `true` with UI shortcuts.
+  `AGY_HUB_PORT=4402` (`agy --remote-control --hub-port`), and port 4405
+  (translation proxy), configured via `RC_NAME` and `AUTH_PASSWORD`. Auxiliary
+  services `ENABLE_IDE` (port 8080 `code-server`) and `ENABLE_TERMINAL` (port
+  7681 `ttyd`) default to `true` with UI shortcuts.
 - **Privacy & Telemetry:** `BLOCK_TELEMETRY=true` (default) sinkholes Google
   telemetry to `0.0.0.0` via `/etc/hosts` and sets OpenTelemetry opt-out flags.
-- **Storage & Sandboxing Lifecycle:** Auth initialized via `setup` subcommand
-  with mounted `~/.gemini`. `entrypoint.sh` initializes project configs under
+- **Storage & Sandboxing:** Auth initialized via `setup` subcommand with
+  mounted `~/.gemini`. `entrypoint.sh` initializes project configs under
   `$GEMINI_DIR/config/projects/` and purges stale CSRF tokens. Runtime state
   (`antigravity_state.pbtxt`, `installation_uuid`, migrations) and `cli.log`
   reside in `$GEMINI_DIR/antigravity-cli/`. Sandbox defaults:
@@ -55,13 +63,13 @@ confidence: 0.95
   `<input>` elements.
 
 ## Translation Proxy & Transcoding
-- **Activation & Routing (`proxy/translation-proxy.js`):** Native Node streaming
+- **Activation & Routing (`proxy/translation-proxy.js`):** Native streaming
   transcoder on port 4405 (no LiteLLM) translating Connect-RPC Protobuf to
   Anthropic and OpenAI endpoints, intercepting API traffic between the daemon
-  and Google backend to map model tiers. Conditionally enabled by
-  `entrypoint.sh` only when custom models are configured. Placeholders
-  `M500`-`M649` return `null` immediately, routing built-in models (Claude,
-  GPT-OSS) upstream to Google when Astra is active.
+  and Google backend to map model tiers. Enabled by `entrypoint.sh` only when
+  custom models are configured. Placeholders `M500`-`M649` return `null`
+  immediately, routing built-in models (Claude, GPT-OSS) upstream to Google
+  when Astra is active.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across streaming and unary calls, coercing
   stringified booleans and integers into native types. Strips
@@ -70,13 +78,13 @@ confidence: 0.95
   `write_to_file` calls when omitted.
 
 ## Sidecar Management (`proxy/sidecar-manager.js`)
-- **Supervisor Engine:** Because running the Antigravity CLI in headless hub
-  mode (`agy --hub`) disables the native Go `SidecarManager` in the Language
-  Server, `proxy/sidecar-manager.js` provides a custom supervisor with an
-  authenticated `/sidecars` REST API and UI for background workers and 5-field
-  cron tasks. Coordinates restart policies, unified env injection
-  (`buildSidecarEnv`), upstream Language Server polling (`waitForUpstream()`),
-  and live CSRF token discovery at `127.0.0.1:${AGY_HUB_PORT}`.
+- **Supervisor Engine:** Because headless hub mode (`agy --hub`) disables the
+  native Go `SidecarManager` in the Language Server, `proxy/sidecar-manager.js`
+  provides a custom supervisor with an authenticated `/sidecars` REST API and
+  UI for background workers and 5-field cron tasks. Coordinates restart
+  policies, unified env injection (`buildSidecarEnv`), upstream Language Server
+  polling (`waitForUpstream()`), and live CSRF token discovery at
+  `127.0.0.1:${AGY_HUB_PORT}`.
 - **Sidecar Types:**
   - *Standalone:* Defined in `~/.gemini/config/sidecars/<id>/sidecar.json`,
     toggled via `sidecars[id].enabled` in `~/.gemini/config/config.json`.
@@ -85,8 +93,9 @@ confidence: 0.95
     `PATH`, `PLUGIN` UI badge, and isolated config resets.
 
 ## Testing & Quality
-- **Test Suite & State Isolation:** Native Node test runner (`node --test
-  tests/*.js`). Maintains state isolation by cleaning up mock environment
-  variables and filesystem fixtures in `finally` blocks (e.g.,
-  `tests/test-sidecar-manager.js`) to prevent CSRF token or state leakage
+- **Test Suite & State Isolation:** Bun test runner (`npm test` / `bun test
+  ./tests/test-*.js`); never use `node --test` since the gateway runs on Bun.
+  Maintains state isolation by cleaning up mock environment variables and
+  filesystem fixtures in `finally` blocks (e.g., `tests/test-sidecar-manager.js`
+  and `tests/test-security.js`) to prevent CSRF token or auth state leakage
   between test suites.

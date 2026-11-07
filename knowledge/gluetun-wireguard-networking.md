@@ -2,7 +2,7 @@
 topic: gluetun-wireguard-networking
 category: knowledge
 tags: [knowledge, gluetun-wireguard-networking]
-updated_at: 2026-10-31T06:01:34.532812+00:00
+updated_at: 2026-11-07T07:01:45.424361+00:00
 confidence: 0.95
 ---
 
@@ -34,3 +34,10 @@ standard `docker restart` (or `komodo_restart_container` ) on the dependent
 container fails with
 `joining network namespace of container: No such container: <old_id>` ,
 requiring the dependent container to be recreated rather than just restarted.
+
+- Docker pins `network_mode: container:<name>` to the target container's ID at
+creation time; when a Gluetun container is recreated (such as during nightly
+image updates), dependent containers lose network connectivity (causing upstream
+502 Bad Gateway errors) and fail simple restarts with `joining network namespace
+of container: No such container: <old-id>`, requiring a full container
+recreation/redeploy to bind to the new Gluetun container ID.
