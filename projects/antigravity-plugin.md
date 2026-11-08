@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-11-02T07:01:30.933231+00:00
+updated_at: 2026-11-08T07:02:58.809428+00:00
 confidence: 1.0
 ---
 
@@ -71,3 +71,11 @@ restart or redeploy `antigravity-docker`.
 - The `growatt-time-sync` scheduled sidecar
 (`sidecars/growatt-time-sync/sidecar.json`) runs weekly (`0 6 * * 0`) using
 `"model": "flash"`.
+
+- Added the `instagram-reels-downloader` scheduled sidecar
+(`sidecars/instagram-reels-downloader/`, running on cron `0 11,19 * * *` with up
+to 30 minutes of random jitter on `:00` scheduled runs) to poll
+`https://www.instagram.com/liveinneon/reels/` via `yt-dlp`, store videos and
+`.yt-dlp-archive.txt` in `/reels`, read session cookies from
+`/instagram/cookies.txt`, and upload newly downloaded `.mp4` files directly to
+the user's Slack DM using `$SLACK_BOT_TOKEN` and `files_upload_v2`.

@@ -2,7 +2,7 @@
 topic: slack-socket-mode
 category: knowledge
 tags: [knowledge, slack, socket-mode, mrkdwn, bolt]
-updated_at: 2026-10-30T14:36:10.703208+00:00
+updated_at: 2026-11-08T07:02:58.812356+00:00
 compacted_at: 2026-10-30T14:36:10.703208+00:00
 confidence: 0.95
 ---
@@ -33,3 +33,8 @@ resolve nested formatting.
 - Dynamic text inserted into Slack messages alongside URL links (<URL>) must
 have '<', '>', and '&' characters sanitized to prevent breaking Slack link
 syntax.
+
+- Slack Incoming Webhooks only support JSON payloads (text, blocks, and links)
+and cannot upload raw binary files such as `.mp4` videos; uploading inline media
+attachments requires a Slack Bot Token with the `files:write` scope calling
+`files_upload_v2`.

@@ -2,7 +2,7 @@
 topic: gluetun-wireguard-networking
 category: knowledge
 tags: [knowledge, gluetun-wireguard-networking]
-updated_at: 2026-11-07T07:01:45.424361+00:00
+updated_at: 2026-11-08T07:02:40.638984+00:00
 confidence: 0.95
 ---
 
@@ -41,3 +41,14 @@ image updates), dependent containers lose network connectivity (causing upstream
 502 Bad Gateway errors) and fail simple restarts with `joining network namespace
 of container: No such container: <old-id>`, requiring a full container
 recreation/redeploy to bind to the new Gluetun container ID.
+
+- Docker containers configured with `network_mode: service:<gluetun>` exit with
+code 143 (`joining network namespace of container: No such container: <old_id>`)
+when the parent Gluetun container is recreated with a new ID, requiring the
+dependent container to be recreated to attach to the new network namespace.
+
+- When a Gluetun VPN container (`gluetun-home` or `gluetun-home-backup`) is
+recreated during scheduled image updates, dependent containers using
+`network_mode: container:<gluetun>` remain bound to the old deleted container
+ID's network namespace (causing `502 Bad Gateway` errors) and must be recreated
+to reattach to the new namespace.

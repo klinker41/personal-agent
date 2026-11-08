@@ -27,6 +27,7 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Yt-Dlp-Instagram-Scraping](file:///workspace/personal-agent/knowledge/yt-dlp-instagram-scraping.md)
 - [Nginx-Proxy-Manager](file:///workspace/personal-agent/knowledge/nginx-proxy-manager.md)
 - [Growatt-Modbus-Rtu](file:///workspace/personal-agent/knowledge/growatt-modbus-rtu.md)
 - [Android-Hinge-Sensor](file:///workspace/personal-agent/knowledge/android-hinge-sensor.md)

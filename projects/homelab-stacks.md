@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-07T07:31:23.820420+00:00
-compacted_at: 2026-11-07T07:31:23.820420+00:00
+updated_at: 2026-11-08T07:30:57.780881+00:00
+compacted_at: 2026-11-08T07:30:57.780881+00:00
 confidence: 1.0
 ---
 
@@ -46,12 +46,12 @@ confidence: 1.0
   container network namespace.
 - Dependent containers sharing a Gluetun network namespace via `network_mode`
   (`service:<gluetun-service>` or `container:<gluetun-container>`)—such as
-  `semaphore-boulder` (Ansible Boulder in the `management` stack on
-  `unraid-nas` using `gluetun-home`) and `rsync-backup` (`files` /
-  `seedbox-files` stacks on `unraid-nas` and `unraid-seedbox` using
+  `semaphore-boulder` (Ansible Boulder on port `:3000` in the `nas-management`
+  stack on `unraid-nas` using `gluetun-home`) and `rsync-backup` (`nas-files`
+  and `seedbox-files` stacks on `unraid-nas` and `unraid-seedbox` using
   `gluetun-home-backup`)—must be restarted or recreated whenever their parent
-  Gluetun container is updated or recreated so they rebind to the new network
-  namespace.
+  Gluetun container is updated or recreated with a new container ID so they
+  rebind to the new network namespace.
 
 ## Raspberry Pi Clusters & Ansible Management
 
@@ -89,11 +89,17 @@ confidence: 1.0
   - `nas-reverse-proxy` (`stacks/unraid-nas/reverse-proxy/compose.yaml`) runs
     `nginx-proxy-manager` (admin API on port `81`, SQLite DB persisted on the
     host at `/mnt/user/docker/nginx-proxy-manager/data/database.sqlite`),
-    `cloudflare-ddns`, `crowdsec`, and `cs-unifi-bouncer`. When `crowdsec`
-    restarts or updates, its Local API (LAPI on port `8080`) takes ~9 seconds
-    to initialize, causing `cs-unifi-bouncer`
+    `cloudflare-ddns`, `crowdsec`, `crowdsec-web-ui`, and `cs-unifi-bouncer`
+    (which syncs CrowdSec decisions as firewall groups to the UniFi Network
+    controller at `https://192.168.1.181:443`). When `crowdsec` restarts or
+    updates, its Local API (LAPI on port `8080`) takes ~9 seconds to
+    initialize, causing `cs-unifi-bouncer`
     (`http://crowdsec:8080/v1/decisions/stream`) to briefly restart-loop and
     trigger a transient Komodo stack unhealthy alert.
+  - `nas-ai` (`stacks/unraid-nas/ai/compose.yaml`) mounts
+    `/mnt/user/media/Reels:/reels` for downloaded Instagram Reels storage and
+    `/mnt/user/docker/Instagram:/instagram` for `cookies.txt` access inside the
+    Antigravity container.
 - **`unraid-seedbox` (`192.168.1.46`)**: `seedbox-torrent` runs `qbittorrent`,
   `qbittorrent-private`, `qui` (healthcheck on `localhost:7476`), `mousetrap`
   (healthcheck on `127.0.0.1:39842`), and `upload-assistant`.
