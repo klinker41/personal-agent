@@ -2,7 +2,7 @@
 topic: gluetun-wireguard-networking
 category: knowledge
 tags: [knowledge, gluetun-wireguard-networking]
-updated_at: 2026-11-08T07:02:40.638984+00:00
+updated_at: 2026-11-09T07:02:53.517553+00:00
 confidence: 0.95
 ---
 
@@ -52,3 +52,17 @@ recreated during scheduled image updates, dependent containers using
 `network_mode: container:<gluetun>` remain bound to the old deleted container
 ID's network namespace (causing `502 Bad Gateway` errors) and must be recreated
 to reattach to the new namespace.
+
+- When a VPN container (such as `gluetun`) is recreated with a new container ID,
+dependent containers configured with `network_mode: service:<vpn-service>` fail
+with `joining network namespace of container: No such container:
+<old-id>` because Docker resolves `service: ` network namespaces to a container
+ID at creation time. A standard container restart cannot rebind the namespace;
+the dependent container must be recreated via `docker compose up -d`.
+
+- When Komodo's auto-updater recreates a Gluetun container (`gluetun-home` or
+`gluetun-home-backup`), dependent containers configured with
+`network_mode: service:<gluetun>` remain bound to the deleted container's
+network namespace ID (`No such container: <id>`), resulting in `502 Bad Gateway`
+errors until the dependent containers are force-recreated to attach to the new
+Gluetun container ID.

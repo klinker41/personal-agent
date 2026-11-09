@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-08T07:30:57.780881+00:00
-compacted_at: 2026-11-08T07:30:57.780881+00:00
+updated_at: 2026-11-09T07:31:12.522129+00:00
+compacted_at: 2026-11-09T07:31:12.522129+00:00
 confidence: 1.0
 ---
 
@@ -27,6 +27,9 @@ confidence: 1.0
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15 seconds (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing
   all remote servers and Docker Swarms via declarative Resource Sync.
+- On `unraid-nas`, Komodo Periphery clones stack directories to
+  `/mnt/user/docker/komodo/periphery/stacks/<stack-name>/stacks/unraid-nas/<subpath>`
+  (e.g., `.../nas-management/stacks/unraid-nas/management`).
 - A scheduled `Global Auto Update` Komodo procedure (`syncs/homelab.toml`) runs
   daily at 03:00 local time, briefly stopping and recreating stacks configured
   with `poll_for_updates = true` and `auto_update = true` (e.g.,
@@ -46,12 +49,13 @@ confidence: 1.0
   container network namespace.
 - Dependent containers sharing a Gluetun network namespace via `network_mode`
   (`service:<gluetun-service>` or `container:<gluetun-container>`)—such as
-  `semaphore-boulder` (Ansible Boulder on port `:3000` in the `nas-management`
-  stack on `unraid-nas` using `gluetun-home`) and `rsync-backup` (`nas-files`
-  and `seedbox-files` stacks on `unraid-nas` and `unraid-seedbox` using
-  `gluetun-home-backup`)—must be restarted or recreated whenever their parent
-  Gluetun container is updated or recreated with a new container ID so they
-  rebind to the new network namespace.
+  `semaphore-boulder` (Ansible Boulder on port `:3000` in `nas-management` on
+  `unraid-nas`, serving `https://ansible-boulder.klinker-cabin.computer` via
+  `service:gluetun-home`) and `rsync-backup` (`nas-files` on `unraid-nas` and
+  `seedbox-files` on `unraid-seedbox` via `service:gluetun-home-backup`)—must
+  be restarted or recreated whenever their parent Gluetun container is updated
+  or recreated with a new container ID so they rebind to the new network
+  namespace.
 
 ## Raspberry Pi Clusters & Ansible Management
 
@@ -114,14 +118,15 @@ confidence: 1.0
     by `root:root` to prevent non-zero exit codes from directory timestamp
     warnings.
 - **`pi-studio` (`192.168.1.72`, Boulder)**:
-  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd`, is
-    polled hourly by Komodo (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`) via
-    `komodo-periphery`, and has no site-to-site WireGuard route to Estes LAN
-    devices.
-  - Hosts `pi-studio-dashboard` (`uptime-kuma` at `uptime.klinker.computer`
-    with SQLite DB at `/home/jklinker/uptime/kuma.db`, and `glances`),
-    `pi-studio-reverse-proxy` (`nginx-proxy-manager` / `openresty`,
-    `cloudflare-ddns`, `crowdsec`, and `crowdsec-web-ui`), and `pi-studio-files`
+  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd`, has no
+    site-to-site WireGuard route to Estes LAN devices, and connects to
+    `komodo-core` on `unraid-nas` via an outbound Periphery-to-Core WebSocket
+    connection polled hourly (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`).
+  - Hosts `pi-studio-dashboard` (`uptime-kuma` at
+    `https://uptime.klinker.computer` with SQLite DB at
+    `/home/jklinker/uptime/kuma.db`, and `glances`), `pi-studio-reverse-proxy`
+    (`nginx-proxy-manager` / `openresty`, `cloudflare-ddns`, `crowdsec`,
+    `cs-unifi-bouncer`, and `crowdsec-web-ui`), and `pi-studio-files`
     (`filebrowser-quantum` at `https://files.klinker.computer` and
     `rsync-backup`).
   - Uptime Kuma includes an `Estes Battery` monitor (ID `80`, under the
