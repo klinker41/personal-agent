@@ -2,8 +2,8 @@
 topic: media-generator
 category: projects
 tags: [project, media-generator, movie-generator, podcast-generator, bun, hono]
-updated_at: 2026-10-30T18:59:00+00:00
-compacted_at: 2026-10-30T18:59:00+00:00
+updated_at: 2026-11-11T07:30:27.753701+00:00
+compacted_at: 2026-11-11T07:30:27.753701+00:00
 confidence: 0.95
 ---
 
@@ -32,8 +32,12 @@ confidence: 0.95
 - **Task Queues & Crash Recovery:** `JobQueue`, `AudiobookQueue`, and
   `BookQueue` inherit from `BaseTaskQueue` with re-entrancy guards to enforce
   FIFO gating, alongside `PodcastScheduler`. Server startup executes
-  `BookStore.recoverStuckM4bBuilds()` to automatically reconcile and resume
-  interrupted audiobook compilation tasks stuck in `m4b_status: building`.
+  `BookStore.recoverStuckM4bBuilds()` to reconcile and resume interrupted
+  audiobook builds stuck in `m4b_status: building`, while `JobQueue.recoverJobs`
+  re-queues `PENDING` jobs. Failed podcast episodes on `unraid-nas` at
+  `/mnt/user/ai/media-generator/podcasts/episodes/<episode-id>.json` can be
+  retried by resetting status from `FAILED` to `PENDING`, clearing the failed
+  step state, and restarting the `media-generator` container.
 - **Tenancy, Persistence & Safe Writes:** Isolated via `data/users.json`,
   `data/podcasts/`, and `data/outputs/` (`GET /api/podcasts` resolves tenancy
   via `PodcastStore.list(user.id)`). File stores (`EpisodeStore`, `UserStore`,
@@ -90,10 +94,12 @@ confidence: 0.95
   `"is_admin": true` in `data/users.json`. Streaming validates `path.sep`
   boundaries via non-blocking `Bun.file(path).exists()`.
 - **Retries & Error Handling:** `postWithRetry` (`gemini.ts`) applies
-  exponential backoff; queue failures invoke `failJob` (`queue.ts`).
-  `GeminiService.generateAudioPart` retries up to 3 times on non-200 responses
-  or content filtering (returns `false` without throwing), aborting if
-  `failedParts >= 5`.
+  exponential backoff; queue failures invoke `failJob` (`queue.ts`). In
+  `backend/src/services/gemini.ts` (`extractResponseText`), a `finishReason:
+  "RECITATION"` response throws a non-retryable error, immediately failing the
+  job in `PodcastGenerator.run`. `GeminiService.generateAudioPart` retries up
+  to 3 times on non-200 responses or content filtering (returns `false` without
+  throwing), aborting if `failedParts >= 5`.
 - **Alerts & Test Isolation:** Slack alerts (`SLACK_WEBHOOK` or
   `SLACK_WEBHOOK_URL`, sender `podcast-generator`) build canonical RSS feed URLs
   with `BASE_URL` or fallback port. Notification and generation tests must mock
