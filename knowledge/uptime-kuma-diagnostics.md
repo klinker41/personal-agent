@@ -2,7 +2,7 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics, uptime-kuma, komodo, pi-studio]
-updated_at: 2026-11-05T07:00:58.685916+00:00
+updated_at: 2026-11-12T07:02:55.477551+00:00
 compacted_at: 2026-10-30T14:35:00+00:00
 confidence: 0.95
 ---
@@ -53,3 +53,10 @@ upstream API.
 $[2].estes_battery` with an Expected Value of `ok` ensures that when the
 threshold check fails, Uptime Kuma includes the actual offending value in the
 alert message (`value was: [49%]`) instead of just `false`.
+
+- Scheduled container maintenance/backup windows around 06:34–06:35 MST
+simultaneously restart Docker containers across `unraid-nas` (including
+`nginx-proxy-manager` terminating HTTPS on `38.75.214.203:443`) and
+`unraid-seedbox`, causing transient `ECONNREFUSED` alerts on Uptime Kuma
+monitors (`Seedbox Notifications`, `NAS Notifications`, `qui`, `Cabin`,
+`Upload Assistant`) that automatically self-recover within a couple of minutes.

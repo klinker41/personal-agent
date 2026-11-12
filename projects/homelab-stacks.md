@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-09T07:31:12.522129+00:00
-compacted_at: 2026-11-09T07:31:12.522129+00:00
+updated_at: 2026-11-12T07:30:49.487657+00:00
+compacted_at: 2026-11-12T07:30:49.487657+00:00
 confidence: 1.0
 ---
 
@@ -49,12 +49,13 @@ confidence: 1.0
   container network namespace.
 - Dependent containers sharing a Gluetun network namespace via `network_mode`
   (`service:<gluetun-service>` or `container:<gluetun-container>`)—such as
-  `semaphore-boulder` (Ansible Boulder on port `:3000` in `nas-management` on
-  `unraid-nas`, serving `https://ansible-boulder.klinker-cabin.computer` via
-  `service:gluetun-home`) and `rsync-backup` (`nas-files` on `unraid-nas` and
-  `seedbox-files` on `unraid-seedbox` via `service:gluetun-home-backup`)—must
-  be restarted or recreated whenever their parent Gluetun container is updated
-  or recreated with a new container ID so they rebind to the new network
+  `semaphore-boulder` (Ansible Boulder on internal port `:3000` / host port
+  `3008` in `nas-management` on `unraid-nas`, serving
+  `https://ansible-boulder.klinker-cabin.computer` via `service:gluetun-home`)
+  and `rsync-backup` (`nas-files` on `unraid-nas` and `seedbox-files` on
+  `unraid-seedbox` via `service:gluetun-home-backup`)—must be recreated via
+  Docker Compose whenever their upstream Gluetun container is updated or
+  recreated with a new container ID so they rebind to the new network
   namespace.
 
 ## Raspberry Pi Clusters & Ansible Management
@@ -118,10 +119,12 @@ confidence: 1.0
     by `root:root` to prevent non-zero exit codes from directory timestamp
     warnings.
 - **`pi-studio` (`192.168.1.72`, Boulder)**:
-  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd`, has no
-    site-to-site WireGuard route to Estes LAN devices, and connects to
-    `komodo-core` on `unraid-nas` via an outbound Periphery-to-Core WebSocket
-    connection polled hourly (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`).
+  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd` and has
+    no site-to-site WireGuard route to Estes LAN devices. Configured in Komodo
+    with an inbound WebSocket connection (`address: ""`), where
+    `komodo-periphery` on `pi-studio` initiates an outbound WebSocket
+    connection to `komodo-core` on `unraid-nas` (port `9120`), polled hourly
+    (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`).
   - Hosts `pi-studio-dashboard` (`uptime-kuma` at
     `https://uptime.klinker.computer` with SQLite DB at
     `/home/jklinker/uptime/kuma.db`, and `glances`), `pi-studio-reverse-proxy`

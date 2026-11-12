@@ -2,7 +2,7 @@
 topic: gluetun-wireguard-networking
 category: knowledge
 tags: [knowledge, gluetun-wireguard-networking]
-updated_at: 2026-11-09T07:02:53.517553+00:00
+updated_at: 2026-11-12T07:02:21.879069+00:00
 confidence: 0.95
 ---
 
@@ -66,3 +66,10 @@ the dependent container must be recreated via `docker compose up -d`.
 network namespace ID (`No such container: <id>`), resulting in `502 Bad Gateway`
 errors until the dependent containers are force-recreated to attach to the new
 Gluetun container ID.
+
+- When a Gluetun VPN container (`qmcgaw/gluetun`) is updated and recreated,
+dependent containers configured with `network_mode: service:<gluetun-service>`
+remain attached to the old, deleted container network namespace
+(`container:<old-id>`), causing upstream reverse proxies to return
+`502 Bad Gateway` until the dependent containers are recreated via
+`docker compose up -d <service>`.
