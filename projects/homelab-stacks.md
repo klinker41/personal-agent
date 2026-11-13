@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-12T07:30:49.487657+00:00
-compacted_at: 2026-11-12T07:30:49.487657+00:00
+updated_at: 2026-11-13T07:32:02.508319+00:00
+compacted_at: 2026-11-13T07:32:02.508319+00:00
 confidence: 1.0
 ---
 
@@ -19,16 +19,16 @@ confidence: 1.0
   `${VAR_NAME}` substitution; `syncs/homelab.toml` maps stack `environment`
   entries to encrypted/masked Komodo `Variable` resources via
   `VAR_NAME=[[KOMODO_SECRET_NAME]]`.
-- Pushing to `main` triggers the `gitops-deploy` Komodo Procedure
-  (`https://komodo.klinker-cabin.computer/listener/github/procedure/gitops-deploy`),
+- Pushing to `main` triggers the `gitops-deploy` Komodo Procedure at
+  https://komodo.klinker-cabin.computer/listener/github/procedure/gitops-deploy,
   executing `RunSync` (`homelab-sync`) followed by `BatchDeployStackIfChanged`
   (`pattern = "*"`).
 - Komodo Core (`komodo-core`, `komodo-mongo`, `komodo-periphery`) runs on
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15 seconds (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing
   all remote servers and Docker Swarms via declarative Resource Sync.
-- On `unraid-nas`, Komodo Periphery clones stack directories to
-  `/mnt/user/docker/komodo/periphery/stacks/<stack-name>/stacks/unraid-nas/<subpath>`
+- On `unraid-nas`, Komodo Periphery clones stack directories under
+  `/mnt/user/docker/komodo/periphery/stacks/<stack>/stacks/unraid-nas/<subpath>`
   (e.g., `.../nas-management/stacks/unraid-nas/management`).
 - A scheduled `Global Auto Update` Komodo procedure (`syncs/homelab.toml`) runs
   daily at 03:00 local time, briefly stopping and recreating stacks configured
@@ -49,10 +49,10 @@ confidence: 1.0
   container network namespace.
 - Dependent containers sharing a Gluetun network namespace via `network_mode`
   (`service:<gluetun-service>` or `container:<gluetun-container>`)—such as
-  `semaphore-boulder` (Ansible Boulder on internal port `:3000` / host port
-  `3008` in `nas-management` on `unraid-nas`, serving
-  `https://ansible-boulder.klinker-cabin.computer` via `service:gluetun-home`)
-  and `rsync-backup` (`nas-files` on `unraid-nas` and `seedbox-files` on
+  `semaphore-boulder` in `nas-management` on `unraid-nas` (Ansible Boulder at
+  `https://ansible-boulder.klinker-cabin.computer`, Uptime Kuma monitor
+  ID `68`, publishing port `3008:3000` via `service:gluetun-home`) and
+  `rsync-backup` (`nas-files` on `unraid-nas` and `seedbox-files` on
   `unraid-seedbox` via `service:gluetun-home-backup`)—must be recreated via
   Docker Compose whenever their upstream Gluetun container is updated or
   recreated with a new container ID so they rebind to the new network
@@ -137,8 +137,9 @@ confidence: 1.0
     `https://home-api.klinker-cabin.computer/api/solar` every 120s (48s
     timeout, 2 retries) via an `HTTP(s) - Json Query` monitor to alert Slack
     when the Estes battery drops below 50%.
-  - `filebrowser-quantum` (`/home/jklinker/filebrowser-quantum/data/config.yaml`
-    with `/mnt/external_hdd`) configures sources (`/srv/home` and `/srv/backup`)
+  - `filebrowser-quantum`
+    (`/home/jklinker/filebrowser-quantum/data/config.yaml` with
+    `/mnt/external_hdd`) configures sources (`/srv/home` and `/srv/backup`)
     with `rules: [{ folderPath: "/", viewable: true }]` so directories are
     browsed on-demand (`GetFsInfoViewableOnly`) without generating a
     container-layer SQLite index (`/home/filebrowser/tmp/sql/index_all.db`) or
