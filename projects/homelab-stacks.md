@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-13T07:32:02.508319+00:00
-compacted_at: 2026-11-13T07:32:02.508319+00:00
+updated_at: 2026-11-14T07:31:57.084253+00:00
+compacted_at: 2026-11-14T07:31:57.084253+00:00
 confidence: 1.0
 ---
 
@@ -25,15 +25,14 @@ confidence: 1.0
   (`pattern = "*"`).
 - Komodo Core (`komodo-core`, `komodo-mongo`, `komodo-periphery`) runs on
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
-  metrics every 15 seconds (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing
-  all remote servers and Docker Swarms via declarative Resource Sync.
+  metrics every 15s (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing remote
+  servers and Docker Swarms via declarative Resource Sync.
 - On `unraid-nas`, Komodo Periphery clones stack directories under
   `/mnt/user/docker/komodo/periphery/stacks/<stack>/stacks/unraid-nas/<subpath>`
   (e.g., `.../nas-management/stacks/unraid-nas/management`).
 - A scheduled `Global Auto Update` Komodo procedure (`syncs/homelab.toml`) runs
-  daily at 03:00 local time, briefly stopping and recreating stacks configured
-  with `poll_for_updates = true` and `auto_update = true` (e.g.,
-  `pi-studio-files`).
+  daily at 03:00 local time, stopping and recreating stacks configured with
+  `poll_for_updates = true` and `auto_update = true` (e.g., `pi-studio-files`).
 
 ## Site-to-Site WireGuard VPN (`gluetun`)
 
@@ -50,18 +49,17 @@ confidence: 1.0
 - Dependent containers sharing a Gluetun network namespace via `network_mode`
   (`service:<gluetun-service>` or `container:<gluetun-container>`)—such as
   `semaphore-boulder` in `nas-management` on `unraid-nas` (Ansible Boulder at
-  `https://ansible-boulder.klinker-cabin.computer`, Uptime Kuma monitor
-  ID `68`, publishing port `3008:3000` via `service:gluetun-home`) and
+  `https://ansible-boulder.klinker-cabin.computer`, Uptime Kuma monitor ID
+  `68`, publishing port `3008:3000` via `service:gluetun-home`) and
   `rsync-backup` (`nas-files` on `unraid-nas` and `seedbox-files` on
   `unraid-seedbox` via `service:gluetun-home-backup`)—must be recreated via
-  Docker Compose whenever their upstream Gluetun container is updated or
-  recreated with a new container ID so they rebind to the new network
-  namespace.
+  Docker Compose whenever their upstream Gluetun container is recreated with a
+  new container ID so they rebind to the new network namespace.
 
 ## Raspberry Pi Clusters & Ansible Management
 
-- Ansible playbooks managing `Pi Swarm` and `Pi Lab` are stored on `unraid-nas`
-  under `/mnt/user/docker/ansible-estes/main/` and
+- Ansible playbooks for `Pi Swarm` and `Pi Lab` live on `unraid-nas` under
+  `/mnt/user/docker/ansible-estes/main/` and
   `/mnt/user/docker/ansible-boulder/main/` (`install-docker.yml`,
   `remove-docker.yml`, `setup-docker.yml`, `configure-reboot-scripts.yml`, and
   `setup-nas.yml`).
@@ -72,7 +70,7 @@ confidence: 1.0
   `Pi Lab` (`pi-lab-nas`, `PERIPHERY_CONNECT_AS=pi-lab-node`) run
   `komodo_periphery` as a Docker Swarm service constrained to
   `node.role == manager` with keys persisted at `/etc/komodo/keys`
-  (`portainer_agent` is completely removed).
+  (`portainer_agent` is removed).
 - **Pi Swarm (19 nodes)**: `pi-rack-1` (`192.168.1.78`) is the Swarm manager;
   `pi-rack-5` (`primary-storage=true, storage=true`) and `pi-rack-6..8`
   (`storage=true`) are storage workers; `pi-rack-2..4`, `pi-rack-9..10`,
@@ -92,39 +90,38 @@ confidence: 1.0
     the host Docker socket, spawning intermediate `docker build` containers
     directly on the NAS host.
   - `nas-reverse-proxy` (`stacks/unraid-nas/reverse-proxy/compose.yaml`) runs
-    `nginx-proxy-manager` (admin API on port `81`, SQLite DB persisted on the
-    host at `/mnt/user/docker/nginx-proxy-manager/data/database.sqlite`),
+    `nginx-proxy-manager` (admin API on port `81`, SQLite DB at
+    `/mnt/user/docker/nginx-proxy-manager/data/database.sqlite`),
     `cloudflare-ddns`, `crowdsec`, `crowdsec-web-ui`, and `cs-unifi-bouncer`
-    (which syncs CrowdSec decisions as firewall groups to the UniFi Network
-    controller at `https://192.168.1.181:443`). When `crowdsec` restarts or
-    updates, its Local API (LAPI on port `8080`) takes ~9 seconds to
-    initialize, causing `cs-unifi-bouncer`
+    (syncing CrowdSec decisions as firewall groups to UniFi Network at
+    `https://192.168.1.181:443`). When `crowdsec` restarts, its Local API
+    (LAPI on port `8080`) takes ~9s to initialize, causing `cs-unifi-bouncer`
     (`http://crowdsec:8080/v1/decisions/stream`) to briefly restart-loop and
     trigger a transient Komodo stack unhealthy alert.
   - `nas-ai` (`stacks/unraid-nas/ai/compose.yaml`) mounts
-    `/mnt/user/media/Reels:/reels` for downloaded Instagram Reels storage and
-    `/mnt/user/docker/Instagram:/instagram` for `cookies.txt` access inside the
+    `/mnt/user/media/Reels:/reels` for downloaded Instagram Reels and
+    `/mnt/user/docker/Instagram:/instagram` for `cookies.txt` inside the
     Antigravity container.
 - **`unraid-seedbox` (`192.168.1.46`)**: `seedbox-torrent` runs `qbittorrent`,
-  `qbittorrent-private`, `qui` (healthcheck on `localhost:7476`), `mousetrap`
-  (healthcheck on `127.0.0.1:39842`), and `upload-assistant`.
+  `qbittorrent-private`, `qui` (healthcheck `localhost:7476`), `mousetrap`
+  (healthcheck `127.0.0.1:39842`), and `upload-assistant`.
 - **`unraid-aibox`**:
-  - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In `aibox-gaming`,
-    `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`; `wolf-den` requires
-    `/var/run/wolf:rw` and write permissions on `wolf.sock` for its ASP.NET
-    Core process to connect to the Wolf API.
-  - When syncing `unraid-aibox` backups via `rsync-backup` to
-    `192.168.1.72:/mnt/external_hdd/backup/aibox/` as `jklinker`, pass
+  - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In
+    `aibox-gaming`, `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`;
+    `wolf-den` requires `/var/run/wolf:rw` and write permissions on
+    `wolf.sock` for its ASP.NET Core process to connect to the Wolf API.
+  - Syncing `unraid-aibox` backups via `rsync-backup` to
+    `192.168.1.72:/mnt/external_hdd/backup/aibox/` as `jklinker` requires
     `--omit-dir-times` (`-O`) if the destination top-level directory is owned
     by `root:root` to prevent non-zero exit codes from directory timestamp
     warnings.
 - **`pi-studio` (`192.168.1.72`, Boulder)**:
-  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd` and has
-    no site-to-site WireGuard route to Estes LAN devices. Configured in Komodo
-    with an inbound WebSocket connection (`address: ""`), where
-    `komodo-periphery` on `pi-studio` initiates an outbound WebSocket
-    connection to `komodo-core` on `unraid-nas` (port `9120`), polled hourly
-    (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`).
+  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd` and no
+    site-to-site WireGuard route to Estes LAN devices. Configured in Komodo
+    with an inbound WebSocket (`address: ""`), where `komodo-periphery`
+    connects outbound to `komodo-core` on `unraid-nas` (port `9120`,
+    `wss://komodo.klinker-cabin.computer/ws/periphery?server=pi-studio`),
+    polled hourly (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`).
   - Hosts `pi-studio-dashboard` (`uptime-kuma` at
     `https://uptime.klinker.computer` with SQLite DB at
     `/home/jklinker/uptime/kuma.db`, and `glances`), `pi-studio-reverse-proxy`
@@ -132,15 +129,14 @@ confidence: 1.0
     `cs-unifi-bouncer`, and `crowdsec-web-ui`), and `pi-studio-files`
     (`filebrowser-quantum` at `https://files.klinker.computer` and
     `rsync-backup`).
-  - Uptime Kuma includes an `Estes Battery` monitor (ID `80`, under the
-    `Server` group and `all` status page) that polls
-    `https://home-api.klinker-cabin.computer/api/solar` every 120s (48s
-    timeout, 2 retries) via an `HTTP(s) - Json Query` monitor to alert Slack
-    when the Estes battery drops below 50%.
+  - Uptime Kuma's `Estes Battery` monitor (ID `80`, `Server` group, `all`
+    status page) polls `https://home-api.klinker-cabin.computer/api/solar`
+    every 120s (48s timeout, 2 retries) via `HTTP(s) - Json Query` to alert
+    Slack when the Estes battery drops below 50%.
   - `filebrowser-quantum`
-    (`/home/jklinker/filebrowser-quantum/data/config.yaml` with
-    `/mnt/external_hdd`) configures sources (`/srv/home` and `/srv/backup`)
-    with `rules: [{ folderPath: "/", viewable: true }]` so directories are
-    browsed on-demand (`GetFsInfoViewableOnly`) without generating a
-    container-layer SQLite index (`/home/filebrowser/tmp/sql/index_all.db`) or
-    waking up the spun-down `/mnt/external_hdd` drive.
+    (`/home/jklinker/filebrowser-quantum/data/config.yaml`) configures
+    `/srv/home` and `/srv/backup` (from `/mnt/external_hdd`) with
+    `rules: [{ folderPath: "/", viewable: true }]` so directories browse
+    on-demand (`GetFsInfoViewableOnly`) without creating a container-layer
+    SQLite index (`/home/filebrowser/tmp/sql/index_all.db`) or waking the
+    spun-down `/mnt/external_hdd` drive.
