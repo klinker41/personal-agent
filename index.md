@@ -15,6 +15,7 @@ Top-level catalog mapping memory topics to structured notes.
   habits, conventions, and global guidelines.
 
 ## Projects
+- [Animation-Generator](file:///workspace/personal-agent/projects/animation-generator.md)
 - [Antigravity-Docker](file:///workspace/personal-agent/projects/antigravity-docker.md)
 - [Antigravity-Mobile](file:///workspace/personal-agent/projects/antigravity-mobile.md)
 - [Antigravity-Plugin](file:///workspace/personal-agent/projects/antigravity-plugin.md)
@@ -27,6 +28,7 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Procedural-Cel-Rigging](file:///workspace/personal-agent/knowledge/procedural-cel-rigging.md)
 - [Yt-Dlp-Instagram-Scraping](file:///workspace/personal-agent/knowledge/yt-dlp-instagram-scraping.md)
 - [Nginx-Proxy-Manager](file:///workspace/personal-agent/knowledge/nginx-proxy-manager.md)
 - [Growatt-Modbus-Rtu](file:///workspace/personal-agent/knowledge/growatt-modbus-rtu.md)

@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-14T07:31:57.084253+00:00
-compacted_at: 2026-11-14T07:31:57.084253+00:00
+updated_at: 2026-11-15T07:31:34.860622+00:00
+compacted_at: 2026-11-15T07:31:34.860622+00:00
 confidence: 1.0
 ---
 
@@ -26,7 +26,10 @@ confidence: 1.0
 - Komodo Core (`komodo-core`, `komodo-mongo`, `komodo-periphery`) runs on
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15s (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing remote
-  servers and Docker Swarms via declarative Resource Sync.
+  servers and Docker Swarms via declarative Resource Sync. Following a power
+  outage or `nas` reboot, remote `komodo-periphery` agents (e.g.,
+  `unraid-seedbox`) may transiently report `Server <id> is not connected` while
+  reconnecting even when the underlying Unraid host and array are healthy.
 - On `unraid-nas`, Komodo Periphery clones stack directories under
   `/mnt/user/docker/komodo/periphery/stacks/<stack>/stacks/unraid-nas/<subpath>`
   (e.g., `.../nas-management/stacks/unraid-nas/management`).
@@ -47,14 +50,14 @@ confidence: 1.0
   minutes, restarting `/gluetun-entrypoint` in-place without dropping the
   container network namespace.
 - Dependent containers sharing a Gluetun network namespace via `network_mode`
-  (`service:<gluetun-service>` or `container:<gluetun-container>`)—such as
+  (`service:<gluetun-service>` or `container:<gluetun-container>`) must be
+  recreated via Docker Compose whenever their upstream Gluetun container gets a
+  new container ID so they rebind to the new namespace. Examples include
   `semaphore-boulder` in `nas-management` on `unraid-nas` (Ansible Boulder at
   `https://ansible-boulder.klinker-cabin.computer`, Uptime Kuma monitor ID
-  `68`, publishing port `3008:3000` via `service:gluetun-home`) and
-  `rsync-backup` (`nas-files` on `unraid-nas` and `seedbox-files` on
-  `unraid-seedbox` via `service:gluetun-home-backup`)—must be recreated via
-  Docker Compose whenever their upstream Gluetun container is recreated with a
-  new container ID so they rebind to the new network namespace.
+  `68`, port `3008:3000` via `service:gluetun-home`) and `rsync-backup`
+  (`nas-files` on `unraid-nas` and `seedbox-files` on `unraid-seedbox` via
+  `service:gluetun-home-backup`).
 
 ## Raspberry Pi Clusters & Ansible Management
 
@@ -106,10 +109,10 @@ confidence: 1.0
   `qbittorrent-private`, `qui` (healthcheck `localhost:7476`), `mousetrap`
   (healthcheck `127.0.0.1:39842`), and `upload-assistant`.
 - **`unraid-aibox`**:
-  - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In
-    `aibox-gaming`, `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`;
-    `wolf-den` requires `/var/run/wolf:rw` and write permissions on
-    `wolf.sock` for its ASP.NET Core process to connect to the Wolf API.
+  - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In `aibox-gaming`,
+    `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`; `wolf-den` requires
+    `/var/run/wolf:rw` and write permissions on `wolf.sock` for its ASP.NET
+    Core process to connect to the Wolf API.
   - Syncing `unraid-aibox` backups via `rsync-backup` to
     `192.168.1.72:/mnt/external_hdd/backup/aibox/` as `jklinker` requires
     `--omit-dir-times` (`-O`) if the destination top-level directory is owned

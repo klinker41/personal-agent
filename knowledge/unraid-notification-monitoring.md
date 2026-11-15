@@ -2,7 +2,7 @@
 topic: unraid-notification-monitoring
 category: knowledge
 tags: [knowledge, unraid-notification-monitoring]
-updated_at: 2026-10-29T06:00:56.305146+00:00
+updated_at: 2026-11-15T07:01:38.051144+00:00
 confidence: 0.95
 ---
 
@@ -34,3 +34,10 @@ conserve UPS battery runtime for `nas` and core network equipment.
 (`unraid-server`) as a network slave; during a power outage, `nas` logs
 `Power failure on UPS unraid-server. Running on batteries.` followed shortly by
 `seedbox` logging `Power failure on UPS Not found. Running on batteries.`.
+
+- When triaging Uptime Kuma Unraid notification monitors (e.g.,
+`Seedbox Notifications`, `AIbox Notifications`) after power events, verify both
+loss and recovery notices (such as UPS communication loss/restoration) before
+clearing via `unraid_dismiss_notification`, while leaving active operational
+warnings (such as an in-progress `Parity-Check started` alert after an unclean
+reboot) unread.
