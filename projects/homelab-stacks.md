@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-15T07:31:34.860622+00:00
-compacted_at: 2026-11-15T07:31:34.860622+00:00
+updated_at: 2026-11-16T07:32:02.961963+00:00
+compacted_at: 2026-11-16T07:32:02.961963+00:00
 confidence: 1.0
 ---
 
@@ -26,10 +26,10 @@ confidence: 1.0
 - Komodo Core (`komodo-core`, `komodo-mongo`, `komodo-periphery`) runs on
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15s (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing remote
-  servers and Docker Swarms via declarative Resource Sync. Following a power
-  outage or `nas` reboot, remote `komodo-periphery` agents (e.g.,
-  `unraid-seedbox`) may transiently report `Server <id> is not connected` while
-  reconnecting even when the underlying Unraid host and array are healthy.
+  servers and Docker Swarms via declarative Resource Sync. After a power outage
+  or `nas` reboot, remote `komodo-periphery` agents (e.g., `unraid-seedbox`)
+  may transiently report `Server <id> is not connected` while reconnecting even
+  when the underlying Unraid host and array are healthy.
 - On `unraid-nas`, Komodo Periphery clones stack directories under
   `/mnt/user/docker/komodo/periphery/stacks/<stack>/stacks/unraid-nas/<subpath>`
   (e.g., `.../nas-management/stacks/unraid-nas/management`).
@@ -105,9 +105,12 @@ confidence: 1.0
     `/mnt/user/media/Reels:/reels` for downloaded Instagram Reels and
     `/mnt/user/docker/Instagram:/instagram` for `cookies.txt` inside the
     Antigravity container.
-- **`unraid-seedbox` (`192.168.1.46`)**: `seedbox-torrent` runs `qbittorrent`,
-  `qbittorrent-private`, `qui` (healthcheck `localhost:7476`), `mousetrap`
-  (healthcheck `127.0.0.1:39842`), and `upload-assistant`.
+- **`unraid-seedbox` (`192.168.1.46`)**:
+  - `seedbox-torrent` (`stacks/unraid-seedbox/torrent/compose.yaml`) runs
+    `qbittorrent` (`binhex/arch-qbittorrentvpn` with Private Internet Access
+    `VPN_PROV=pia`, `VPN_CLIENT=wireguard`, `STRICT_PORT_FORWARD=yes`),
+    `qbittorrent-private`, `qui` (healthcheck `localhost:7476`), `mousetrap`
+    (healthcheck `127.0.0.1:39842`), and `upload-assistant`.
 - **`unraid-aibox`**:
   - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In `aibox-gaming`,
     `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`; `wolf-den` requires

@@ -2,7 +2,7 @@
 topic: animation-generator
 category: project
 tags: [project, animation-generator]
-updated_at: 2026-11-15T07:01:22.257544+00:00
+updated_at: 2026-11-15T17:44:47.061650+00:00
 confidence: 0.95
 ---
 
@@ -30,3 +30,7 @@ shadows, two-pass `<rect>` capsule limbs, and standardized model-sheet layout
 with `front`/`three_quarter`/`side` views, 5 visemes, and blink states) is
 enforced via workspace and skill instructions in `AGENTS.md` and
 `.agents/skills/cel-animation/SKILL.md`.
+
+- Stored on unraid-nas at /mnt/user/ai/animation-generator and bind-mounted into
+the antigravity container (stacks/unraid-nas/ai/compose.yaml) at
+/workspace/animation-generator.
