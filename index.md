@@ -15,6 +15,7 @@ Top-level catalog mapping memory topics to structured notes.
   habits, conventions, and global guidelines.
 
 ## Projects
+- [Pi-Lab](file:///workspace/personal-agent/projects/pi-lab.md)
 - [Animation-Generator](file:///workspace/personal-agent/projects/animation-generator.md)
 - [Antigravity-Docker](file:///workspace/personal-agent/projects/antigravity-docker.md)
 - [Antigravity-Mobile](file:///workspace/personal-agent/projects/antigravity-mobile.md)
