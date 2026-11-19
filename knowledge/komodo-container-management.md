@@ -2,8 +2,8 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-11-15T07:32:22.525940+00:00
-compacted_at: 2026-11-15T07:32:22.525940+00:00
+updated_at: 2026-11-19T07:32:01.938045+00:00
+compacted_at: 2026-11-19T07:32:01.938045+00:00
 confidence: 0.95
 ---
 
@@ -32,15 +32,20 @@ confidence: 0.95
   without `username` or `icon_url` overrides (ignored by Slack App Incoming
   Webhooks anyway); use a dedicated Slack App webhook to customize sender
   name and icon.
-- **Sync & Procedure Failures**: Syncing `Swarm`, `Stack`, and `Alerter`
-  definitions (`ResourceSync` / `CommitSync`) while target servers are
-  offline/disabled (`Cannot send command when Server is unreachable or
-  disabled`) or Swarm managers are disconnected (`Failed to request from
-  Swarm: No managers connected`) marks the Swarm unhealthy, fires critical
-  alerts, and fails the sync procedure even if online stacks deploy cleanly.
-  In procedures, `RunSync` loops until pending changes converge; persistent
-  diffs or state mismatches fail with `procedure sync loop exited after max
-  iterations`.
+- **Sync, Deploy & Procedure Failures**:
+  - **Offline targets**: Syncing `Swarm`, `Stack`, and `Alerter` definitions
+    (`ResourceSync` / `CommitSync`) while target servers are offline/disabled
+    (`Cannot send command when Server is unreachable or disabled`) or Swarm
+    managers are disconnected (`Failed to request from Swarm: No managers
+    connected`) marks the Swarm unhealthy, fires critical alerts, and fails
+    the sync procedure even if online stacks deploy cleanly.
+  - **Sync convergence**: In procedures, `RunSync` loops until pending
+    changes converge; persistent diffs or state mismatches fail with
+    `procedure sync loop exited after max iterations`.
+  - **Registry rate limits**: Transient `toomanyrequests` errors on `lscr.io`
+    or GHCR during `DeployStack` cause `Compose Pull` to exit non-zero and
+    skip `Compose Up`; re-running the procedure via `RunProcedure` resolves
+    deployment once the rate limit clears.
 - **Swarm Periphery Diagnostics**: If `komodo-periphery` running as a Docker
   Swarm service reports down while the host is reachable via SSH/Ansible,
   check `docker info` and `journalctl -u docker` on the manager node for

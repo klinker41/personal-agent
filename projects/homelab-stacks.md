@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-16T07:32:02.961963+00:00
-compacted_at: 2026-11-16T07:32:02.961963+00:00
+updated_at: 2026-11-19T07:31:26.242388+00:00
+compacted_at: 2026-11-19T07:31:26.242388+00:00
 confidence: 1.0
 ---
 
@@ -19,10 +19,12 @@ confidence: 1.0
   `${VAR_NAME}` substitution; `syncs/homelab.toml` maps stack `environment`
   entries to encrypted/masked Komodo `Variable` resources via
   `VAR_NAME=[[KOMODO_SECRET_NAME]]`.
-- Pushing to `main` triggers the `gitops-deploy` Komodo Procedure at
-  https://komodo.klinker-cabin.computer/listener/github/procedure/gitops-deploy,
-  executing `RunSync` (`homelab-sync`) followed by `BatchDeployStackIfChanged`
-  (`pattern = "*"`).
+- Pushing to `main` triggers the two-stage `gitops-deploy` Komodo Procedure at
+  https://komodo.klinker-cabin.computer/listener/github/procedure/gitops-deploy
+  — Stage 1 runs `RunSync` (`homelab-sync` to sync resource declarations) and
+  Stage 2 runs `BatchDeployStackIfChanged` (`Deploy Changed Stacks`,
+  `pattern = "*"`). It can also be manually re-triggered via the Komodo
+  `RunProcedure` API on `unraid-nas` (`192.168.1.95`).
 - Komodo Core (`komodo-core`, `komodo-mongo`, `komodo-periphery`) runs on
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15s (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing remote
