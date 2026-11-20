@@ -2,8 +2,8 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-19T07:31:26.242388+00:00
-compacted_at: 2026-11-19T07:31:26.242388+00:00
+updated_at: 2026-11-20T07:32:12.326888+00:00
+compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
 
@@ -11,8 +11,8 @@ confidence: 1.0
 
 ## GitOps & Komodo Architecture
 
-- GitOps repository at `/workspace/homelab-stacks` (`klinker41/homelab-stacks`)
-  drives all 34 Komodo v2 stacks across 6 environments: `unraid-nas`,
+- GitOps repo `/workspace/homelab-stacks` (`klinker41/homelab-stacks`) drives
+  all 34 Komodo v2 stacks across 6 environments: `unraid-nas`,
   `unraid-seedbox`, `unraid-aibox` (ID `22`), `pi-studio`, `pi-lab`, and
   `pi-swarm`.
 - Compose files reside in `stacks/<host>/<stack>/compose.yaml` using
@@ -21,42 +21,44 @@ confidence: 1.0
   `VAR_NAME=[[KOMODO_SECRET_NAME]]`.
 - Pushing to `main` triggers the two-stage `gitops-deploy` Komodo Procedure at
   https://komodo.klinker-cabin.computer/listener/github/procedure/gitops-deploy
-  — Stage 1 runs `RunSync` (`homelab-sync` to sync resource declarations) and
-  Stage 2 runs `BatchDeployStackIfChanged` (`Deploy Changed Stacks`,
-  `pattern = "*"`). It can also be manually re-triggered via the Komodo
-  `RunProcedure` API on `unraid-nas` (`192.168.1.95`).
+  — Stage 1 runs `RunSync` (`homelab-sync`) and Stage 2 runs
+  `BatchDeployStackIfChanged` (`Deploy Changed Stacks`,
+  `pattern = "nas-*,seedbox-*,pi-studio-*"`, omitting `aibox-*` since AIBox is
+  powered off when idle). Because `gitops-deploy` locks itself while running,
+  edits to `gitops-deploy` in `syncs/homelab.toml` require running
+  `km execute -y run-sync homelab-sync` directly on `komodo-core`.
 - Komodo Core (`komodo-core`, `komodo-mongo`, `komodo-periphery`) runs on
   `unraid-nas` (`stacks/unraid-nas/komodo/compose.yaml`), polling server
   metrics every 15s (`KOMODO_MONITORING_INTERVAL: 15-sec`) and managing remote
-  servers and Docker Swarms via declarative Resource Sync. After a power outage
-  or `nas` reboot, remote `komodo-periphery` agents (e.g., `unraid-seedbox`)
-  may transiently report `Server <id> is not connected` while reconnecting even
-  when the underlying Unraid host and array are healthy.
-- On `unraid-nas`, Komodo Periphery clones stack directories under
+  servers and Swarms via Resource Sync. On `unraid-nas`, Periphery clones
+  stacks under
   `/mnt/user/docker/komodo/periphery/stacks/<stack>/stacks/unraid-nas/<subpath>`
-  (e.g., `.../nas-management/stacks/unraid-nas/management`).
-- A scheduled `Global Auto Update` Komodo procedure (`syncs/homelab.toml`) runs
-  daily at 03:00 local time, stopping and recreating stacks configured with
+  (e.g., `.../nas-management/stacks/unraid-nas/management`). After a power
+  outage or `nas` reboot, remote `komodo-periphery` agents (e.g.,
+  `unraid-seedbox`) may transiently report `Server <id> is not connected`
+  while reconnecting even when the host and array are healthy.
+- Scheduled `Global Auto Update` procedure (`syncs/homelab.toml`) runs daily
+  at 03:00 local time, stopping and recreating stacks configured with
   `poll_for_updates = true` and `auto_update = true` (e.g., `pi-studio-files`).
 
 ## Site-to-Site WireGuard VPN (`gluetun`)
 
-- Cross-site connectivity to the Boulder network (`klinker.computer` on UDP
-  port `51820`, updated dynamically via `cloudflare-ddns`) is provided by 4
-  Gluetun WireGuard services (`gluetun-home` and `gluetun-home-backup` across
-  `unraid-nas`, `unraid-seedbox`, and `unraid-aibox`).
-- Because Gluetun WireGuard configs require a raw IPv4 `Endpoint` rather than a
-  hostname, all 4 services mount their host config to `/tmp/wg0.conf:ro` and
-  use an inline `/bin/sh` entrypoint in `compose.yaml` to resolve
+- Cross-site connectivity to Boulder (`klinker.computer` UDP `51820`, updated
+  via `cloudflare-ddns`) uses 4 Gluetun WireGuard services (`gluetun-home` and
+  `gluetun-home-backup` across `unraid-nas`, `unraid-seedbox`, and
+  `unraid-aibox`).
+- Because Gluetun WireGuard configs require a raw IPv4 `Endpoint` rather than
+  a hostname, all 4 services mount their host config to `/tmp/wg0.conf:ro` and
+  run an inline `/bin/sh` entrypoint in `compose.yaml` that resolves
   `klinker.computer` into `/gluetun/wireguard/wg0.conf` at startup and every 5
   minutes, restarting `/gluetun-entrypoint` in-place without dropping the
   container network namespace.
-- Dependent containers sharing a Gluetun network namespace via `network_mode`
+- Containers sharing a Gluetun namespace via `network_mode`
   (`service:<gluetun-service>` or `container:<gluetun-container>`) must be
-  recreated via Docker Compose whenever their upstream Gluetun container gets a
-  new container ID so they rebind to the new namespace. Examples include
-  `semaphore-boulder` in `nas-management` on `unraid-nas` (Ansible Boulder at
-  `https://ansible-boulder.klinker-cabin.computer`, Uptime Kuma monitor ID
+  recreated via Docker Compose whenever their upstream Gluetun container gets
+  a new container ID. Dependents include `semaphore-boulder` in
+  `nas-management` on `unraid-nas`
+  (`https://ansible-boulder.klinker-cabin.computer`, Uptime Kuma monitor ID
   `68`, port `3008:3000` via `service:gluetun-home`) and `rsync-backup`
   (`nas-files` on `unraid-nas` and `seedbox-files` on `unraid-seedbox` via
   `service:gluetun-home-backup`).
@@ -66,27 +68,25 @@ confidence: 1.0
 - Ansible playbooks for `Pi Swarm` and `Pi Lab` live on `unraid-nas` under
   `/mnt/user/docker/ansible-estes/main/` and
   `/mnt/user/docker/ansible-boulder/main/` (`install-docker.yml`,
-  `remove-docker.yml`, `setup-docker.yml`, `configure-reboot-scripts.yml`, and
-  `setup-nas.yml`).
-- `setup-nas.yml` checks for I2C device `0x5a` and configures the ATX Power
-  Management HAT with watchdog enabled (`i2cset -y 1 0x5a 0x35 0x80`) and
-  always-on auto power restore (`i2cset -y 1 0x5a 0x34 0x03`).
+  `remove-docker.yml`, `setup-docker.yml`, `configure-reboot-scripts.yml`,
+  `setup-nas.yml`). `setup-nas.yml` checks I2C device `0x5a` and configures
+  the ATX Power Management HAT with watchdog enabled
+  (`i2cset -y 1 0x5a 0x35 0x80`) and always-on auto power restore
+  (`i2cset -y 1 0x5a 0x34 0x03`).
 - Both `Pi Swarm` (`pi-rack-1`, `PERIPHERY_CONNECT_AS=pi-swarm-node`) and
   `Pi Lab` (`pi-lab-nas`, `PERIPHERY_CONNECT_AS=pi-lab-node`) run
-  `komodo_periphery` as a Docker Swarm service constrained to
-  `node.role == manager` with keys persisted at `/etc/komodo/keys`
-  (`portainer_agent` is removed).
-- **Pi Swarm (19 nodes)**: `pi-rack-1` (`192.168.1.78`) is the Swarm manager;
+  `komodo_periphery` as a Swarm service constrained to `node.role == manager`
+  with keys persisted at `/etc/komodo/keys` (`portainer_agent` removed).
+- **Pi Swarm (19 nodes)**: `pi-rack-1` (`192.168.1.78`) is Swarm manager;
   `pi-rack-5` (`primary-storage=true, storage=true`) and `pi-rack-6..8`
   (`storage=true`) are storage workers; `pi-rack-2..4`, `pi-rack-9..10`,
   `pi-rack-cm-1..3`, and 6 `super6c-1-*` nodes are compute workers.
-- **Pi Lab**: `pi-lab-control-1` (`192.168.1.92`) reaches the LAN through a
-  network bridge (`br0` spanning `eth0` and `eth1`) on `pi-lab-nas`
-  (`192.168.1.113`). `pi-lab-nas` uses
-  `/etc/systemd/system/br0-forward-allow.service` (`PartOf=docker.service`,
-  `WantedBy=multi-user.target docker.service`) to insert
-  `iptables -I FORWARD -i br0 -j ACCEPT` and `-o br0 -j ACCEPT` rules so
-  Docker's default `FORWARD DROP` policy does not block bridged traffic.
+- **Pi Lab**: `pi-lab-control-1` (`192.168.1.92`) reaches the LAN via bridge
+  `br0` (`eth0` and `eth1`) on `pi-lab-nas` (`192.168.1.113`). `pi-lab-nas`
+  uses `/etc/systemd/system/br0-forward-allow.service`
+  (`PartOf=docker.service`, `WantedBy=multi-user.target docker.service`) to
+  insert `iptables -I FORWARD -i br0 -j ACCEPT` and `-o br0 -j ACCEPT` rules
+  so Docker's default `FORWARD DROP` policy does not block bridged traffic.
 
 ## Host-Specific Stack Notes
 
@@ -95,24 +95,23 @@ confidence: 1.0
     the host Docker socket, spawning intermediate `docker build` containers
     directly on the NAS host.
   - `nas-reverse-proxy` (`stacks/unraid-nas/reverse-proxy/compose.yaml`) runs
-    `nginx-proxy-manager` (admin API on port `81`, SQLite DB at
+    `nginx-proxy-manager` (admin API port `81`, SQLite DB at
     `/mnt/user/docker/nginx-proxy-manager/data/database.sqlite`),
     `cloudflare-ddns`, `crowdsec`, `crowdsec-web-ui`, and `cs-unifi-bouncer`
-    (syncing CrowdSec decisions as firewall groups to UniFi Network at
-    `https://192.168.1.181:443`). When `crowdsec` restarts, its Local API
-    (LAPI on port `8080`) takes ~9s to initialize, causing `cs-unifi-bouncer`
+    (syncing CrowdSec firewall groups to UniFi Network at
+    `https://192.168.1.181:443`). On `crowdsec` restart, LAPI (port `8080`)
+    takes ~9s to initialize, causing `cs-unifi-bouncer`
     (`http://crowdsec:8080/v1/decisions/stream`) to briefly restart-loop and
-    trigger a transient Komodo stack unhealthy alert.
+    trigger a transient Komodo unhealthy alert.
   - `nas-ai` (`stacks/unraid-nas/ai/compose.yaml`) mounts
-    `/mnt/user/media/Reels:/reels` for downloaded Instagram Reels and
-    `/mnt/user/docker/Instagram:/instagram` for `cookies.txt` inside the
-    Antigravity container.
+    `/mnt/user/media/Reels:/reels` (downloaded Instagram Reels) and
+    `/mnt/user/docker/Instagram:/instagram` (`cookies.txt`) in Antigravity.
 - **`unraid-seedbox` (`192.168.1.46`)**:
   - `seedbox-torrent` (`stacks/unraid-seedbox/torrent/compose.yaml`) runs
-    `qbittorrent` (`binhex/arch-qbittorrentvpn` with Private Internet Access
-    `VPN_PROV=pia`, `VPN_CLIENT=wireguard`, `STRICT_PORT_FORWARD=yes`),
-    `qbittorrent-private`, `qui` (healthcheck `localhost:7476`), `mousetrap`
-    (healthcheck `127.0.0.1:39842`), and `upload-assistant`.
+    `qbittorrent` (`binhex/arch-qbittorrentvpn` with PIA: `VPN_PROV=pia`,
+    `VPN_CLIENT=wireguard`, `STRICT_PORT_FORWARD=yes`), `qbittorrent-private`,
+    `qui` (healthcheck `localhost:7476`), `mousetrap` (healthcheck
+    `127.0.0.1:39842`), and `upload-assistant`.
 - **`unraid-aibox`**:
   - Runs `aibox-ai` (including `Strata`) and `aibox-gaming`. In `aibox-gaming`,
     `wolf` and `wolf-den` share `/var/run/wolf/wolf.sock`; `wolf-den` requires
@@ -121,20 +120,19 @@ confidence: 1.0
   - Syncing `unraid-aibox` backups via `rsync-backup` to
     `192.168.1.72:/mnt/external_hdd/backup/aibox/` as `jklinker` requires
     `--omit-dir-times` (`-O`) if the destination top-level directory is owned
-    by `root:root` to prevent non-zero exit codes from directory timestamp
-    warnings.
+    by `root:root` to avoid non-zero exit codes from timestamp warnings.
 - **`pi-studio` (`192.168.1.72`, Boulder)**:
-  - Runs on a 13.8 GiB SD card root filesystem with `/mnt/external_hdd` and no
-    site-to-site WireGuard route to Estes LAN devices. Configured in Komodo
-    with an inbound WebSocket (`address: ""`), where `komodo-periphery`
-    connects outbound to `komodo-core` on `unraid-nas` (port `9120`,
+  - Runs on a 13.8 GiB SD card rootfs with `/mnt/external_hdd` and no
+    site-to-site WireGuard route to Estes LAN. Configured in Komodo with
+    inbound WebSocket (`address: ""`), where `komodo-periphery` connects
+    outbound to `komodo-core` on `unraid-nas` (port `9120`,
     `wss://komodo.klinker-cabin.computer/ws/periphery?server=pi-studio`),
     polled hourly (`KOMODO_RESOURCE_POLL_INTERVAL: 1-hr`).
   - Hosts `pi-studio-dashboard` (`uptime-kuma` at
-    `https://uptime.klinker.computer` with SQLite DB at
+    `https://uptime.klinker.computer` with SQLite DB
     `/home/jklinker/uptime/kuma.db`, and `glances`), `pi-studio-reverse-proxy`
     (`nginx-proxy-manager` / `openresty`, `cloudflare-ddns`, `crowdsec`,
-    `cs-unifi-bouncer`, and `crowdsec-web-ui`), and `pi-studio-files`
+    `cs-unifi-bouncer`, `crowdsec-web-ui`), and `pi-studio-files`
     (`filebrowser-quantum` at `https://files.klinker.computer` and
     `rsync-backup`).
   - Uptime Kuma's `Estes Battery` monitor (ID `80`, `Server` group, `all`
