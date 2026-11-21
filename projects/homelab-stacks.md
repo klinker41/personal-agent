@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-20T07:32:12.326888+00:00
+updated_at: 2026-11-21T07:05:31.410415+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -146,3 +146,24 @@ confidence: 1.0
     on-demand (`GetFsInfoViewableOnly`) without creating a container-layer
     SQLite index (`/home/filebrowser/tmp/sql/index_all.db`) or waking the
     spun-down `/mnt/external_hdd` drive.
+
+- On `unraid-nas` (`stacks/unraid-nas/files/compose.yaml`), the `rsync-backup`
+container runs daily at 1:00 AM (`America/Denver`, `RSYNC_CRONTAB=0 1 * * *`)
+over `gluetun-home-backup` to `192.168.1.72:/mnt/external_hdd/backup/server`
+using `-rtv --timeout=7200 --delete`.
+- Unraid `rsync-backup` paths mapped under `/mnt/external_hdd/backup/server`:
+`/mnt/user/ai` -> `ai`, `/mnt/user/docker` -> `docker`, `/mnt/user/downloads` ->
+`downloads`, `/mnt/user/gaming` -> `gaming`, `/mnt/user/home` -> `homes`,
+`/mnt/user/photos` -> `photos`, and `/boot` (Unraid flash drive) -> `unraid`.
+
+- On unraid-nas (20 CPU threads, 30 GiB RAM, 0 swap), both jellyfin
+(stacks/unraid-nas/media-playback/compose.yaml) and antigravity
+(stacks/unraid-nas/ai/compose.yaml) enforce deploy.resources.limits.memory: 8g
+to prevent container memory spikes from freezing the host.
+- Jellyfin on unraid-nas sets
+<ParallelImageEncodingLimit>2</ParallelImageEncodingLimit> in
+/mnt/user/docker/jellyfin/config/config/system.xml to prevent OOM crashes when
+generating thumbnails for ultra-high-resolution photos in
+/mnt/user/home/jklinker/Photo Shoots.
+- Pushing changes to stacks/unraid-nas/ai/compose.yaml triggers Komodo GitOps to
+recreate the antigravity container, disconnecting active agent sessions.

@@ -2,7 +2,7 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-11-07T07:30:50.661760+00:00
+updated_at: 2026-11-21T07:03:59.330853+00:00
 compacted_at: 2026-11-07T07:30:50.661760+00:00
 confidence: 0.95
 ---
@@ -99,3 +99,11 @@ confidence: 0.95
   filesystem fixtures in `finally` blocks (e.g., `tests/test-sidecar-manager.js`
   and `tests/test-security.js`) to prevent CSRF token or auth state leakage
   between test suites.
+
+- `TIER_MODEL_CANDIDATES` in `proxy/translation-proxy.js` configures tier
+overrides (`pro`: `gemini-4-carbon-high`, `flash`: `gemini-4-neon-medium`,
+`flashLite`: `gemini-4-hydrogen-medium`) and serves as the single source of
+truth for both `fetchAvailableModels` proxy rewriting and the `/sidecars` page
+UI (`proxy/lib/pages.js`), which displays an Active Model Tiers header bar,
+resolved model chips on sidecar cards, and resolved model labels in modal
+dropdowns.

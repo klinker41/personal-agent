@@ -29,6 +29,7 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Jellyfin-Memory-Tuning](file:///workspace/personal-agent/knowledge/jellyfin-memory-tuning.md)
 - [Procedural-Cel-Rigging](file:///workspace/personal-agent/knowledge/procedural-cel-rigging.md)
 - [Yt-Dlp-Instagram-Scraping](file:///workspace/personal-agent/knowledge/yt-dlp-instagram-scraping.md)
 - [Nginx-Proxy-Manager](file:///workspace/personal-agent/knowledge/nginx-proxy-manager.md)

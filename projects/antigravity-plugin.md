@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-11-08T07:02:58.809428+00:00
+updated_at: 2026-11-21T07:03:59.331234+00:00
 confidence: 1.0
 ---
 
@@ -79,3 +79,29 @@ to 30 minutes of random jitter on `:00` scheduled runs) to poll
 `.yt-dlp-archive.txt` in `/reels`, read session cookies from
 `/instagram/cookies.txt`, and upload newly downloaded `.mp4` files directly to
 the user's Slack DM using `$SLACK_BOT_TOKEN` and `files_upload_v2`.
+
+- Sidecar model tier allocation: `slack-chat` (with `slack_daemon.py` capping
+Decisions API `model_tier` routing so conversations never escalate above
+`flash`), `aibox-updater`, and `jellyfin-log-checker` (`max_log_files: 2`) use
+`flash`; routine maintenance sidecars (`podcast-organizer`,
+`sonarr-import-cleaner`, `pokemon-episode-namer`, `growatt-time-sync`,
+`dangling-container-cleaner`, and the consolidated Radarr/Sonarr quality and
+series monitoring checker) use `flash_lite`; `sidecar-auditor` runs Fridays on
+`pro` without a Python pre-filter to audit `brain/` transcripts, daemon logs,
+MCP calls, `slack-chat`, and `memory-daemon`.
+- Removed the daily `service-auditor` (`Workspace Service Log Auditor`) sidecar
+due to low signal and consolidated the separate Radarr and Sonarr monitored
+quality/series checkers into a single sidecar.
+- `utils/sidecar_prefilter.py` runs `dangling-container-cleaner`
+(`komodo_prune_containers` on `0 5,17 * * *`) deterministically in Python with
+zero agent turns during normal operation.
+
+- Consolidated `pro-model-updater` and `tts-model-updater` into a single
+`model-updater` sidecar (`sidecars/model-updater/sidecar.json`) backed by a thin
+fetch-only `skills/model-updater/scripts/fetch_models.py` script rather than
+hardcoded Python ranking tables.
+- `skills/model-updater/SKILL.md` is the single source of truth for tier
+preferences (`pro`: `gemini-4-carbon-high`, `flash`: `gemini-4-neon-medium`,
+`flashLite`: `gemini-4-hydrogen-medium`) and known codename progressions; when
+unrecognized codenames appear in the catalog, `model-updater` leaves
+repositories untouched and sends a Slack alert.

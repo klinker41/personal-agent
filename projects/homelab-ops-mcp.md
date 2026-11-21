@@ -2,7 +2,7 @@
 topic: homelab-ops-mcp
 category: project
 tags: [project, homelab-ops-mcp]
-updated_at: 2026-11-05T07:01:11.499633+00:00
+updated_at: 2026-11-21T07:02:57.612216+00:00
 confidence: 0.95
 ---
 
@@ -29,3 +29,14 @@ numbers, and track numbers.
 container-level Komodo MCP queries for Raspberry Pi hosts (such as pi-studio)
 return empty and must be verified via direct endpoint probes or Uptime Kuma
 monitors.
+
+- Shared Arr v3 queue logic lives in `homelab_ops/providers/arr_queue.py` to
+handle queue inspection, qBittorrent tracker classification, and safe item
+removal across both `sonarr.py` and `radarr.py` (providing `radarr_get_queue`
+and `radarr_remove_queue_item`), deployed to `unraid-nas` (`homelab-ops:5005`)
+as `jklinker/homelab-ops-mcp:latest`.
+
+- `ToolSpec.normalize_args` (`homelab_ops/registry.py`) and
+`komodo_get_container_logs` (`homelab_ops/providers/containers.py`) alias
+`lines`, `limit`, `num_lines`, and `line_count` to `tail` and handle boolean
+`tail` values.

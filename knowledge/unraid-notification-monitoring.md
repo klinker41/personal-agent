@@ -2,7 +2,7 @@
 topic: unraid-notification-monitoring
 category: knowledge
 tags: [knowledge, unraid-notification-monitoring]
-updated_at: 2026-11-15T07:01:38.051144+00:00
+updated_at: 2026-11-21T07:04:33.814860+00:00
 confidence: 0.95
 ---
 
@@ -41,3 +41,8 @@ loss and recovery notices (such as UPS communication loss/restoration) before
 clearing via `unraid_dismiss_notification`, while leaving active operational
 warnings (such as an in-progress `Parity-Check started` alert after an unclean
 reboot) unread.
+
+- `unraid-nas` (`192.168.1.95`) serves as the network UPS master
+(`unraid-server`) for `unraid-seedbox` (`192.168.1.46`), so an `unraid-nas`
+reboot generates paired UPS communications lost/restored unread notifications on
+`seedbox` that should be cleared via `unraid_dismiss_notification`.

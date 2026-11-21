@@ -2,7 +2,7 @@
 topic: radarr-api-metrics
 category: knowledge
 tags: [knowledge, radarr-api-metrics]
-updated_at: 2026-08-29T11:55:15.959985+00:00
+updated_at: 2026-11-21T07:02:17.753483+00:00
 confidence: 0.95
 ---
 
@@ -12,3 +12,7 @@ confidence: 0.95
 movies without files. To count only missing movies that have passed their
 release window, filter `/api/v3/movie` for `monitored == True`, `hasFile ==
 False`, and `isAvailable == True`.
+
+- Radarr and Sonarr share compatible Arr v3 queue endpoints and status payloads,
+allowing a single shared provider implementation for queue inspection,
+qBittorrent tracker classification, and safe queue item removal.
