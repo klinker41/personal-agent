@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-21T07:05:31.410415+00:00
+updated_at: 2026-11-22T07:21:12.557743+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -156,10 +156,10 @@ using `-rtv --timeout=7200 --delete`.
 `downloads`, `/mnt/user/gaming` -> `gaming`, `/mnt/user/home` -> `homes`,
 `/mnt/user/photos` -> `photos`, and `/boot` (Unraid flash drive) -> `unraid`.
 
-- On unraid-nas (20 CPU threads, 30 GiB RAM, 0 swap), both jellyfin
-(stacks/unraid-nas/media-playback/compose.yaml) and antigravity
-(stacks/unraid-nas/ai/compose.yaml) enforce deploy.resources.limits.memory: 8g
-to prevent container memory spikes from freezing the host.
+- On `unraid-nas`, both `jellyfin`
+(`stacks/unraid-nas/media-playback/compose.yaml`) and `antigravity`
+(`stacks/unraid-nas/ai/compose.yaml`) run without Docker memory limits
+(planned 96 GiB RAM upgrade).
 - Jellyfin on unraid-nas sets
 <ParallelImageEncodingLimit>2</ParallelImageEncodingLimit> in
 /mnt/user/docker/jellyfin/config/config/system.xml to prevent OOM crashes when
@@ -167,3 +167,72 @@ generating thumbnails for ultra-high-resolution photos in
 /mnt/user/home/jklinker/Photo Shoots.
 - Pushing changes to stacks/unraid-nas/ai/compose.yaml triggers Komodo GitOps to
 recreate the antigravity container, disconnecting active agent sessions.
+
+- Configured GitHub App credentials on the `antigravity` container in
+`stacks/unraid-nas/ai/compose.yaml` via `GITHUB_APP_ID=5864331`,
+`GITHUB_APP_INSTALLATION_ID=184407633`, and
+`GITHUB_APP_PRIVATE_KEY_PATH=/home/developer/.gemini/jklinker-antigravity-bot.2026-11-21.private-key.pem`.
+
+- unraid-aibox (192.168.1.57, NIC MACs 1a:4b:24:c7:26:c5 and bc:fc:e7:3b:d2:f0)
+stays powered off when idle, wakes via Wake-on-LAN from unraid-nas
+(192.168.1.95), and requires re-arming WoL on eth0 and eth1 after every boot or
+reboot.
+- unraid-aibox hosts five Komodo-managed Docker stacks (aibox-dashboard,
+aibox-files, aibox-gaming, aibox-photos, aibox-ai) on a 50GB docker.img;
+recreating gluetun-home-backup during deployment requires restarting
+rsync-backup afterward.
+
+- The jellyfin (stacks/unraid-nas/media-playback/compose.yaml, Komodo stack
+nas-media-playback) and antigravity (stacks/unraid-nas/ai/compose.yaml, Komodo
+stack nas-ai) services run without Docker memory limits; tests/test_stacks.py
+enforces the absence of deploy, memory, mem_limit, and memswap_limit keys on
+both services.
+
+- The strata service in stacks/unraid-aibox/ai/compose.yaml (deployed via Komodo
+as stack aibox-ai) is configured for 32 GB system RAM using the
+Qwen3.8-Flash-Next Coder model (FAMILY=coder, MODEL=IQ1_M, CONTEXT=131072,
+KV=k8v4, VISION=no, REINSTALL=1).
+- Strata model weights and packs on unraid-aibox are persisted on host storage
+under /mnt/user/ai/strata/models/ and /mnt/user/ai/strata/packs/.
+
+- The `buildbox` stack (`stacks/unraid-nas/buildbox/compose.yaml`) on
+`unraid-nas` (`192.168.1.95`) runs `jenkins` alongside `jenkins-android-agent`
+and `jenkins-docker-agent`, mounting `/mnt/user/docker/jenkins/home` to
+`/var/jenkins_home` to persist controller state and archived build artifacts
+(`jobs/<job>/builds/<build-number>/archive`) copied back from ephemeral agent
+volumes.
+
+- Jenkins (https://jenkins.klinker.computer) runs in Docker on unraid-nas
+(192.168.1.95, also referred to as unraid-server) with job configs at
+/mnt/user/docker/jenkins/home/jobs/<job>/config.xml (loaded cleanly by
+restarting the jenkins container via Komodo), GitHub credentials ID klinker41,
+and Android build agent unraid-server-android-agent (JDK 21, android-37.2,
+build-tools/37.0.0).
+
+- Dedicated Watchtower stacks (`nas-watchtower`, `seedbox-watchtower`,
+`aibox-watchtower`, `pi-studio-watchtower`) run `nickfedor/watchtower:latest`
+(`WATCHTOWER_SCHEDULE=0 0 4 * * *`, `WATCHTOWER_CLEANUP=true`) across
+`unraid-nas`, `unraid-seedbox`, `unraid-aibox` (`send_alerts = false`), and
+`pi-studio`, scoped strictly to auto-update `komodo-core` and
+`komodo-periphery`.
+- `komodo-core` and `komodo-periphery` are intentionally excluded from Komodo's
+`GlobalAutoUpdate` (via `komodo.skip` labels and `PROTECTED_CONTAINERS`) so
+`komodo-periphery` cannot kill itself mid-deployment, with
+`tests/test_stacks.py` enforcing that Watchtower targets only Komodo services.
+
+- Jenkins runs as the jenkins container on unraid-nas (192.168.1.95) with its
+persistent home directory at /mnt/user/docker/jenkins/home (UID/GID 1000:1000)
+and build agents unraid-server-android-agent and unraid-server-docker-agent.
+
+- autobrr runs on unraid-nas (192.168.1.95) at
+https://autobrr.klinker-cabin.computer with its SQLite database stored at
+/mnt/user/docker/autobrr/config/autobrr.db.
+- mousetrap runs on unraid-seedbox and uses an autobrr API key to update the MAM
+session ID in autobrr, while Homepage uses a dedicated read-scoped API key to
+poll autobrr stats.
+
+- Komodo (`https://komodo.klinker-cabin.computer`) routes Slack alerts through
+the `slack-homelab` alerter with an explicit problem-only `alert_types`
+allowlist so routine `Global Auto Update` (03:00), `ScheduleRun`
+(`Backup Core Database`, `Rotate Server Keys`), and `homelab-sync` update events
+are suppressed.

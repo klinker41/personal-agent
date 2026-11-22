@@ -2,7 +2,7 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-11-21T07:31:41.723099+00:00
+updated_at: 2026-11-22T07:21:12.557135+00:00
 compacted_at: 2026-11-21T07:31:41.723099+00:00
 confidence: 1.0
 ---
@@ -64,3 +64,20 @@ confidence: 1.0
   and a Growatt SPF 3500 inverter (Lithium mode, connected to `unraid-nas`
   at `/dev/ttyUSB0` via USB serial Modbus RTU); and displays homelab status
   on a TRMNL 800x480 e-ink display refreshed every 15 minutes.
+
+- Unraid NAS homelab server (unraid-nas) is being upgraded to 96GB of RAM,
+making strict Docker container and Gradle build memory caps unnecessary.
+
+- Runs a Jenkins instance on the nas homelab host with jobs manually configured
+via the Jenkins UI (without Jenkinsfiles) and uses the Jenkins Slack
+Notification plugin for build failure alerts.
+
+- Prefers scheduled background sync and maintenance sidecars to run silently on
+clean/successful runs and notify Slack only on failures or blockers.
+
+- Prefers migrating client code for breaking API changes immediately during
+dependency updates rather than deferring them so projects stay close to head,
+with notifications sent whenever code changes are required.
+
+- Prefers homelab Slack notifications to alert only on actionable problems and
+failures rather than routine green tasks.

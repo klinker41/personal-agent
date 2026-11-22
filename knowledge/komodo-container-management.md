@@ -2,7 +2,7 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-11-21T07:40:45.437726+00:00
+updated_at: 2026-11-22T07:21:12.558706+00:00
 compacted_at: 2026-11-21T07:40:45.437726+00:00
 confidence: 0.95
 ---
@@ -89,3 +89,27 @@ confidence: 0.95
     ephemeral random-named `sha256:...` containers (`--log-driver=none`)
     indicate active `docker build` jobs from `jenkins-docker-agent` via the
     mounted host Docker socket.
+
+- When `komodo-periphery`'s outbound WebSocket to Komodo Core stalls with `WARN
+Timed out waiting for Ping: deadline has elapsed`, the process stays alive and
+lacks a default Docker healthcheck, so `RestartPolicy=unless-stopped` does not
+recover it and `docker restart komodo-periphery` is required.
+- `komodo-periphery` must not self-update via Komodo's `GlobalAutoUpdate` or
+`DeployStack` (exclude it with the `komodo.skip` label), because
+`komodo-periphery` executes `docker compose up -d` itself and stopping its own
+container mid-command aborts recreation and leaves the host offline.
+- Use `nickfedor/watchtower` (maintained fork supporting Docker Engine 29.x)
+scoped explicitly to `komodo-core` and `komodo-periphery` container names to
+safely auto-update Komodo containers externally.
+
+- Leaving `alert_types` empty (`[]`) on a Komodo alerter forwards all alert
+categories, including routine informational events (`StackAutoUpdated`,
+`DeploymentAutoUpdated`, `StackImageUpdateAvailable`,
+`DeploymentImageUpdateAvailable`, `ResourceSyncPendingUpdates`, `ScheduleRun`,
+and `None`).
+- To restrict a Komodo alerter to failure, health, and manual test
+notifications, explicitly set `alert_types` to `ServerUnreachable`, `ServerCpu`,
+`ServerMem`, `ServerDisk`, `ServerVersionMismatch`, `SwarmUnhealthy`,
+`AwsBuilderTerminationFailed`, `ContainerStateChange`, `StackStateChange`,
+`ProcedureFailed`, `ActionFailed`, `BuildFailed`, `RepoBuildFailed`, `Test`, and
+`Custom`.

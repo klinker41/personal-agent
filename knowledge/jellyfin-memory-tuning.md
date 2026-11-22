@@ -2,7 +2,7 @@
 topic: jellyfin-memory-tuning
 category: knowledge
 tags: [knowledge, jellyfin-memory-tuning]
-updated_at: 2026-11-21T07:05:31.412362+00:00
+updated_at: 2026-11-22T07:04:43.149385+00:00
 confidence: 0.95
 ---
 
@@ -19,3 +19,8 @@ alongside a Docker memory limit so heavy library scans stay bounded or trigger a
 contained cgroup OOM rather than hanging the host OS.
 - Use docker update --memory=<limit> <container> to apply cgroup memory caps
 live to running containers without restarting them.
+
+- Following the 96GB RAM upgrade on unraid-nas, the 8g Docker container memory
+limit on Jellyfin was removed while keeping
+<ParallelImageEncodingLimit>2</ParallelImageEncodingLimit> in
+/mnt/user/docker/jellyfin/config/config/system.xml.

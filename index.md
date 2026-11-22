@@ -15,6 +15,7 @@ Top-level catalog mapping memory topics to structured notes.
   habits, conventions, and global guidelines.
 
 ## Projects
+- [Jellyfin-Client](file:///workspace/personal-agent/projects/jellyfin-client.md)
 - [Pi-Lab](file:///workspace/personal-agent/projects/pi-lab.md)
 - [Animation-Generator](file:///workspace/personal-agent/projects/animation-generator.md)
 - [Antigravity-Docker](file:///workspace/personal-agent/projects/antigravity-docker.md)
@@ -29,6 +30,19 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Compose-Downloadable-Fonts](file:///workspace/personal-agent/knowledge/compose-downloadable-fonts.md)
+- [Google-Play-Publishing](file:///workspace/personal-agent/knowledge/google-play-publishing.md)
+- [Compose-Material3-Migration](file:///workspace/personal-agent/knowledge/compose-material3-migration.md)
+- [Github-Commit-Attribution](file:///workspace/personal-agent/knowledge/github-commit-attribution.md)
+- [Autobrr-Api-Scopes](file:///workspace/personal-agent/knowledge/autobrr-api-scopes.md)
+- [Compose-Ui-Testing](file:///workspace/personal-agent/knowledge/compose-ui-testing.md)
+- [Jenkins-Job-Provisioning](file:///workspace/personal-agent/knowledge/jenkins-job-provisioning.md)
+- [Strata-Container-Config](file:///workspace/personal-agent/knowledge/strata-container-config.md)
+- [Android-Gradle-Plugin](file:///workspace/personal-agent/knowledge/android-gradle-plugin.md)
+- [Jenkins-Slack-Notifications](file:///workspace/personal-agent/knowledge/jenkins-slack-notifications.md)
+- [Gow-Nvidia-Driver](file:///workspace/personal-agent/knowledge/gow-nvidia-driver.md)
+- [Github-App-Auth](file:///workspace/personal-agent/knowledge/github-app-auth.md)
+- [Android-Builds-In-Antigravity](file:///workspace/personal-agent/knowledge/android-builds-in-antigravity.md)
 - [Jellyfin-Memory-Tuning](file:///workspace/personal-agent/knowledge/jellyfin-memory-tuning.md)
 - [Procedural-Cel-Rigging](file:///workspace/personal-agent/knowledge/procedural-cel-rigging.md)
 - [Yt-Dlp-Instagram-Scraping](file:///workspace/personal-agent/knowledge/yt-dlp-instagram-scraping.md)

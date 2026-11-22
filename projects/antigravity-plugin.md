@@ -2,7 +2,7 @@
 topic: antigravity-plugin
 category: project
 tags: [antigravity, plugin, sidecars, skills, rules]
-updated_at: 2026-11-21T07:03:59.331234+00:00
+updated_at: 2026-11-22T07:20:35.555393+00:00
 confidence: 1.0
 ---
 
@@ -105,3 +105,57 @@ preferences (`pro`: `gemini-4-carbon-high`, `flash`: `gemini-4-neon-medium`,
 `flashLite`: `gemini-4-hydrogen-medium`) and known codename progressions; when
 unrecognized codenames appear in the catalog, `model-updater` leaves
 repositories untouched and sends a Slack alert.
+
+- Added `utils/github_app.py` to lazily bootstrap the `gh` CLI into
+`~/.local/bin/gh`, sign RS256 GitHub App JWTs via `openssl` + Python stdlib with
+zero pip dependencies, and mint 1-hour installation tokens (`python3
+utils/github_app.py token | ensure-gh | repos`).
+- Added the `github-watcher` sidecar (`sidecars/github-watcher/`), scheduled
+every 10 minutes (`*/10 * * * *`) on `flash`, which polls GitHub issues and PRs
+scoped to local `/workspace/*` repos, seeds initial `state.json` on first run,
+filters out `jklinker-antigravity-bot[bot]` events to prevent loops, and uses
+disposable `git worktree` checkouts to investigate issues, open well-scoped fix
+PRs, and review/update owner-authored PRs.
+- `github-watcher` leaves spawned `agentapi` conversations unarchived and sends
+Slack notifications via `notify-the-user` containing
+`https://antigravity.klinker-cabin.computer/c/<conversation_id>`, allowing
+`slack-chat` to automatically map `thread_ts -> conversation_id` and route Slack
+thread replies back into the same session.
+- Updated `rules/commit-co-author.md` and sidecar co-author trailers to credit
+the GitHub App bot identity `jklinker-antigravity-bot[bot]
+<359595847+jklinker-antigravity-bot[bot]@users.noreply.github.com>`.
+
+- `sidecars/jellyfin-upstream-sync/sidecar.json` runs every 12 hours
+(`0 */12 * * *`) on `flash` via `utils/sidecar_prefilter.py`
+(`jellyfin-upstream-sync` mode) to merge new `MakD/AFinity` commits into
+`jellyfin-client` without spending LLM tokens when 0 upstream commits exist, and
+is registered in `sidecar-auditor`.
+
+- In `sidecars/slack-chat/slack_daemon.py`, Jenkins build notifications are
+matched in Stage 0 (`ACTIONABLE_ALERT_PATTERNS` and `RECOVERY_ALERT_PATTERNS`),
+keyed per job as `jenkins-<slug>` (`_is_jenkins_incident_key()`), isolated to
+exact-only correlation (bypassing fuzzy/burst homelab alert merging), and routed
+to matching `/workspace/<project>` targets via `_resolve_alert_target`.
+- The `slack-chat` sidecar persists active Slack thread correlation and
+`incident_key` state at
+`/home/developer/.gemini/antigravity/sidecar_data/antigravity-plugin/slack-chat/data/state.json`.
+
+- Commit Co-authored-by trailers across plugin rules
+(rules/commit-co-author.md), integrity tests, and sidecar prompts use
+Antigravity as the display name paired with the GitHub App noreply address:
+Co-authored-by: Antigravity
+<359595847+jklinker-antigravity-bot[bot]@users.noreply.github.com>.
+
+- Rule markdown files under rules/ (such as rules/simplify-changes.md) are
+validated by content assertions in tests/test_plugin.py (run via python3 -m
+unittest discover -s tests), so rule edits require corresponding test updates.
+
+- Enforces git commit attribution via the always-on rules/commit-co-author.md
+rule (validated in tests/test_plugin.py), appending a Co-authored-by trailer for
+Antigravity to every commit message.
+
+- Includes the scheduled `jellyfin-dependency-updater` sidecar
+(`jellyfin_deps_checker.py`) to routinely check and update Gradle, version
+catalog, and Android tooling dependencies in `/workspace/jellyfin-client`,
+migrating breaking API changes instead of deferring updates and notifying the
+user when code changes are made.
