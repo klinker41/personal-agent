@@ -2,7 +2,7 @@
 topic: compose-ui-testing
 category: knowledge
 tags: [knowledge, compose-ui-testing]
-updated_at: 2026-11-22T07:15:27.439069+00:00
+updated_at: 2026-11-23T07:12:51.410526+00:00
 confidence: 0.95
 ---
 
@@ -23,3 +23,15 @@ does not hang.
 `ApplicationProvider.getApplicationContext<Application>()` rather than
 `LocalContext` resource calls to satisfy Android Lint's
 `LocalContextGetResourceValueCall` check.
+
+- Annotate Robolectric pixel-inspection tests with
+@GraphicsMode(GraphicsMode.Mode.NATIVE) so Canvas(bitmap) actually rasterizes
+pixels; legacy ShadowCanvas returns 0 for Bitmap.getPixel().
+
+- Use the Gradle task `:app:testDebugScreenshotTestDefaultTestSuite` to verify
+Android Gradle Plugin Compose screenshot tests against reference PNGs.
+
+- Compose Preview Screenshot Testing
+(:app:updateDebugScreenshotTestDefaultTestSuite) renders GraphicsLayer and
+chained RenderEffect blurs in reference images, while Robolectric tests
+verifying custom draw/GraphicsLayer modifiers must explicitly pump draw frames.

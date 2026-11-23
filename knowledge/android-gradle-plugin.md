@@ -2,7 +2,7 @@
 topic: android-gradle-plugin
 category: knowledge
 tags: [knowledge, android-gradle-plugin]
-updated_at: 2026-11-22T07:23:50.673384+00:00
+updated_at: 2026-11-23T07:09:50.273375+00:00
 confidence: 0.95
 ---
 
@@ -47,3 +47,18 @@ by summing compressed base sections in the `.aab` while excluding
 - Running `bundle<Variant>` and `assemble<Variant>` in the same Gradle
 invocation causes AGP to build a universal APK instead of per-ABI split APKs;
 invoke `assemble<Variant>` separately when generating or measuring per-ABI APKs.
+
+- To include Robolectric test execution in JaCoCo unit test coverage reports,
+configure `JacocoTaskExtension` (inside `plugins.withId("jacoco")`) with
+`isIncludeNoLocationClasses = true` and `excludes = listOf("jdk.internal.*")`.
+
+- When an Android build script conditionally toggles `splits.abi` based on
+whether `bundle*` tasks are in the current Gradle invocation, combining
+`bundle*` and `assemble*` (or debug resource/test tasks) in a single `./gradlew`
+run causes `packageDebug` `NullPointerException` failures; split
+APK/verification tasks and AAB bundle tasks into separate `./gradlew`
+invocations.
+
+- Run ./gradlew :app:updateLintBaselineDebug (updateLintBaseline<Variant>) to
+regenerate lint-baseline.xml in place, baselining newly introduced lint issues
+while automatically pruning resolved or stale entries.

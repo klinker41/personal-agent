@@ -2,7 +2,7 @@
 topic: komodo-container-management
 category: knowledge
 tags: [knowledge, komodo-container-management]
-updated_at: 2026-11-22T07:21:12.558706+00:00
+updated_at: 2026-11-23T07:05:40.403596+00:00
 compacted_at: 2026-11-21T07:40:45.437726+00:00
 confidence: 0.95
 ---
@@ -113,3 +113,16 @@ notifications, explicitly set `alert_types` to `ServerUnreachable`, `ServerCpu`,
 `AwsBuilderTerminationFailed`, `ContainerStateChange`, `StackStateChange`,
 `ProcedureFailed`, `ActionFailed`, `BuildFailed`, `RepoBuildFailed`, `Test`, and
 `Custom`.
+
+- Komodo v2 lacks a built-in alert duration threshold (`moghtech/komodo#1384`);
+`AlertBuffer::ready_to_open` triggers `ServerCpu` alerts after 2 consecutive
+monitoring polls above threshold, making spike sensitivity directly tied to
+`KOMODO_MONITORING_INTERVAL` unless debounced externally via a Custom Alerter
+webhook.
+
+- Per-server CPU alerts in Komodo are controlled via `send_cpu_alerts`
+(alongside `cpu_warning` and `cpu_critical` percentage thresholds) under
+`[server.config]` in Resource Sync TOML files or via the `UpdateServer` API.
+- Komodo Resource Syncs using `match_tags` only reconcile and overwrite
+resources carrying the matching tags, leaving untagged resources (such as
+standalone alerters) untouched in Komodo's database.

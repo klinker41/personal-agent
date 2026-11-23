@@ -30,6 +30,10 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Compose-Progressive-Blur](file:///workspace/personal-agent/knowledge/compose-progressive-blur.md)
+- [Unraid-Docker-Storage](file:///workspace/personal-agent/knowledge/unraid-docker-storage.md)
+- [Android-Perfetto-Profiling](file:///workspace/personal-agent/knowledge/android-perfetto-profiling.md)
+- [Compose-Floating-Overlays](file:///workspace/personal-agent/knowledge/compose-floating-overlays.md)
 - [Compose-Downloadable-Fonts](file:///workspace/personal-agent/knowledge/compose-downloadable-fonts.md)
 - [Google-Play-Publishing](file:///workspace/personal-agent/knowledge/google-play-publishing.md)
 - [Compose-Material3-Migration](file:///workspace/personal-agent/knowledge/compose-material3-migration.md)

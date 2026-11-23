@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-22T07:21:12.557743+00:00
+updated_at: 2026-11-23T07:12:05.752967+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -236,3 +236,29 @@ the `slack-homelab` alerter with an explicit problem-only `alert_types`
 allowlist so routine `Global Auto Update` (03:00), `ScheduleRun`
 (`Backup Core Database`, `Rotate Server Keys`), and `homelab-sync` update events
 are suppressed.
+
+- `komodo-core` runs on `unraid-nas` (`/mnt/user/docker/komodo/compose.yaml`)
+with `KOMODO_MONITORING_INTERVAL=15-sec` and sends alerts via the
+`slack-homelab` alerter (`cpu_warning: 90%`, `cpu_critical: 99%` on
+`unraid-nas`, `unraid-seedbox`, and `pi-studio`).
+
+- The `homelab-sync` Komodo Resource Sync (`syncs/homelab.toml` in
+`klinker41/homelab-stacks`) uses `match_tags = ["gitops"]`; live UI/API changes
+to `gitops`-tagged resources such as `unraid-nas` must also be committed to
+`syncs/homelab.toml` to avoid being reverted.
+- The `slack-homelab` Komodo alerter (`https://komodo.klinker-cabin.computer`)
+has no `gitops` tag or `[[alerter]]` entry in `syncs/homelab.toml`, so its
+failure-only alert configuration persists directly in Komodo.
+- `unraid-nas` has `send_cpu_alerts = false` under `[server.config]` in
+`syncs/homelab.toml` to suppress high CPU alerts.
+
+- On `unraid-nas` (`192.168.1.95`), the cache-backed `/mnt/user/build` share
+stores isolated container build caches and workspaces so heavy build state stays
+off `docker.img` and out of nightly `/mnt/user/docker` `rsync-backup` runs.
+- `jenkins-android-agent` (`stacks/unraid-nas/buildbox/compose.yaml`)
+bind-mounts `/mnt/user/build/jenkins/{gradle,work,m2}` (owned by `1000:1000`) to
+`/home/jenkins/{.gradle,work,.m2}`, `antigravity`
+(`stacks/unraid-nas/ai/compose.yaml`) bind-mounts
+`/mnt/user/build/antigravity/{gradle,m2}` to `/home/developer/{.gradle,.m2}`
+with `GRADLE_USER_HOME=/home/developer/.gradle`, and `filebrowser-quantum`
+mounts `/mnt/user/build` at `/srv/build`.

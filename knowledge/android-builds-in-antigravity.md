@@ -2,7 +2,7 @@
 topic: android-builds-in-antigravity
 category: knowledge
 tags: [android, gradle, antigravity-docker, toolchain]
-updated_at: 2026-11-22T07:05:30.569813+00:00
+updated_at: 2026-11-23T07:12:05.756245+00:00
 confidence: 1.0
 ---
 
@@ -44,3 +44,19 @@ ktfmtFormat); cap memory and concurrency in
 /home/developer/.gemini/gradle/gradle.properties with
 org.gradle.jvmargs=-Xmx2560m, kotlin.daemon.jvmargs=-Xmx2048m, and
 org.gradle.workers.max=4.
+
+- Concurrent Gradle builds in the container can trigger Kotlin compiler
+OutOfMemoryError; wait for any active workspace Gradle process to complete
+before starting verification builds, and use --no-parallel if memory is
+constrained.
+
+- Antigravity's `/home/developer/.gemini/antigravity-cli/bin/java` wrapper
+defaults `GRADLE_USER_HOME` to `/home/developer/.gemini/gradle` when unset, so
+`GRADLE_USER_HOME=/home/developer/.gradle` must be explicitly set in the
+container environment for Gradle builds to use a `/home/developer/.gradle` bind
+mount.
+- Do not share a single `GRADLE_USER_HOME` (`~/.gradle`) bind mount across
+multiple containers (such as `antigravity` and `jenkins-android-agent`), as
+Gradle stores daemon registries, PID files, and lock-managed caches expecting a
+single namespace; isolate each container's `~/.gradle` directory on the host or
+use an HTTP `gradle/build-cache-node` service for shared task outputs.

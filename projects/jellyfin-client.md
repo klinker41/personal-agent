@@ -2,7 +2,7 @@
 topic: jellyfin-client
 category: project
 tags: [project, jellyfin-client]
-updated_at: 2026-11-22T07:23:50.672680+00:00
+updated_at: 2026-11-23T07:12:51.406573+00:00
 confidence: 0.95
 ---
 
@@ -187,3 +187,145 @@ widgets use system `sans-serif`.
 - Core library desugaring must remain enabled despite `minSdk = 35` to satisfy
 Readium's AAR metadata requirement, and `slf4j-api` must stay on the runtime
 classpath for startup initialization prior to `SdkLogBridge.install()`.
+
+- Fork of MakD/AFinity (upstream/master) using master as the default branch.
+- Intentionally omits libmpv/MPV player support (MpvDeviceCheckItem,
+MpvConfigEditorDialog) and the in-app self-updater (UpdateAvailableDialog);
+during upstream merges, keep these removed and strip any newly added localized
+strings.xml entries for MPV or self-update.
+- Gradle verification suite consists of ktfmtCheck, checkCancellationRethrow,
+checkItemProjection, compileDebugKotlin, and testDebugUnitTest, with
+fork-specific composeLintChecks and mockk dependencies in
+gradle/libs.versions.toml.
+- Preserves fork-specific Compose recomposition optimizations
+(contentAlphaProvider in HeroCarousel.kt, rememberCardRowListState() and
+isScrollingProvider in HomeScreen.kt) and newer Gradle wrapper versions when
+syncing with upstream.
+
+- AppPinnedNavigationDrawer (PinnedNavigationDrawer.kt and PinnedDrawerBlur.kt)
+uses borderless Material 3 tonal elevation (surfaceContainerHigh blended at
+DefaultPinnedDrawerTintAlpha = 0.66f over a frosted blur backdrop) while
+horizontal rows scroll edge-to-edge behind the drawer via
+LocalPinnedDrawerStartInset.
+
+- The full verification suite (`AGENTS.md`) runs `ktfmtCheck` (`ktfmtFormat` for
+formatting), custom Gradle checks `checkCancellationRethrow` and
+`checkItemProjection`, `compileDebugKotlin`, `testDebugUnitTest`,
+`:app:lintDebug`, and `:app:testDebugScreenshotTestDefaultTestSuite`.
+- JVM unit and Robolectric tests under `app/src/test/java/com/makd/afinity/` use
+shared test utilities such as `testutil/FakeApiClient.kt` to test repositories,
+Room database migrations, Audiobookshelf download workers
+(`AbsMediaDownloadWorker`), and ViewModels, with JaCoCo configured to include
+Robolectric class execution.
+
+- Navigation defaults in NavigationPreferenceDefaults.kt (com.makd.afinity)
+enable the navigation drawer by default (DEFAULT_NAVIGATION_DRAWER_ENABLED =
+true) with individual library menu entries (DrawerLibrariesMode.EACH, preserving
+legacy libraries_in_drawer = true without individual_libraries_in_drawer as
+DrawerLibrariesMode.SCREEN).
+- The side_sheet_enabled preference defaults to true and opens side sheets in
+both landscape orientation and unfolded foldable postures.
+- Gradle verification runs ktfmtCheckMain (which also checks untracked Kotlin
+files under main source sets and is enforced by a git pre-push ktfmtCheck hook),
+ktfmtCheckTest, custom static checks (checkCancellationRethrow,
+checkItemProjection), testDebugUnitTest, lintDebug, and
+testDebugScreenshotTestDefaultTestSuite.
+
+- AppModalNavigationDrawer wraps Material 3 ModalWideNavigationRail and hosts
+AppNavigationDrawerContent inside the header slot (with zeroed
+expandedHeaderTopPadding, contentPadding, and windowInsets, plus
+statusBarsPadding() on the inner header) so the drawer renders full-bleed
+without a 20.dp trailing seam.
+- Visual UI components and UX fixes should expose stateless composable overloads
+decoupled from Hilt ViewModels and include @ScreenshotWindowPreviews coverage in
+app/src/screenshotTest, updating reference PNGs via
+:app:updateDebugScreenshotTestDefaultTestSuite and verifying with
+:app:testDebugScreenshotTestDefaultTestSuite.
+
+- In unfolded/expanded layouts, the pinned floating navigation drawer
+(`PinnedNavigationDrawer.kt`, `shouldHidePinnedDrawerForRoute`) stays visible
+across authenticated sub-screens (movie/TV/season/person details, search,
+settings) and hides only on pre-auth/onboarding and full-screen
+player/reader/viewer routes.
+- Pinned drawer clearance (`272.dp` via `LocalPinnedDrawerStartInset` and
+`LocalPinnedDrawerWindowInset`) is applied automatically by `AfinityScreen`
+(`insetContentForPinnedDrawer = true`) and `pinnedDrawerComposable`; screens
+with full-bleed horizontal carousels opt out
+(`insetContentForPinnedDrawer = false`) and use `LocalDetailEdgePadding` or
+`PortraitDetailLayout(edgeToEdgeItems = true)` (`StartInsetLazyListScope`) so
+rows scroll edge-to-edge without double-padding non-bleed items.
+- Movie, TV show, and season detail sub-screens use edge-to-edge horizontal
+scrolling rows and a blurred top app bar consistent with the home screen.
+- The full Gradle verification suite consists of `ktfmtCheck`,
+`checkCancellationRethrow`, `checkItemProjection`, `compileDebugKotlin`,
+`testDebugUnitTest`, `:app:lintDebug`, and
+`:app:testDebugScreenshotTestDefaultTestSuite`.
+
+- When navigation drawer mode is enabled on unfolded foldables and tablets
+(`windowWidth >= 600.dp && windowHeight >=
+500.dp` via `shouldPinNavigationDrawer`), `AppPinnedNavigationDrawer` pins a `240.dp`-wide floating card inset `16.dp` from start/top/bottom safe insets with `24.dp
+` rounded corners and a semi-transparent backdrop blur (`PinnedDrawerBlur.kt`).
+- `LocalPinnedDrawerStartInset` (`256.dp` when pinned, `0.dp` otherwise) is
+added to horizontal row `contentPadding` (including `CardRow` and
+`DiscoverSection`) so carousels start to the right of the drawer at rest while
+scrolling behind the blurred card into the outer `16.dp` margins.
+- Full verification for UI changes runs `ktfmtCheck`, `:app:lintDebug`,
+Robolectric/unit tests, and `:app:testDebugScreenshotTestDefaultTestSuite`.
+
+- Build artifacts (`base.archivesName`) and R8 mapping archives
+(`archive<Variant>Mapping`) in `app/build.gradle.kts` use the
+`jellyfin-client-v<versionName>` prefix instead of the legacy `afinity-` prefix.
+- Because `app/build.gradle.kts` toggles `splits.abi` globally via
+`isBundleBuild` whenever a `bundle*` task is present in the Gradle invocation,
+`:app:bundleNightly` (and other `bundle*` tasks) must be run in a separate
+`./gradlew` invocation from `:app:assembleDebug`, lint, and test tasks.
+
+- Application ID is xyz.klinker.jellyfin (Kotlin base package com.makd.afinity);
+pushing to origin master triggers Jenkins to build the nightly APK.
+- Nightly builds enable <profileable android:enabled="true" android:shell="true"
+/> via app/src/nightly/AndroidManifest.xml, wire
+androidx.compose.runtime:runtime-tracing strictly under nightlyImplementation,
+and gate custom PerfTrace helpers (PerfTrace.kt) on BuildConfig.IS_NIGHTLY
+alongside ReportDrawnWhen/ReportDrawnAfter markers (StartupDrawReporting.kt).
+- Compose compiler stability and skippability reports are generated with
+-PcomposeMetrics=true alongside app/compose_compiler_config.conf.
+- Standard Gradle verification runs ktfmtFormat/ktfmtCheck, custom tasks
+checkCancellationRethrow and checkItemProjection, compileDebugKotlin,
+testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite.
+
+- TopAppBar progressive blur (Modifier.topBarBlurBackdrop in
+TopBarProgressiveBlur.kt) extends 16.dp (DefaultTopBarBlurBottomExtension) below
+the bar height in draw/clip space without altering TopAppBar layout height or
+touch targets; visual top-bar updates require regenerating reference screenshots
+via :app:updateDebugScreenshotTestDefaultTestSuite.
+- Project verification runs ktfmtCheck (:app:ktfmtCheckMain),
+checkCancellationRethrow, checkItemProjection, lintDebug, testDebugUnitTest, and
+:app:testDebugScreenshotTestDefaultTestSuite; because the local pre-push hook
+runs ktfmtCheck across untracked workspace files, isolated commits from a dirty
+workspace should be pushed from a temporary clean detached git worktree.
+
+- Maintains a fork synced with upstream/master, enforcing Slack Compose lint
+rules (such as ComposeModifierMissing and ComposeParameterOrder) via
+app/lint-baseline.xml (refreshed with ./gradlew :app:updateLintBaselineDebug)
+and storing screenshot test reference PNGs under
+app/src/screenshotTestDefaultDebug/reference/.
+
+- Home screen horizontal rows (CardRow, MusicVideoCardRow, MediaRowSkeleton)
+must scroll edge-to-edge: keep outer section Columns unpadded horizontally,
+apply Modifier.padding(horizontal = CardDimensions.RowGutter) to
+HomeSectionHeader, and pass contentPadding = CardDimensions.RowContentPadding
+(16.dp) to the LazyRow.
+- Full Gradle verification suite runs ktfmtCheck, checkCancellationRethrow,
+checkItemProjection, compileDebugKotlin, testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite (requiring reference image updates
+when UI layouts intentionally change).
+
+- HomeScreen uses a scroll-driven progressive gradient backdrop blur (0.dp
+bottom to 20.dp top) paired with a 0.25f vertical surface scrim behind
+AfinityTopAppBar via Modifier.topBarBlurSource and Modifier.topBarBlurBackdrop
+(TopBarProgressiveBlur.kt), replacing the previous opaque top bar cut.
+- rememberTopBarScrollProgress (TopBarScrollProgress.kt) maps Home LazyListState
+scroll position to a 0f..1f ramp over 450.dp when the hero carousel is present
+(clamped to hero height on shorter viewports) or 64.dp when the hero is hidden
+or offline.
