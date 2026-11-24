@@ -2,7 +2,7 @@
 topic: android-gradle-plugin
 category: knowledge
 tags: [knowledge, android-gradle-plugin]
-updated_at: 2026-11-23T07:09:50.273375+00:00
+updated_at: 2026-11-24T07:14:48.248992+00:00
 confidence: 0.95
 ---
 
@@ -62,3 +62,9 @@ invocations.
 - Run ./gradlew :app:updateLintBaselineDebug (updateLintBaseline<Variant>) to
 regenerate lint-baseline.xml in place, baselining newly introduced lint issues
 while automatically pruning resolved or stale entries.
+
+- Interrupted or canceled Android unit test tasks (such as testDebugUnitTest)
+can leave corrupted binary test-result files under
+build/test-results/<variant>/binary that crash subsequent runs with
+java.io.EOFException; run cleanTest<Variant>UnitTest to reset the binary result
+store.

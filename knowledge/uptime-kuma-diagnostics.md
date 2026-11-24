@@ -2,7 +2,7 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics, uptime-kuma, komodo, pi-studio]
-updated_at: 2026-11-12T07:02:55.477551+00:00
+updated_at: 2026-11-24T07:13:49.120085+00:00
 compacted_at: 2026-10-30T14:35:00+00:00
 confidence: 0.95
 ---
@@ -60,3 +60,13 @@ simultaneously restart Docker containers across `unraid-nas` (including
 `unraid-seedbox`, causing transient `ECONNREFUSED` alerts on Uptime Kuma
 monitors (`Seedbox Notifications`, `NAS Notifications`, `qui`, `Cabin`,
 `Upload Assistant`) that automatically self-recover within a couple of minutes.
+
+- Simultaneous `timeout of 48000ms exceeded` alerts across
+`.klinker-cabin.computer` monitors (while containers and local ingress remain
+healthy) can be caused by CrowdSec on `unraid-nas` banning the Boulder home WAN
+IP (`pi-studio`) and `cs-unifi-bouncer` adding it to the Cabin UniFi firewall
+drop group—for example, when `crowdsecurity/http-probing` triggers on bursts of
+`404` responses such as missing `GET /Audio/<uuid>/Lyrics` requests from
+Jellyfin clients; clear false-positive bans on `unraid-nas` with `docker exec
+crowdsec cscli decisions delete --ip
+<ip>` and verify removal in `cs-unifi-bouncer ` logs.

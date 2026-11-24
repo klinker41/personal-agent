@@ -30,6 +30,13 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Qbittorrent-Pia-Wireguard](file:///workspace/personal-agent/knowledge/qbittorrent-pia-wireguard.md)
+- [Jellyfin-Session-Reporting](file:///workspace/personal-agent/knowledge/jellyfin-session-reporting.md)
+- [Jetpack-Datastore-Caching](file:///workspace/personal-agent/knowledge/jetpack-datastore-caching.md)
+- [Android-Tv-Compatibility](file:///workspace/personal-agent/knowledge/android-tv-compatibility.md)
+- [Kotlin-Flow-Testing](file:///workspace/personal-agent/knowledge/kotlin-flow-testing.md)
+- [Compose-Focus-Navigation](file:///workspace/personal-agent/knowledge/compose-focus-navigation.md)
+- [Exoplayer-Playback-Lifecycle](file:///workspace/personal-agent/knowledge/exoplayer-playback-lifecycle.md)
 - [Compose-Progressive-Blur](file:///workspace/personal-agent/knowledge/compose-progressive-blur.md)
 - [Unraid-Docker-Storage](file:///workspace/personal-agent/knowledge/unraid-docker-storage.md)
 - [Android-Perfetto-Profiling](file:///workspace/personal-agent/knowledge/android-perfetto-profiling.md)

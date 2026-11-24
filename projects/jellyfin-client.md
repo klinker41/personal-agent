@@ -2,7 +2,7 @@
 topic: jellyfin-client
 category: project
 tags: [project, jellyfin-client]
-updated_at: 2026-11-23T07:12:51.406573+00:00
+updated_at: 2026-11-24T07:19:46.463091+00:00
 confidence: 0.95
 ---
 
@@ -329,3 +329,202 @@ AfinityTopAppBar via Modifier.topBarBlurSource and Modifier.topBarBlurBackdrop
 scroll position to a 0f..1f ramp over 450.dp when the hero carousel is present
 (clamped to hero height on shorter viewports) or 64.dp when the hero is hidden
 or offline.
+
+- Audio and podcast playback is coordinated across AudioMiniPlayerOverlay,
+MusicPlaybackManager, AudioService, and PodcastProgressTracker;
+resolvePodcastProgress treats positions below 10,000 ms as 0 ticks (clearing
+episode resume progress), so stop(), pauseForCast(), and track transitions must
+capture and report the outgoing playback position before clearMediaItems()
+resets state to 0L.
+
+- In TV mode (`LocalIsTelevision.current`), `shouldPinNavigationDrawer` in
+`PinnedNavigationDrawer.kt` returns `false` so the navigation drawer starts
+collapsed (accessible via the top-left menu button and
+`AppModalNavigationDrawer`) while keeping `HeroCarousel` enabled without
+modifying upstream `MainNavigation.kt`.
+- TV mode defaults initial screen focus to the `HeroCarousel` Play button across
+all four hero layouts (`HeroContentRich`, `HeroContentCentered`,
+`HeroPeekContentRich`, and `HeroPeekContentCentered`) via
+`rememberHeroPlayFocusRequester` guarded by `rememberSaveable`, and uses
+`focusOutline` across media and detail cards for D-pad focus highlights.
+- Full Gradle verification runs `ktfmtCheck`, `checkCancellationRethrow`,
+`checkItemProjection`, `compileDebugKotlin`, `testDebugUnitTest`,
+`:app:lintDebug`, and `:app:testDebugScreenshotTestDefaultTestSuite`.
+
+- Podcast album pages reuse MusicAlbumScreen and MusicAlbumViewModel, using
+PodcastProgressTracker.isPodcastAlbum(albumId) (with offline/legacy cache
+fallbacks) to expose MusicAlbumUiState.isPodcast and route episode clicks to
+PodcastEpisodeDetailScreen via Destination.createPodcastEpisodeDetailRoute
+instead of starting immediate playback.
+- Full Gradle verification suite runs ktfmtCheck (ktfmtFormat to format), custom
+checks checkCancellationRethrow and checkItemProjection, compileDebugKotlin,
+testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite
+(:app:updateDebugScreenshotTestDefaultTestSuite to update reference
+screenshots).
+
+- Offline auto-download (com.makd.afinity.data.autodownload) combines a 4-hour
+periodic WorkManager sync (AutoDownloadScheduler / AutoDownloadWorker),
+15-minute throttled foreground syncs in AutoDownloadManager (cold launch, server
+reconnect, exiting Offline Mode, and session or library preference changes), and
+immediate syncs on Jellyfin WebSocket mediaChangeManager.itemsAdded events
+(debounced by 2s and bypassing the 15-minute throttle via
+scheduler.triggerSyncNow(wifiOnly, replace = true) when online, authenticated,
+permitted by canDownload, and auto-download libraries are enabled).
+- Gradle verification suite includes ktfmtFormat/ktfmtCheck, custom static
+checks checkCancellationRethrow and checkItemProjection, compileDebugKotlin,
+testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite.
+
+- Product goal is to eventually replace Symphonium as a unified Android client
+for both video and audio content (music, audiobooks, and podcasts).
+- Continue Listening (JellyfinMediaRepository, PodcastHomeHelpers,
+PodcastHomeSections) merges and deduplicates in-progress AudioBook and podcast
+Audio items sorted by lastPlayedDate, querying Items with Filters=IsResumable
+instead of /Items/Resume so libraries hidden by LatestItemsExcludes are still
+included.
+- Latest Podcasts is a configurable HomeRow backed by AppDataRepository that
+caches and displays unplayed episodes from podcast libraries, preferring
+episode-embedded artwork over podcast-wide show artwork when available.
+- Podcast playback progress is tracked and synced via PodcastProgressTracker and
+MusicProgressReporter.
+- Full Gradle verification pipeline includes ktfmtCheck,
+checkCancellationRethrow, checkItemProjection, compileDebugKotlin,
+testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite.
+
+- Supports Android TV and D-pad/keyboard navigation directly on the shared
+`MainActivity` and `PlayerActivity` architecture (`LEANBACK_LAUNCHER`,
+`Context.isTelevision()` / `LocalIsTelevision`, pure-Compose focus
+rings/outlines, and `PlayerRemoteKeyHandler`) rather than a separate TV
+activity, preserving compatibility with future Kotlin Multiplatform and web
+keyboard navigation goals.
+- Uses `minSdk = 34` (lowered from 35 for Android TV device compatibility) with
+API 35 features such as `PdfRenderer` text extraction in `BookPages.kt` guarded
+by SDK version checks.
+
+- Publishes signed release bundles (`:app:bundleRelease`) for application ID
+`xyz.klinker.jellyfin` to the Google Play `alpha` track via
+`fastlane android publish_release`, using `PLAY_RELEASE_STATUS` (`completed` by
+default, or `draft` while in Play Console Draft state).
+- Jenkins job (`/mnt/user/docker/jenkins/home/jobs/jellyfin-client/config.xml`
+on `unraid-nas`) binds `PLAY_SERVICE_ACCOUNT_JSON`
+(`google-play-service-account` in GCP project `562752253464`) and
+`ANDROID_KEYSTORE_*` credentials to run `fastlane android publish_release`,
+falling back to `./gradlew bundleRelease`.
+
+- LibraryPlaybackSpeedStore persists playback speeds (0.5x–3.0x, defaulting to
+1.0x) in DataStore per library using keys playback_speed_abs_<libraryId>
+(falling back to mediaType) for Audiobookshelf and playback_speed_jf_<libraryId>
+for Jellyfin audiobook and podcast libraries, while caching item-to-library
+mappings for offline playback.
+- Jellyfin podcast playback speed resolution uses
+PodcastProgressTracker.resolvePodcastTrack() and persisted albumId-to-libraryId
+mappings in AutoDownloadPreferences so multiple podcast libraries maintain
+independent speeds online and offline without affecting regular music playback.
+- AudioService.playResolved() re-applies persisted library playback speed after
+ensurePlayerInitialized() so speeds survive player tearDown(), and
+MusicCastRemote gates the Cast lyrics overlay with !playbackState.isPodcast.
+
+- Auto-download architecture (com.makd.afinity.data.autodownload and
+AutoDownloadWorker): AutoDownloadManager, AutoDownloadPolicy,
+AutoDownloadPreferences, AutoDownloadScheduler, and PlayedItemEventBus manage
+per-(serverId, userId) library auto-downloads for unplayed and in-progress items
+with a 6-hour retry cooldown on failed downloads.
+- Auto-download scoping and playback cleanup: Tracks per-library auto-managed
+item IDs separately so manual downloads remain untouched, caches podcast album
+IDs for offline podcast tracking (mapping Music libraries for podcasts/music and
+Books libraries for audiobooks), and automatically deletes auto-managed
+downloads upon playback completion via PlayedItemEventBus hooks in
+PodcastProgressTracker and JellyfinAudiobookReporter.
+- Gradle verification suite runs ktfmtCheck (formatted via ktfmtFormat), custom
+checks checkCancellationRethrow and checkItemProjection, compileDebugKotlin,
+testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite.
+
+- Home screen Latest Audiobooks and Latest Podcasts shelves sort items
+newest-first via sortedByRecency() in PodcastHomeHelpers.kt (using premiereDate
+and dateCreated on AfinityTrack and AfinityAudiobook) inside AppDataRepository
+(applyBookShelves, applyPodcastShelves, and refreshPlaybackSections).
+- Selecting a podcast episode on the home screen navigates to
+PodcastEpisodeDetailScreen (PodcastEpisodeDetailViewModel) instead of starting
+playback immediately, using ItemStore.project with offline DB fallback and
+exposing watched, favorite, and download controls.
+
+- Podcast episodes (stored as Jellyfin Audio items) bypass SessionApi playback
+start/progress/stop calls in MusicProgressReporter and CastManager; instead,
+PodcastProgressTracker syncs resume state via UserDataApi using
+syncPeriodicIfDue and an allowCompletion flag so periodic syncs and pauses near
+the end of an episode do not mark it played prematurely.
+- WebSocket UserDataChanged events directly drive Continue Listening and Latest
+Podcasts visibility in HomeViewModel as well as played-item download deletion
+(isMarkedPlayedEvent) in AutoDownloadManager, so podcast and audiobook progress
+reporting in PlaybackRepository and JellyfinPlaybackRepository must avoid
+emitting transient Played = true or zeroed PlaybackPositionTicks states during
+active playback and pause.
+
+- Uses a flat, zero-shadow UI design across dark and light themes: card
+elevation shadows and the AppPinnedNavigationDrawer drop shadow are removed
+outright without replacement borders/outlines for visual consistency and to
+eliminate ShadowCircularRRectOp GPU overhead.
+- PinnedDrawerBlur renders on a 0.25x downscaled layer, and
+TopBarProgressiveBlur uses a single-pass 0.25x 20dp blur masked with a
+smoothstep vertical alpha gradient (holding 1.0 alpha across the top 55% and
+feathering to 0.0 at 100%) over full-res content, locking unfolded 2076x2152
+scrolling at 120Hz with zero jank.
+- HeroCarousel and PortraitDetailLayout avoid offscreen alpha = 0.99f +
+BlendMode.DstIn saveLayers, HeroTone decodes downsampled 160x90 bitmaps, and
+UserImageStore downsamples and caches user avatars as 256px JPEGs using unique
+temp files.
+- SessionManager uses optimistic startup session restoration (skipping initial
+refreshUserPolicy) with asynchronous server address validation on sessionScope,
+refreshing user policy once after validation and persisting updated credentials
+when a server URL switches.
+- CastManager offloads Dagger instantiation and Google Play Services
+availability checks onto Dispatchers.IO before switching to
+Dispatchers.Main.immediate for CastContext.getSharedInstance, which enforces
+main-thread invocation.
+- The repository's git pre-push hook runs ktfmtCheckMain across the workspace
+and blocks pushes if unrelated untracked WIP Kotlin files are unformatted.
+
+- PlayerViewModel handles container and decode PlaybackExceptions (such as
+ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) via retryWithTranscodeFallback(),
+setting forceTranscodeFallback = true and reloading media with enableDirectPlay
+= false.
+- Full Gradle verification suite runs ktfmtCheck, static checks,
+compileDebugKotlin, testDebugUnitTest, :app:lintDebug, and
+:app:testDebugScreenshotTestDefaultTestSuite.
+
+- App (`com.makd.afinity`) retains
+`android.permission.CHANGE_WIFI_MULTICAST_STATE` for mDNS discovery in
+`LocalServiceDiscovery.kt` (which guards `WifiManager` access) while explicitly
+setting `<uses-feature android:name="android.hardware.wifi"
+android:required="false" />`, guarded by `AppManifestFeaturesRobolectricTest `.
+- Full Gradle verification pipeline runs `./gradlew ktfmtCheck
+checkCancellationRethrow checkItemProjection compileDebugKotlin
+testDebugUnitTest :app:lintDebug :app:testDebugScreenshotTestDefaultTestSuite
+:app:assembleDebug`.
+
+- Play Store package `xyz.klinker.jellyfin` is published from Jenkins via
+`fastlane android publish_release`, which builds `:app:bundleRelease`, uses
+`app.versionName` from `gradle.properties` unmodified, and computes version
+codes as `app.versionCode * 10000 + BUILD_NUMBER` (staying above existing Play
+track version codes).
+- Fastlane `publish_release` reads comma-separated `PLAY_TRACKS` (defaulting to
+`internal,alpha` via `PlayReleaseHelper.parse_tracks`, replacing `PLAY_TRACK`),
+uploading the `.aab` to the first track and promoting the release to remaining
+tracks with status controlled by `PLAY_RELEASE_STATUS` (default `completed`, or
+`draft` before initial Play review approval).
+- Foreground service declarations: `FOREGROUND_SERVICE_MEDIA_PLAYBACK` is used
+by Media3 `AudioService` for background Jellyfin and Audiobookshelf audio
+playback, and `FOREGROUND_SERVICE_DATA_SYNC` is used by WorkManager workers
+`MediaDownloadWorker` and `AbsMediaDownloadWorker` for user-initiated offline
+media downloads.
+
+- PlayerViewModel (ui/player/PlayerViewModel.kt) handles playback source
+resolution across local offline files, DirectPlay, and automatic Transcode
+fallback (retryWithTranscodeFallback / forceTranscodeFallback on decode errors),
+using atomic StateFlow.update mutations for _uiState across Main and
+Dispatchers.IO coroutines.
+- Repository enforces ktfmtCheck via a Git pre-push hook and runs CI unit test
+builds on Jenkins via unraid-server-android-agent on unraid-nas (192.168.1.95).

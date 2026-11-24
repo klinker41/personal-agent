@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-23T07:12:05.752967+00:00
+updated_at: 2026-11-24T07:20:48.617831+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -262,3 +262,15 @@ bind-mounts `/mnt/user/build/jenkins/{gradle,work,m2}` (owned by `1000:1000`) to
 `/mnt/user/build/antigravity/{gradle,m2}` to `/home/developer/{.gradle,.m2}`
 with `GRADLE_USER_HOME=/home/developer/.gradle`, and `filebrowser-quantum`
 mounts `/mnt/user/build` at `/srv/build`.
+
+- `unraid-nas` runs `crowdsec` paired with `cs-unifi-bouncer`, which enforces
+ban decisions at the Cabin network edge by adding offending IPs to a UniFi
+firewall drop group.
+- `qui` runs as a Docker container on `unraid-seedbox` and is exposed via
+`https://qui.klinker-cabin.computer`.
+
+- On `unraid-seedbox` (`192.168.1.46`), the `torrent` stack runs `qbittorrent`
+(`binhex/arch-qbittorrentvpn`, WebUI port `8081` behind
+`https://qbittorrent.klinker-cabin.computer`) alongside `qui`, using
+`/mnt/user/docker/qbittorrent/config/wireguard/wg0.conf` with
+`STRICT_PORT_FORWARD=yes` and PIA endpoint `netherlands.pvt.site:1337`.

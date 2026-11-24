@@ -2,7 +2,7 @@
 topic: jellyfin-api-v12
 category: knowledge
 tags: [knowledge, jellyfin-api-v12]
-updated_at: 2026-10-19T06:03:44.599227+00:00
+updated_at: 2026-11-24T07:10:17.990056+00:00
 confidence: 0.95
 ---
 
@@ -32,3 +32,16 @@ buffer data (`format: binary`) in the request body rather than base64 strings.
 
 - In Jellyfin audio item metadata, disc numbers map to 'ParentIndexNumber' and
 track numbers map to 'IndexNumber'.
+
+- Jellyfin's /Items/Resume endpoint filters out libraries listed in the user's
+LatestItemsExcludes preference (commonly excluding Audiobooks and Podcasts);
+query /Items directly with Recursive=true and Filters=IsResumable (plus
+IncludeItemTypes such as AudioBook or Audio) to reliably fetch resumable items
+from excluded libraries.
+
+- Jellyfin persists per-user podcast episode playback state (Played, PlayCount,
+LastPlayedDate, PlaybackPositionTicks) on Audio items in server-side UserData,
+and marking a parent podcast album watched marks its child episodes played.
+- Querying unplayed podcast episodes with isPlayed = false skips played recent
+episodes and falls back to older unplayed backlog episodes from earlier in the
+feed unless historical episodes are marked played.
