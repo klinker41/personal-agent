@@ -2,7 +2,7 @@
 topic: exoplayer-playback-lifecycle
 category: knowledge
 tags: [knowledge, exoplayer-playback-lifecycle]
-updated_at: 2026-11-24T07:19:46.467441+00:00
+updated_at: 2026-11-25T07:05:06.264695+00:00
 confidence: 0.95
 ---
 
@@ -41,3 +41,13 @@ segment loading) alongside main-thread player callbacks, always mutate
 MutableStateFlow with atomic .update { ... } rather than non-atomic
 read-modify-write assignments (_uiState.value = _uiState.value.copy(...)) to
 prevent lost-update races.
+
+- In AndroidX Media3, AudioFocusManager.willPauseWhenDucked() returns true for
+C.AUDIO_CONTENT_TYPE_SPEECH, causing ExoPlayer to configure
+setWillPauseWhenDucked(true) and pause instead of ducking on
+AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK; use C.AUDIO_CONTENT_TYPE_MUSIC or
+C.AUDIO_CONTENT_TYPE_MOVIE when ducking is desired.
+- Media3's AudioFocusManager.setAudioAttributes() does not rebuild a cached
+AudioFocusRequest when only content type changes, so switching an active player
+from AUDIO_CONTENT_TYPE_SPEECH to AUDIO_CONTENT_TYPE_MUSIC retains
+willPauseWhenDucked = true.

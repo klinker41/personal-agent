@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-24T07:20:48.617831+00:00
+updated_at: 2026-11-25T07:13:13.163035+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -274,3 +274,16 @@ firewall drop group.
 `https://qbittorrent.klinker-cabin.computer`) alongside `qui`, using
 `/mnt/user/docker/qbittorrent/config/wireguard/wg0.conf` with
 `STRICT_PORT_FORWARD=yes` and PIA endpoint `netherlands.pvt.site:1337`.
+
+- CrowdSec on unraid-nas (/mnt/user/docker/crowdsec/config) pairs with
+cs-unifi-bouncer to push active ban decisions into a UniFi firewall block group
+protecting .klinker-cabin.computer ingress.
+- A local CrowdSec s02-enrich parser (homelab/immich-whitelist at
+/mnt/user/docker/crowdsec/config/parsers/s02-enrich/immich-whitelist.yaml on
+unraid-nas) whitelists GET 404 responses on photos.klinker-cabin.computer
+matching (?i)^/api/assets/[a-f0-9-]+/thumbnail([?]|$).
+
+- CrowdSec runs on `unraid-nas` alongside `cs-unifi-bouncer`, which syncs active
+ban decisions to the Cabin UniFi firewall block group and drops inbound WAN
+traffic across all `.klinker-cabin.computer` services (including containers
+hosted on `unraid-seedbox`).

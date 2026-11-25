@@ -2,7 +2,7 @@
 topic: compose-focus-navigation
 category: knowledge
 tags: [knowledge, compose-focus-navigation]
-updated_at: 2026-11-24T07:05:57.321753+00:00
+updated_at: 2026-11-25T07:14:19.659585+00:00
 confidence: 0.95
 ---
 
@@ -27,3 +27,26 @@ to seek from a hidden HUD continues seeking across key repeats rather than
 switching mid-hold to focus traversal; pass `Ctrl`, `Left Alt`, and `Meta`
 modifier chords through to `super.dispatchKeyEvent` before custom remote
 handling.
+
+- When attaching an initial FocusRequester to a Compose row that uses
+focusRestorer(), place focusRequester() immediately before focusRestorer() in
+the modifier chain.
+- Default bring-into-view behavior inside a LazyColumn only scrolls far enough
+to reveal a focused child button inside a top hero banner; explicitly scroll the
+LazyColumn to (0, 0) on hero focus so the full banner image is visible.
+- When replacing focus outlines with a custom scale-up FocusIndication in
+Compose, use TraversableNode to prevent nested focusable components from
+compounding scale transforms, and adjust modifier clip ordering and card spacing
+so scaled items are not clipped.
+
+- In Jetpack Compose, opening a dialog from
+`combinedClickable(onLongClick = ...)` while a D-pad or keyboard activation key
+(`DirectionCenter`, `Enter`, `NumPadEnter`, `Spacebar`) is still held down
+causes `AbstractClickableNode` on the newly focused dialog button to accept
+repeated `KeyDown` events (`repeatCount > 0`) and immediately fire `onClick` on
+`KeyUp` when the user releases the key.
+- To prevent a held long-press key from accidentally clicking the initially
+focused button in a newly opened Compose dialog, attach
+`Modifier.onPreviewKeyEvent` to the dialog to consume repeated activation
+`KeyDown` events (`repeatCount > 0`), track fresh `KeyDown` (`repeatCount == 0`)
+events per key, and consume unmatched `KeyUp` events.

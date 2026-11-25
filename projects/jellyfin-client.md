@@ -2,7 +2,7 @@
 topic: jellyfin-client
 category: project
 tags: [project, jellyfin-client]
-updated_at: 2026-11-24T07:19:46.463091+00:00
+updated_at: 2026-11-25T07:15:35.143924+00:00
 confidence: 0.95
 ---
 
@@ -528,3 +528,72 @@ using atomic StateFlow.update mutations for _uiState across Main and
 Dispatchers.IO coroutines.
 - Repository enforces ktfmtCheck via a Git pre-push hook and runs CI unit test
 builds on Jenkins via unraid-server-android-agent on unraid-nas (192.168.1.95).
+
+- In AudioService.kt, both ABS_AUDIO_ATTRIBUTES (audiobooks/podcasts) and
+MUSIC_AUDIO_ATTRIBUTES intentionally use C.AUDIO_CONTENT_TYPE_MUSIC (alongside
+MOVIE in PlayerViewModel and MUSIC in ThemeMusicPlayer) so media playback ducks
+rather than pauses on incoming notifications.
+
+- In TV mode (com.makd.afinity), HomeScreen directs initial focus to the first
+available content row below HeroCarousel via HomeTvFocus.kt and
+LocalCardRowInitialFocusRequester (prioritizing continue
+watching/reading/listening, then next up, then library rows while waiting for
+initial row loads) and scrolls the LazyColumn to (0, 0) when focus moves to
+HeroCarousel.
+- Detail screens (ItemDetailScreen.kt, DetailPrimaryButton.kt,
+PlaybackSelectionButton.kt) and playback side sheets immediately move focus to
+the primary Play button in TV mode, covered by TvFocusNavigationRobolectricTest.
+- Focused TV UI elements use an animated scale-up indication (FocusIndication.kt
+with TraversableNode handling for nested focusables, paired with
+CardDimensions.kt and clip ordering adjustments) instead of focus outlines.
+
+- Successful online playback syncs in `JellyfinPlaybackRepository` (non-music
+`reportPlaybackProgress` and `reportPlaybackStop`) and `PodcastProgressTracker`
+call `UserDataDao.updateSyncedPlaybackState` (`toBeSynced = 0`, preserving
+already-played state) so `UserDataSyncWorker` cannot overwrite newer server
+progress with stale offline `userdata` rows.
+- `JellyfinAudiobookLoader` and `PodcastEpisodeDetailViewModel` overlay unsynced
+local `userdata` (`toBeSynced = true`) onto online responses, and
+`MusicTrackEntity.toAfinityTrack` preserves local `playbackPositionTicks` and
+`played` state for downloaded podcasts.
+- `JellyfinAudiobookReporter` schedules `UserDataSyncScheduler` when progress or
+stop calls fail offline and retries `reportPlaybackStart` after offline starts
+or pauses >= 15 minutes.
+
+- Codebase is a single-module Android app (`:app`, package `com.makd.afinity`,
+~250k LOC across ~1,070 Kotlin files) forked from `MakD/AFinity`, where major
+multi-module or Kotlin Multiplatform restructures permanently break upstream
+mergeability.
+- Kotlin Multiplatform adoption is blocked across layers by heavy coupling to
+Android `R.*` resources, Hilt (`@HiltViewModel`), `Timber`, and
+`android.content.Context`, while pervasive `java.*` usage (`UUID`, `java.time`,
+`java.io`, `java.net`) can be retained on JVM Desktop (Linux) but requires a
+data-layer rewrite (`kotlin.uuid`, `kotlinx-datetime`, Okio) for Web (Wasm/JS).
+
+- TV launcher UI components in `com.makd.afinity.tvlauncher.ui` (such as
+`TvAppsRowSection.kt` and `TvAppActionsDialog`) use `LocalIsTelevision` and
+`rememberTvInitialFocusRequester` for TV D-pad focus management, which must be
+provided alongside `InputMode.Keyboard` in Robolectric TV UI tests
+(`TvLauncherUiRobolectricTest`).
+- The full Gradle verification suite runs `ktfmtCheck`,
+`checkCancellationRethrow`, `checkItemProjection`, `compileDebugKotlin`,
+`testDebugUnitTest`, `:app:lintDebug`, and
+`:app:testDebugScreenshotTestDefaultTestSuite`.
+
+- Optional TV launcher mode is isolated under
+`app/src/main/java/com/makd/afinity/tvlauncher/` (`TvLauncherManager`,
+`TvLauncherStatus`, `TvInstalledAppsRepository`, `TvAppArtworkCache`,
+`TvLauncherViewModel`, and `ui/` composables) backed by a disabled-by-default
+`.TvLauncherAlias` `<activity-alias>` in `AndroidManifest.xml` and lazy
+`TvLauncherManager` injection on non-TV devices.
+- When TV launcher mode is active, TV Settings shows the `adb` command to set
+the default home activity, the Home screen adds an installed apps row (excluding
+`com.makd.afinity` and evicting `TvAppArtworkCache` entries on `LauncherApps`
+callbacks), login/unauthenticated screens render `TvLauncherFallbackPanel`
+(respecting `LocalPinnedDrawerStartInset`), and `TvLauncherManager.disableAlias`
+blocks turning off the alias if no other enabled `CATEGORY_HOME` launcher
+exists.
+- Full Gradle verification runs `ktfmtCheck`, `checkCancellationRethrow`,
+`checkItemProjection`, `compileDebugKotlin`, `testDebugUnitTest` (using
+`@RunWith(RobolectricTestRunner::class)` for `PackageManager` and Compose UI
+tests), `:app:lintDebug`, and `:app:testDebugScreenshotTestDefaultTestSuite`.

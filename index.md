@@ -30,6 +30,7 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Crowdsec-Parser-Whitelists](file:///workspace/personal-agent/knowledge/crowdsec-parser-whitelists.md)
 - [Qbittorrent-Pia-Wireguard](file:///workspace/personal-agent/knowledge/qbittorrent-pia-wireguard.md)
 - [Jellyfin-Session-Reporting](file:///workspace/personal-agent/knowledge/jellyfin-session-reporting.md)
 - [Jetpack-Datastore-Caching](file:///workspace/personal-agent/knowledge/jetpack-datastore-caching.md)

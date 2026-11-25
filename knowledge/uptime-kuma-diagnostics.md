@@ -2,7 +2,7 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics, uptime-kuma, komodo, pi-studio]
-updated_at: 2026-11-24T07:13:49.120085+00:00
+updated_at: 2026-11-25T07:16:48.638010+00:00
 compacted_at: 2026-10-30T14:35:00+00:00
 confidence: 0.95
 ---
@@ -70,3 +70,19 @@ drop group—for example, when `crowdsecurity/http-probing` triggers on bursts o
 Jellyfin clients; clear false-positive bans on `unraid-nas` with `docker exec
 crowdsec cscli decisions delete --ip
 <ip>` and verify removal in `cs-unifi-bouncer ` logs.
+
+- Simultaneous 48,000ms probe timeouts across .klinker-cabin.computer monitors
+in Uptime Kuma while local Cabin containers remain healthy can indicate CrowdSec
+on unraid-nas banned the Boulder WAN IP (pi-studio) via cs-unifi-bouncer; check
+cscli decisions list on unraid-nas.
+
+- Simultaneous 48,000ms Uptime Kuma probe timeouts across
+`.klinker-cabin.computer` monitors while local containers remain healthy can
+indicate CrowdSec on `unraid-nas` banned Boulder's public WAN IP via
+`cs-unifi-bouncer`; clear false-positive bans with `docker exec crowdsec cscli
+decisions delete --ip <ip>`.
+
+- Simultaneous 48000ms timeout alerts from uptime.klinker.computer across Cabin
+monitors (*.klinker-cabin.computer) can be caused by CrowdSec (cs-unifi-bouncer)
+banning the Home WAN IP shared by Uptime Kuma and user devices; verify active
+bans with cscli decisions list.
