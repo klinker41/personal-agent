@@ -2,7 +2,7 @@
 topic: exoplayer-playback-lifecycle
 category: knowledge
 tags: [knowledge, exoplayer-playback-lifecycle]
-updated_at: 2026-11-25T07:05:06.264695+00:00
+updated_at: 2026-11-26T07:02:35.168072+00:00
 confidence: 0.95
 ---
 
@@ -51,3 +51,8 @@ C.AUDIO_CONTENT_TYPE_MOVIE when ducking is desired.
 AudioFocusRequest when only content type changes, so switching an active player
 from AUDIO_CONTENT_TYPE_SPEECH to AUDIO_CONTENT_TYPE_MUSIC retains
 willPauseWhenDucked = true.
+
+- Relative seeks (such as 10s rewind/forward) briefly transition ExoPlayer into
+`STATE_BUFFERING`; derive center playback control visibility declaratively from
+overall controls visibility (`showControls && !isControlsLocked`) rather than
+imperatively clearing button visibility on `STATE_BUFFERING`.

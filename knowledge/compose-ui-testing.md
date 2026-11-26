@@ -2,43 +2,54 @@
 topic: compose-ui-testing
 category: knowledge
 tags: [knowledge, compose-ui-testing]
-updated_at: 2026-11-24T07:02:38.980501+00:00
+updated_at: 2026-11-26T07:47:28.840738+00:00
+compacted_at: 2026-11-26T07:47:28.840738+00:00
 confidence: 0.95
 ---
 
-# Knowledge: Compose-Ui-Testing
+# Compose UI Testing
 
-- Android Compose Preview Screenshot Testing records reference images via
-`:app:updateDebugScreenshotTestDefaultTestSuite` and validates them via
-`:app:testDebugScreenshotTestDefaultTestSuite`.
-- In Compose screenshot previews using Coil, provide a
-`LocalAsyncImagePreviewHandler` returning results with `DataSource.MEMORY_CACHE`
-to bypass crossfade animations and avoid non-deterministic renders.
-- In Robolectric Compose UI tests containing indeterminate animations such as
-`CircularProgressIndicator`, pause the test clock
-(`composeTestRule.mainClock.autoAdvance = false`) and flush frames explicitly
-(`waitForIdle()`, `advanceTimeByFrame()`, `waitForIdle()`) so synchronization
-does not hang.
-- In Compose Robolectric tests, resolve Android string resources via
-`ApplicationProvider.getApplicationContext<Application>()` rather than
-`LocalContext` resource calls to satisfy Android Lint's
-`LocalContextGetResourceValueCall` check.
+## Preview Screenshot Testing
 
-- Annotate Robolectric pixel-inspection tests with
-@GraphicsMode(GraphicsMode.Mode.NATIVE) so Canvas(bitmap) actually rasterizes
-pixels; legacy ShadowCanvas returns 0 for Bitmap.getPixel().
+- Record AGP Compose preview reference PNGs with
+  `:app:updateDebugScreenshotTestDefaultTestSuite` and verify against them
+  with `:app:testDebugScreenshotTestDefaultTestSuite`.
+- Screenshot previews render `GraphicsLayer` and chained `RenderEffect` blurs
+  directly in reference images.
+- For Coil images, provide a `LocalAsyncImagePreviewHandler` returning
+  `DataSource.MEMORY_CACHE` results to bypass crossfade animations and ensure
+  deterministic renders.
 
-- Use the Gradle task `:app:testDebugScreenshotTestDefaultTestSuite` to verify
-Android Gradle Plugin Compose screenshot tests against reference PNGs.
+## Robolectric UI & Rendering
 
-- Compose Preview Screenshot Testing
-(:app:updateDebugScreenshotTestDefaultTestSuite) renders GraphicsLayer and
-chained RenderEffect blurs in reference images, while Robolectric tests
-verifying custom draw/GraphicsLayer modifiers must explicitly pump draw frames.
+- **Animations & Custom Draw**: For indeterminate animations (e.g.,
+  `CircularProgressIndicator`), set
+  `composeTestRule.mainClock.autoAdvance = false` and flush frames manually
+  (`waitForIdle()`, `advanceTimeByFrame()`, `waitForIdle()`) to avoid
+  synchronization hangs. Explicitly pump draw frames when verifying custom draw
+  or `GraphicsLayer` modifiers.
+- **Pixel Inspection**: Annotate tests with
+  `@GraphicsMode(GraphicsMode.Mode.NATIVE)` so `Canvas(bitmap)` rasterizes
+  pixels (legacy `ShadowCanvas` returns `0` for `Bitmap.getPixel()`).
+- **Lazy Containers**: Compact default viewports keep off-screen `LazyRow` and
+  `LazyVerticalGrid` items uncomposed; scroll explicitly before asserting on
+  or interacting with off-screen items.
+- **String Resources**: Resolve Android strings via
+  `ApplicationProvider.getApplicationContext<Application>()` instead of
+  `LocalContext` resource calls to satisfy Android Lint's
+  `LocalContextGetResourceValueCall` check.
 
-- Robolectric Compose tests exercising D-pad traversal and focus ring rendering
-require `InputMode.Keyboard` to trigger non-touch focus behavior and indicators.
-- Compose 2D directional focus (`FocusDirection.Down`) resolves geometrically by
-visual bounds rather than list index, so moving down from a horizontally offset
-hero button into a horizontal card row focuses the vertically aligned card
-rather than index 0.
+## D-Pad & Focus Testing
+
+- **Touch & Input Mode**: Configure `InstrumentationRegistry` touch-mode state
+  in an outer JUnit rule (with `try`/`finally` cleanup for isolation) before
+  `ComponentActivity` launches. Set `InputMode.Keyboard` (including under a
+  touch-mode rule) to enable non-touch focus behavior, D-pad traversal, and
+  focus rings.
+- **Overlay Focus Restoration**: Activate trigger buttons via
+  `Key.DirectionCenter` key events rather than touch `performClick()` so
+  non-touch focus mode persists across overlay open/dismiss cycles.
+- **2D Directional Geometry**: Directional focus (e.g., `FocusDirection.Down`)
+  resolves geometrically by visual bounds rather than list index; moving down
+  from a horizontally offset hero button into a horizontal card row focuses the
+  vertically aligned card rather than index `0`.

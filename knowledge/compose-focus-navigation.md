@@ -2,7 +2,7 @@
 topic: compose-focus-navigation
 category: knowledge
 tags: [knowledge, compose-focus-navigation]
-updated_at: 2026-11-25T07:14:19.659585+00:00
+updated_at: 2026-11-26T07:06:30.196156+00:00
 confidence: 0.95
 ---
 
@@ -50,3 +50,54 @@ focused button in a newly opened Compose dialog, attach
 `Modifier.onPreviewKeyEvent` to the dialog to consume repeated activation
 `KeyDown` events (`repeatCount > 0`), track fresh `KeyDown` (`repeatCount == 0`)
 events per key, and consume unmatched `KeyUp` events.
+
+- When implementing custom D-pad Left/Right scrubbing on a Material 3 `Slider`,
+consume both `KeyDown` and `KeyUp` events for `DirectionLeft` and
+`DirectionRight` so Material 3's internal `Slider` `KeyUp` handler does not
+trigger unintended step jumps.
+- TV modal overlays in Compose require an unfocusable scrim backdrop, focus
+trapping inside the panel, explicit initial focus assignment, `Back`/`Escape`
+dismissal handling, and focus restoration to the triggering control on close.
+
+- Under Compose TV's `PivotBringIntoViewSpec` (30% viewport pivot), focusing
+sibling buttons inside a top hero carousel can scroll the parent list partially
+down; attaching a `BringIntoViewModifierNode` to the hero container that pins
+child `BringIntoView` rects to `(0, 0)` keeps the carousel anchored at the top.
+- Replacing layout-layer focus scaling with draw-phase focus overlays (border
+halo and gradient sheen) avoids vertical `BringIntoView` scroll bounce during
+horizontal focus traversal across row items; hoist static `Shape` instances
+outside draw modifiers to prevent per-frame allocations.
+- Robolectric tests verifying TV scroll positioning must configure the scroll
+container with a `BringIntoViewSpec` matching `PivotBringIntoViewSpec` to
+reproduce Compose TV's 30% pivot behavior.
+
+- Material 3's `MinimumInteractiveModifierNode` expands `36.dp`/`40.dp`
+`IconButton`s to `48.dp`, causing oversized focus highlights that clip against
+`TopAppBar`'s `clipToBounds()`; provide `LocalMinimumInteractiveComponentSize
+provides Dp.Unspecified` on TV where touch-target padding is unneeded.
+- To avoid clipping scaled focus rings (`focusOutline`) on pill-grouped or
+badge-cutout buttons, apply pill shapes via `.background(color, shape)` rather
+than `.clip(shape)` on the parent row, and place focus/scale/clickable modifiers
+before `.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }`
+on the same node.
+- When coordinating a parent fallback `FocusRequester` with a child item's
+single-frame deferred focus retry on screen return, await two frames
+(`withFrameNanos {}` twice) before invoking the parent fallback so child focus
+restoration settles first.
+
+- Touch-oriented floating overlays such as scroll-to-top `FloatingActionButton`s
+inside `AnimatedVisibility` join the Compose focus tree once revealed and can
+hijack D-pad directional focus from `LazyColumn` rows on Android TV; gating
+`AnimatedVisibility` visibility on `!isTelevision` omits the node from
+composition and the focus hierarchy completely.
+
+- Explicitly setting `.focusProperties { canFocus = true }` overrides Compose's
+`Focusability.SystemDefined` behavior (which keeps controls non-focusable in
+`InputMode.Touch`), causing buttons to capture focus on touchscreens when
+containers like `NavigableListDetailPaneScaffold` request pane focus; only
+override `canFocus = false` when disabling focusability, leaving system-defined
+focusability intact when enabled.
+- Custom focus indication nodes (such as TV scale, border, halo, and sheen
+effects) should gate rendering against `InputMode.Touch` on non-TV devices
+rather than relying solely on focus state, ensuring programmatic pane focus does
+not display TV highlights on touchscreens.

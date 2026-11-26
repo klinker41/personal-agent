@@ -2,7 +2,7 @@
 topic: android-builds-in-antigravity
 category: knowledge
 tags: [android, gradle, antigravity-docker, toolchain]
-updated_at: 2026-11-23T07:12:05.756245+00:00
+updated_at: 2026-11-26T07:01:49.072987+00:00
 confidence: 1.0
 ---
 
@@ -60,3 +60,12 @@ multiple containers (such as `antigravity` and `jenkins-android-agent`), as
 Gradle stores daemon registries, PID files, and lock-managed caches expecting a
 single namespace; isolate each container's `~/.gradle` directory on the host or
 use an HTTP `gradle/build-cache-node` service for shared task outputs.
+
+- Capping `org.gradle.workers.max=10` on a 20-thread hybrid CPU (8 P-cores + 12
+E-cores) halves peak system load average during single-module Android builds
+without regressing wall-clock build time.
+- Properties in `$GRADLE_USER_HOME/gradle.properties` override a repository's
+`gradle.properties`, allowing high workstation/server memory settings
+(`-Xmx12g`, `kotlin.daemon.jvm.options=-Xmx6g`) in version control while
+applying constrained limits (`-Xmx4096m`, `-Xmx2g`, `org.gradle.workers.max=4`)
+on 4-vCPU / 16 GB GitHub Actions runners.

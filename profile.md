@@ -2,8 +2,8 @@
 topic: profile
 category: identity
 tags: [user, preferences, conventions]
-updated_at: 2026-11-23T07:32:03.200646+00:00
-compacted_at: 2026-11-23T07:32:03.200646+00:00
+updated_at: 2026-11-26T07:31:58.355384+00:00
+compacted_at: 2026-11-26T07:31:58.355384+00:00
 confidence: 1.0
 ---
 
@@ -14,18 +14,17 @@ confidence: 1.0
   annotations and strict TypeScript.
 - **Architecture & Dependencies:** Prefer simple, self-contained
   implementations and shared utilities over unnecessary external
-  dependencies. For homelab media generators, prefer consolidated
-  single-container Bun/Hono or Node.js services with filesystem-based JSON
-  storage and in-process task queues over multi-container
-  Python/PostgreSQL/Redis/Celery setups. Migrate client code for breaking
-  API changes immediately during dependency updates rather than deferring
-  them so projects stay close to head, sending notifications whenever code
-  changes are required.
+  dependencies. For homelab media generators, prefer single-container
+  Bun/Hono or Node.js services with filesystem JSON storage and in-process
+  task queues over multi-container Python/PostgreSQL/Redis/Celery setups.
+  During dependency updates, migrate client code for breaking API changes
+  immediately so projects stay close to head, sending notifications whenever
+  code changes are required.
 - **Configuration & Remediation:** Define application and model
   configuration defaults in code (e.g., `models.ts`) rather than baking
   them into Dockerfiles. Fix underlying data and permissions on disk rather
-  than introducing permissive fallback logic or compatibility workarounds
-  in application code.
+  than adding permissive fallback logic or compatibility workarounds in
+  application code.
 - **Model Tiering & Agent Efficiency:** Right-size recurring agent sidecars
   and workflows (`flash_lite` for routine homelab/media cleanup, `flash`
   for interactive Slack chat and host updates, and `pro` for code reviews
@@ -54,12 +53,14 @@ confidence: 1.0
 
 ## Homelab Infrastructure
 - **Unraid Hosts:** Operates three Unraid OS servers (`unraid-nas` at
-  `192.168.1.95` with a 20-thread Intel Core Ultra 7 265K,
-  `unraid-seedbox`, and `unraid-aibox`), using `PUID=99` and `PGID=100`
-  (`nobody:users`), workspace paths under `/mnt/user/home/jklinker/Coding`,
-  container data under `/mnt/user/docker/`, and Docker Hub user `jklinker`.
-  `unraid-nas` is being upgraded to 96GB of RAM, making strict Docker
-  container and Gradle build memory caps unnecessary.
+  `192.168.1.95` with an Intel Core Ultra 7 265K [8 P-cores, 12 E-cores,
+  20 threads, LGA 1851] and 96 GB RAM, `unraid-seedbox`, and
+  `unraid-aibox`), using `PUID=99` and `PGID=100` (`nobody:users`), Docker
+  Hub user `jklinker`, and workspaces under `/mnt/user/home/jklinker/Coding`.
+  With 96 GB RAM on `unraid-nas`, strict Docker container and Gradle build
+  memory caps are unnecessary; store persistent container configs and init
+  scripts in `/mnt/user/docker/<service>` and large build caches, data, and
+  logs in `/mnt/user/build/<service>`.
 - **Orchestration:** Manages all 34 stacks across the three Unraid servers,
   `pi-studio` (in Boulder, hosting Uptime Kuma), and Estes Raspberry Pi
   Docker Swarm clusters (`pi-swarm` and `pi-lab`, including `pi-lab-nas` at

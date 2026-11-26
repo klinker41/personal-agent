@@ -2,7 +2,7 @@
 topic: jellyfin-client
 category: project
 tags: [project, jellyfin-client]
-updated_at: 2026-11-25T07:15:35.143924+00:00
+updated_at: 2026-11-26T07:06:30.192184+00:00
 confidence: 0.95
 ---
 
@@ -597,3 +597,86 @@ exists.
 `checkItemProjection`, `compileDebugKotlin`, `testDebugUnitTest` (using
 `@RunWith(RobolectricTestRunner::class)` for `PackageManager` and Compose UI
 tests), `:app:lintDebug`, and `:app:testDebugScreenshotTestDefaultTestSuite`.
+
+- Single-module Android monolith (`:app` plus `:benchmark`) whose build times
+are primarily bottlenecked by low-parallelism phases (KSP for Hilt/Room,
+`kotlinc` + Compose compiler, Android Lint, and R8).
+- `gradle.properties` sets `org.gradle.jvmargs=-Xmx12g
+-Dfile.encoding=UTF-8`, `kotlin.daemon.jvm.options=-Xmx6g`, `org.gradle.workers.max=10`, and `org.gradle.caching=true
+` (without configuration cache).
+- `.github/workflows/ci.yml` writes runner-safe Gradle limits (`-Xmx4096m`,
+`kotlin.daemon.jvm.options=-Xmx2g`, `org.gradle.workers.max=4`) to
+`$GRADLE_USER_HOME/gradle.properties` for `ubuntu-latest`, while Jenkins
+(`unraid-nas`) and `fastlane/Fastfile` pass only `--no-daemon` and inherit
+heap/worker settings from `gradle.properties`.
+
+- TV player overlay and scrubbing helpers live in `PlayerTvOverlay.kt`:
+`PlayerSeekBarDpadController` handles accumulated D-pad Left/Right scrubbing
+with Trickplay preview and Center/debounce/focus-exit seek commit,
+`PlayerOverlayBackdrop` provides unfocusable focus-trapping scrims with
+Back/Escape dismissal, and `rememberPlayerOverlayInitialFocusRequester` manages
+initial focus and restoration across player popups.
+- `PlayerViewModel` derives `showPlayButton` from
+`showControls && !isControlsLocked` across transient buffering states, updates
+`_playbackProgress` optimistically on `PlayerEvent.SeekRelative`, and suppresses
+`startControlsAutoHide()` while any overlay panel is open.
+
+- TV mode (`LocalIsTelevision.current`) forces `rememberTopBarBlurState`
+progress to `0f` in `TopBarProgressiveBlur.kt`, disabling top app bar blur,
+graphics layer recording, and scrims across `HomeScreen` and detail screens.
+- `HeroCarousel` on `HomeScreen` uses `tvHeroPinBringIntoViewToTop`
+(`BringIntoViewModifierNode` in `HomeTvFocus.kt`) to pin `BringIntoView`
+requests from any hero button to `(0, 0)`, while `CardRow` and
+`SpotlightCarousel` apply `Modifier.tvFocusFirstOnEnter` (`TvFocus.kt`) to
+always focus the first item when entering a section.
+- `FocusIndication.kt` (`drawFocusHighlight`) renders focus highlights in the
+draw phase without layout-layer scaling—using a top-down white sheen (`0.24f` to
+`0.08f` alpha), a `3.dp` high-contrast border with a dark outer halo, and a
+hoisted `DefaultFocusShape`.
+
+- Offline playback progress is persisted in Room userdata with toBeSynced = true
+(scoped by userId, itemId, and serverId via DatabaseRepository.getUserData);
+JellyfinMediaRepository overlays pending toBeSynced local userdata onto
+server-fetched Continue Listening podcast episodes and audiobooks via
+withPendingUserData and includes offline-started downloaded tracks.
+- Authoritative detail loads (PodcastEpisodeDetailViewModel,
+AudiobookDetailViewModel), PodcastProgressTracker, and UserDataSyncWorker
+publish resolved playback progress back into ItemStore so stale server payloads
+cannot overwrite local resume positions.
+- UserDataDao.markUserDataSyncedIfUnchanged and
+UserDataSyncWorker.clearSyncedSnapshot use atomic compare-and-clear updates with
+three-state handling so concurrent online syncs modifying or clearing toBeSynced
+mid-upload do not trigger stale ItemStore patches or redundant worker retries.
+
+- In TV mode (`LocalIsTelevision.current`), `AfinityTopAppBar` uses a `60.dp`
+height (vs `48.dp` on mobile), `40.dp` `AfinityBackButton`, and
+`LocalMinimumInteractiveComponentSize = Dp.Unspecified` so scaled focus outlines
+on top bar buttons do not clip.
+- TV `HomeScreen` gates top app bar focus so D-pad navigation only enters top
+bar actions from the topmost home list row, and restores focus to the home list
+via `rememberHomeTvFocusPlan` and `HomeTvReturnFocusEffect` when returning to
+Home.
+
+- On `HomeScreen`, the scroll-to-top `FloatingActionButton` is never composed or
+drawn in TV mode (`shouldShowHomeScrollToTop` in `HomeTvFocus.kt` requires
+`!isTelevision && firstVisibleItemIndex > 3`) so it cannot grab D-pad focus or
+break row navigation.
+
+- TV launcher Home screen app pinning (`com.makd.afinity.tvlauncher`) persists
+ordered pinned package names in `AppPreferences` DataStore
+(`tv_launcher_pinned_apps` via `TvPinnedAppsStore`, empty by default), resolves
+`pinnedApps` against installed apps in pin order in `TvLauncherViewModel`, and
+renders only pinned apps plus a trailing `TvAllAppsTile` in `TvAppsRowSection`
+with long-click Pin/Unpin actions in `TvLauncherAppsDialog`.
+- Gradle verification enforces `ktfmtCheck`, `checkCancellationRethrow`,
+`checkItemProjection`, `compileDebugKotlin`, `testDebugUnitTest`,
+`:app:lintDebug` (including `ComposeViewModelForwarding`, requiring shared
+composables to accept state and callbacks rather than forwarded `ViewModel`
+instances), and `:app:testDebugScreenshotTestDefaultTestSuite`.
+
+- Top bar actions (`AfinityTopAppBar`, `TvLauncherTopBarActions`) avoid setting
+`canFocus = true` unconditionally when `LocalTopBarButtonsFocusable` is enabled
+so Compose's `Focusability.SystemDefined` touch-mode gating remains active, and
+`FocusIndication` (`FocusScaleIndicationNode`, `FocusScaleNode`) suppresses TV
+focus scale, border, halo, and sheen visuals during `InputMode.Touch` on non-TV
+devices.

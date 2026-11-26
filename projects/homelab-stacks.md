@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-25T07:13:13.163035+00:00
+updated_at: 2026-11-26T07:01:49.069069+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -287,3 +287,21 @@ matching (?i)^/api/assets/[a-f0-9-]+/thumbnail([?]|$).
 ban decisions to the Cabin UniFi firewall block group and drops inbound WAN
 traffic across all `.klinker-cabin.computer` services (including containers
 hosted on `unraid-seedbox`).
+
+- `antigravity` remains in the `nas-ai` stack
+(`stacks/unraid-nas/ai/compose.yaml`) rather than `nas-buildbox` because
+`antigravity-plugin` reaches `http://homelab-ops:5005/sse` via `ai_default`,
+`ANTIGRAVITY_*` secrets are scoped to `nas-ai` in `syncs/homelab.toml`, and
+stack separation avoids restarting `antigravity` during `nas-buildbox` deploys.
+- `nas-buildbox` (`stacks/unraid-nas/buildbox/compose.yaml`) runs `gradle-cache`
+(`gradle/build-cache-node:latest`) with
+`/mnt/user/build/gradle-cache-node:/data` and
+`/mnt/user/docker/gradle-cache/conf:/data/conf` (no host ports published) and
+defines the `gradle-cache` Docker network, which `nas-ai` joins as
+`external: true`.
+- Shared Gradle client init scripts live in
+`/mnt/user/docker/gradle-cache/init.d` (`remote-cache.gradle.kts` targeting
+`http://gradle-cache:5071/cache/`), bind-mounted `:ro` into
+`jenkins-android-agent` (`/home/jenkins/.gradle/init.d:ro`) and read-write into
+`antigravity` (`/home/developer/.gradle/init.d`, without `:ro` so
+`entrypoint.sh`'s `chown -R` succeeds).

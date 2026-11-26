@@ -2,7 +2,7 @@
 topic: antigravity-container-setup
 category: knowledge
 tags: [knowledge, antigravity-container-setup]
-updated_at: 2026-11-07T07:03:08.125923+00:00
+updated_at: 2026-11-26T07:01:49.072520+00:00
 confidence: 0.95
 ---
 
@@ -30,3 +30,9 @@ bind-mounted at `/home/developer/.ssh` from `/mnt/user/docker/antigravity/ssh`.
 extracted post-build using `docker run --rm --entrypoint agy <image> --version |
 tr -d '[:space:]'` to tag release images (`<AGY_VERSION>` and
 `<AGY_VERSION>-slim`).
+
+- `antigravity-docker/entrypoint.sh` runs under `set -e` and executes
+`chown -R developer:developer /home/developer` on startup; mounting any volume
+or directory under `/home/developer` as read-only (`:ro`) causes `chown -R` to
+fail with `Read-only file system` and crash-loops the container before
+`auth-proxy.js` or `agy` start.
