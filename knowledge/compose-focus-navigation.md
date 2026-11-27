@@ -2,7 +2,7 @@
 topic: compose-focus-navigation
 category: knowledge
 tags: [knowledge, compose-focus-navigation]
-updated_at: 2026-11-26T07:06:30.196156+00:00
+updated_at: 2026-11-27T07:03:10.292923+00:00
 confidence: 0.95
 ---
 
@@ -101,3 +101,8 @@ focusability intact when enabled.
 effects) should gate rendering against `InputMode.Touch` on non-TV devices
 rather than relying solely on focus state, ensuring programmatic pane focus does
 not display TV highlights on touchscreens.
+
+- When animating a Compose `Slider` thumb's visual size on TV or keyboard focus,
+place the indicator inside a fixed-size thumb container matching its maximum
+focused dimension so resizing the thumb does not shift the slider's track
+bounds.

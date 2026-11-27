@@ -2,57 +2,72 @@
 topic: exoplayer-playback-lifecycle
 category: knowledge
 tags: [knowledge, exoplayer-playback-lifecycle]
-updated_at: 2026-11-26T07:02:35.168072+00:00
+updated_at: 2026-11-27T07:46:05.320296+00:00
+compacted_at: 2026-11-27T07:46:05.320296+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Exoplayer-Playback-Lifecycle
 
-- In AndroidX Media3 ExoPlayer, calling clearMediaItems() or transitioning
-between media items resets currentPosition to 0L and fires
-Player.Listener.onPositionDiscontinuity before onMediaItemTransition; state
-listeners that sync currentPosition on discontinuity will overwrite the outgoing
-item's final position unless it is captured beforehand or read from the outgoing
-PositionInfo.
+## Lifecycle, Position & Audio Focus
 
-- When an Android audio service tears down ExoPlayer and lazily recreates it via
-ensurePlayerInitialized(), persisted playback speed must be re-applied after
-initialization during resume/play rather than relying on in-memory session
-state, because the new ExoPlayer instance resets to 1.0x.
+- In AndroidX Media3 ExoPlayer, `clearMediaItems()` or item transitions
+  reset `currentPosition` to `0L` and fire
+  `Player.Listener.onPositionDiscontinuity` before `onMediaItemTransition`.
+  Listeners syncing `currentPosition` on discontinuity will overwrite the
+  outgoing item's final position unless captured beforehand or read from
+  the outgoing `PositionInfo`.
+- Lazily recreating a torn-down ExoPlayer via `ensurePlayerInitialized()`
+  resets speed to `1.0x`; re-apply persisted playback speed after
+  initialization on resume/play rather than relying on in-memory session
+  state.
+- In Media3, `AudioFocusManager.willPauseWhenDucked()` returns `true` for
+  `C.AUDIO_CONTENT_TYPE_SPEECH`, setting `setWillPauseWhenDucked(true)` so
+  `AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK` pauses instead of ducking; use
+  `C.AUDIO_CONTENT_TYPE_MUSIC` or `C.AUDIO_CONTENT_TYPE_MOVIE` to duck.
+  `AudioFocusManager.setAudioAttributes()` does not rebuild a cached
+  `AudioFocusRequest` when only content type changes, so switching an
+  active player from `AUDIO_CONTENT_TYPE_SPEECH` to
+  `AUDIO_CONTENT_TYPE_MUSIC` retains `willPauseWhenDucked = true`.
 
-- When mocking ExoPlayer's SimpleCache with a relaxed MockK mock, stub
-getContentMetadata(any()) to return DefaultContentMetadata.EMPTY; otherwise
-content length defaults to 0L instead of C.LENGTH_UNSET (-1L), causing
-CacheDataSource.open() to hit an immediate 0-byte EOF and emit async
-ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED errors on the playback thread.
-- In Robolectric tests that load multiple media items, isolate Player/ViewModel
-instances per scenario or avoid 0-byte local files so delayed background
-ExoPlayer PlaybackExceptions delivered on Looper.getMainLooper() cannot leak
-into subsequent test phases.
+## Queue Transitions & Advancement
 
-- In Robolectric tests using ExoPlayer with a paused MainLooper, asynchronous
-errors from the background ExoPlayer:Playback thread (such as
-ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED on 0-byte dummy files) sit queued on
-MainLooper until pumped and can leak into subsequent loads on the same
-player/ViewModel instance; isolate each playback scenario in its own test
-harness.
-- When ViewModel playback flows launch concurrent Dispatchers.IO tasks (e.g.,
-segment loading) alongside main-thread player callbacks, always mutate
-MutableStateFlow with atomic .update { ... } rather than non-atomic
-read-modify-write assignments (_uiState.value = _uiState.value.copy(...)) to
-prevent lost-update races.
+- When manually jumping to a queued item before async media preparation
+  completes, call `exoPlayer.stop()` right after reporting the outgoing
+  item's position to prevent audio bleed and mid-transition
+  `Player.STATE_ENDED` triggers.
+- When advancing asynchronously across separate playback engines, defer
+  tearing down or switching the active engine until incoming preparation
+  succeeds, reset advancement state on `CancellationException` before
+  rethrowing, and dispatch `ACTION_STOP` if all remaining queued items
+  fail.
+- When coordinating background service advancement guards (such as
+  `isAdvancing`) with optional Compose navigation collectors that may be
+  absent during background playback, replace `yield()` ordering with
+  generation-tagged events acknowledged after navigation completes,
+  falling back to immediate completion when there are no subscribers.
 
-- In AndroidX Media3, AudioFocusManager.willPauseWhenDucked() returns true for
-C.AUDIO_CONTENT_TYPE_SPEECH, causing ExoPlayer to configure
-setWillPauseWhenDucked(true) and pause instead of ducking on
-AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK; use C.AUDIO_CONTENT_TYPE_MUSIC or
-C.AUDIO_CONTENT_TYPE_MOVIE when ducking is desired.
-- Media3's AudioFocusManager.setAudioAttributes() does not rebuild a cached
-AudioFocusRequest when only content type changes, so switching an active player
-from AUDIO_CONTENT_TYPE_SPEECH to AUDIO_CONTENT_TYPE_MUSIC retains
-willPauseWhenDucked = true.
+## UI & State Concurrency
 
-- Relative seeks (such as 10s rewind/forward) briefly transition ExoPlayer into
-`STATE_BUFFERING`; derive center playback control visibility declaratively from
-overall controls visibility (`showControls && !isControlsLocked`) rather than
-imperatively clearing button visibility on `STATE_BUFFERING`.
+- Relative seeks (e.g., 10s rewind/forward) briefly transition ExoPlayer
+  into `STATE_BUFFERING`; derive center playback control visibility
+  declaratively from `showControls && !isControlsLocked` rather than
+  imperatively clearing button visibility on `STATE_BUFFERING`.
+- When ViewModel flows launch concurrent `Dispatchers.IO` tasks (e.g.,
+  segment loading) alongside main-thread player callbacks, mutate
+  `MutableStateFlow` with atomic `.update { ... }` instead of non-atomic
+  `_uiState.value = _uiState.value.copy(...)` to prevent lost-update races.
+
+## Testing
+
+- With a relaxed MockK `SimpleCache`, stub `getContentMetadata(any())` to
+  return `DefaultContentMetadata.EMPTY`; otherwise content length defaults
+  to `0L` instead of `C.LENGTH_UNSET` (`-1L`), causing
+  `CacheDataSource.open()` to hit an immediate 0-byte EOF and emit async
+  `ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED` on the playback thread.
+- In Robolectric tests (multi-item loads or paused `MainLooper`), async
+  `PlaybackException`s from `ExoPlayer:Playback` (such as
+  `ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED` on 0-byte dummy files) sit
+  queued on `Looper.getMainLooper()` until pumped and leak across shared
+  `Player`/`ViewModel` instances; isolate each scenario in its own test
+  harness and avoid 0-byte local files.

@@ -30,6 +30,8 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Tdarr-Version-Parity](file:///workspace/personal-agent/knowledge/tdarr-version-parity.md)
+- [Ffmpeg-Audio-Mixing](file:///workspace/personal-agent/knowledge/ffmpeg-audio-mixing.md)
 - [Offline-Sync-Reconciliation](file:///workspace/personal-agent/knowledge/offline-sync-reconciliation.md)
 - [Gradle-Build-Cache](file:///workspace/personal-agent/knowledge/gradle-build-cache.md)
 - [Crowdsec-Parser-Whitelists](file:///workspace/personal-agent/knowledge/crowdsec-parser-whitelists.md)

@@ -2,7 +2,7 @@
 topic: compose-ui-testing
 category: knowledge
 tags: [knowledge, compose-ui-testing]
-updated_at: 2026-11-26T07:47:28.840738+00:00
+updated_at: 2026-11-27T07:03:10.293513+00:00
 compacted_at: 2026-11-26T07:47:28.840738+00:00
 confidence: 0.95
 ---
@@ -53,3 +53,9 @@ confidence: 0.95
   resolves geometrically by visual bounds rather than list index; moving down
   from a horizontally offset hero button into a horizontal card row focuses the
   vertically aligned card rather than index `0`.
+
+- When verifying that resizing a `Slider` thumb on focus does not shift track
+bounds, test at a non-midpoint value and assert the thumb node's horizontal
+center remains invariant across focus states, rather than checking outer
+`Slider` bounds or testing at the 50% midpoint where symmetric inset changes
+cancel out.

@@ -2,7 +2,7 @@
 topic: antigravity-container-setup
 category: knowledge
 tags: [knowledge, antigravity-container-setup]
-updated_at: 2026-11-26T07:01:49.072520+00:00
+updated_at: 2026-11-27T07:04:28.747378+00:00
 confidence: 0.95
 ---
 
@@ -36,3 +36,7 @@ tr -d '[:space:]'` to tag release images (`<AGY_VERSION>` and
 or directory under `/home/developer` as read-only (`:ro`) causes `chown -R` to
 fail with `Read-only file system` and crash-loops the container before
 `auth-proxy.js` or `agy` start.
+
+- The `antigravity` container on `unraid-nas` bind-mounts `/tmp` to the Unraid
+`build` share so large temporary build and media-rendering files do not consume
+space inside `docker.img`.

@@ -2,7 +2,7 @@
 topic: jellyfin-client
 category: project
 tags: [project, jellyfin-client]
-updated_at: 2026-11-26T07:06:30.192184+00:00
+updated_at: 2026-11-27T07:03:10.288823+00:00
 confidence: 0.95
 ---
 
@@ -680,3 +680,29 @@ so Compose's `Focusability.SystemDefined` touch-mode gating remains active, and
 `FocusIndication` (`FocusScaleIndicationNode`, `FocusScaleNode`) suppresses TV
 focus scale, border, halo, and sheen visuals during `InputMode.Touch` on non-TV
 devices.
+
+- AudioService uses two distinct playback engines: ActiveEngine.MUSIC
+(MusicQueueManager, PodcastProgressTracker, MusicPlayerScreen) for music and
+podcasts, and ActiveEngine.ABS (AudiobookshelfPlayer,
+JellyfinAudiobookStarter/JellyfinAudiobookReporter, AudiobookshelfPlayerScreen)
+for Audiobookshelf and Jellyfin audiobooks.
+- Home screen Continue Listening (ContinueListeningQueue,
+ContinueListeningNavigationEffect, ContinueListeningQueueSheet) coordinates
+cross-engine autoplay and an interactive Up Next queue (drag-to-reorder,
+swipe-to-remove, clear, and jump-to-item with live progress saving) across mixed
+Jellyfin audiobooks and podcasts while leaving Audiobookshelf's shelf separate
+and clearing on unrelated playback.
+
+- App source lives under package com.makd.afinity, with offline media managed by
+JellyfinDownloadRepository and DatabaseRepositoryImpl and playback/casting
+handled by PlayerActivity and PlayerViewModel.
+- Downloaded shows and music share on-disk shows/ and music/ directories across
+users on the same server, requiring cross-user reference checks before recursive
+directory deletion.
+
+- In TV and non-touch keyboard modes (`PlayerTvOverlay.kt`,
+`PlayerControls.kt`), the video player `SeekBar` omits `.focusOutline` and
+instead animates (`150ms`) track and chapter-marker opacities
+(`rememberSeekBarVisualStyle`) while growing `TvSeekBarThumb` from `10.dp` to
+`20.dp` inside a fixed `20.dp` container on focus or active seek, preserving
+standard `SliderDefaults` in touch mode.

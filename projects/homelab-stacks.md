@@ -2,7 +2,7 @@
 topic: homelab-stacks
 category: projects
 tags: [komodo, gitops, docker, stacks, homelab]
-updated_at: 2026-11-26T07:01:49.069069+00:00
+updated_at: 2026-11-27T07:08:21.494401+00:00
 compacted_at: 2026-11-20T07:32:12.326888+00:00
 confidence: 1.0
 ---
@@ -305,3 +305,8 @@ defines the `gradle-cache` Docker network, which `nas-ai` joins as
 `jenkins-android-agent` (`/home/jenkins/.gradle/init.d:ro`) and read-write into
 `antigravity` (`/home/developer/.gradle/init.d`, without `:ro` so
 `entrypoint.sh`'s `chown -R` succeeds).
+
+- The `nas-media-pipeline-processing` stack (Compose project
+`media-pipeline-processing`) on `unraid-nas` runs `tdarr-server` (Compose
+service `tdarr`), `tdarr-node` (registered as `unraid-server` with QSV/VAAPI
+encoding), `metadata-remote`, and `rename`.
