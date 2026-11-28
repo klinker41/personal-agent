@@ -30,6 +30,7 @@ Top-level catalog mapping memory topics to structured notes.
 - [Trmnl-Dashboard](file:///workspace/personal-agent/projects/trmnl-dashboard.md)
 
 ## Knowledge & Workflows
+- [Resvg-Font-Rendering](file:///workspace/personal-agent/knowledge/resvg-font-rendering.md)
 - [Tdarr-Version-Parity](file:///workspace/personal-agent/knowledge/tdarr-version-parity.md)
 - [Ffmpeg-Audio-Mixing](file:///workspace/personal-agent/knowledge/ffmpeg-audio-mixing.md)
 - [Offline-Sync-Reconciliation](file:///workspace/personal-agent/knowledge/offline-sync-reconciliation.md)

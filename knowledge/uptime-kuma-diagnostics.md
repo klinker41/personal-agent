@@ -2,87 +2,80 @@
 topic: uptime-kuma-diagnostics
 category: knowledge
 tags: [knowledge, uptime-kuma-diagnostics, uptime-kuma, komodo, pi-studio]
-updated_at: 2026-11-25T07:16:48.638010+00:00
-compacted_at: 2026-10-30T14:35:00+00:00
+updated_at: 2026-11-28T07:58:26.581697+00:00
+compacted_at: 2026-11-28T07:58:26.581697+00:00
 confidence: 0.95
 ---
 
 # Knowledge: Uptime-Kuma-Diagnostics
 
-- Because Uptime Kuma (`uptime.klinker.computer`) runs on `pi-studio` in Boulder
-and probes `.klinker-cabin.computer` services in Estes across an inter-site WAN
-/ `gluetun-home` WireGuard link, transient inter-site connectivity drops cause
-48,000ms probe timeout alerts for Cabin-hosted services (`unraid-nas`,
-`unraid-seedbox`, `unraid-aibox`) even when local containers and ingress
-endpoints are healthy.
-- Uptime Kuma API keys (`UPTIME_KUMA_API_KEY`) only authenticate the read-only
-Prometheus `/metrics` endpoint; mutating monitors or status pages
-(`deleteMonitor`, `saveStatusPage`) requires authenticating via Uptime Kuma's
-Socket.IO WebSocket with an admin username and password.
-- When `kuma_get_monitors` returns `HTTP 502 Bad Gateway` rather than `HTTP 0`
-(timeout), the `pi-studio` host and `pi-studio-reverse-proxy` (`openresty`) are
-online and reachable over WAN, isolating the failure to the upstream
-`uptime-kuma` container (`pi-studio-dashboard` stack) restarting or
-initializing.
-- When pruning millions of `heartbeat` rows or compacting a multi-gigabyte
-Uptime Kuma SQLite database (`kuma.db`) on slow SD card storage, a conditional
-`DELETE FROM heartbeat WHERE ...` causes heavy row-by-row B-tree and index
-updates plus massive `.db-wal` growth; stashing retained rows in `/dev/shm`
-followed by an unconditional `DELETE FROM heartbeat` (`O(1)` table truncation)
-and `VACUUM INTO '/dev/shm/kuma_compact.db'` performs compaction in RAM without
-saturating SD card I/O.
-- On `unraid-nas`, `semaphore-boulder` (`Ansible Boulder`) uses
-`network_mode: service:gluetun-home` (in the Komodo `management` stack) and
-`rsync-backup` uses `network_mode: service:gluetun-home-backup` (in the Komodo
-`files` stack). When `gluetun-home` or `gluetun-home-backup` is recreated (e.g.,
-during the 3:00 AM container auto-update window), dependent containers remain
-pinned to the destroyed container ID, causing `Ansible Boulder` to fail with
-HTTP 502; `komodo_restart_container` fails with `No such container: <old_id>`,
-so the dependent container must be recreated via
-```bash
-docker exec -w /mnt/user/docker/komodo/periphery/stacks/nas-management/stacks/unraid-nas/management \
-  komodo-periphery docker compose -p management --env-file .env up -d --force-recreate semaphore-boulder
-```
+## Diagnostics & Alerts
 
-- Uptime Kuma `HTTP(s) - Json Query` monitors support JSONata expressions
-(`$number`, `$replace`, ternary `? :`), allowing string-formatted metrics (like
-percentages) to be parsed and threshold-checked directly without modifying the
-upstream API.
-- Using a ternary JSONata expression such as
-`$number($replace($[2].estes_battery, "%", "")) >= 50 ? "ok" :
-$[2].estes_battery` with an Expected Value of `ok` ensures that when the
-threshold check fails, Uptime Kuma includes the actual offending value in the
-alert message (`value was: [49%]`) instead of just `false`.
+- **Simultaneous 48,000ms timeouts on `.klinker-cabin.computer` monitors**:
+  Uptime Kuma (`uptime.klinker.computer`) runs on `pi-studio` in Boulder and
+  probes Cabin services (`unraid-nas`, `unraid-seedbox`, `unraid-aibox`) in
+  Estes over the inter-site WAN / `gluetun-home` WireGuard link. Simultaneous
+  `timeout of 48000ms exceeded` alerts while local containers and ingress are
+  healthy indicate either:
+  - A transient inter-site WAN or WireGuard connectivity drop.
+  - CrowdSec on `unraid-nas` banning the Boulder home WAN IP (shared by
+    `pi-studio` and user devices) and `cs-unifi-bouncer` adding it to the Cabin
+    UniFi firewall drop group—for example, `crowdsecurity/http-probing`
+    triggering on bursts of `404` responses like missing
+    `GET /Audio/<uuid>/Lyrics` requests from Jellyfin clients. Inspect bans on
+    `unraid-nas` with `docker exec crowdsec cscli decisions list`, remove false
+    positives with `docker exec crowdsec cscli decisions delete --ip <ip>`,
+    and verify removal in `cs-unifi-bouncer` logs.
+- **`kuma_get_monitors` `HTTP 502 Bad Gateway` vs `HTTP 0`**: A `502` (rather
+  than `HTTP 0` timeout) confirms `pi-studio` and `pi-studio-reverse-proxy`
+  (`openresty`) are online and reachable over WAN, isolating the failure to
+  the upstream `uptime-kuma` container (`pi-studio-dashboard` stack)
+  restarting or initializing.
+- **06:34–06:35 MST `ECONNREFUSED` spikes**: Scheduled maintenance/backup
+  windows simultaneously restart containers across `unraid-nas` (including
+  `nginx-proxy-manager` terminating HTTPS on `38.75.214.203:443`) and
+  `unraid-seedbox`, causing transient `ECONNREFUSED` alerts on
+  `Seedbox Notifications`, `NAS Notifications`, `qui`, `Cabin`, and
+  `Upload Assistant` that self-recover within a couple of minutes.
+- **Stale `gluetun` network references after auto-updates**: On `unraid-nas`,
+  `semaphore-boulder` (`Ansible Boulder`) uses
+  `network_mode: service:gluetun-home` (Komodo `management` stack) and
+  `rsync-backup` uses `network_mode: service:gluetun-home-backup` (Komodo
+  `files` stack). Recreating `gluetun-home` or `gluetun-home-backup` (e.g.,
+  during the 3:00 AM container auto-update window) leaves dependents pinned to
+  the destroyed container ID, causing `Ansible Boulder` to fail with HTTP 502
+  and `komodo_restart_container` to fail with `No such container: <old_id>`.
+  Recreate the dependent container via:
 
-- Scheduled container maintenance/backup windows around 06:34–06:35 MST
-simultaneously restart Docker containers across `unraid-nas` (including
-`nginx-proxy-manager` terminating HTTPS on `38.75.214.203:443`) and
-`unraid-seedbox`, causing transient `ECONNREFUSED` alerts on Uptime Kuma
-monitors (`Seedbox Notifications`, `NAS Notifications`, `qui`, `Cabin`,
-`Upload Assistant`) that automatically self-recover within a couple of minutes.
+  ```bash
+  docker exec \
+    -w /mnt/user/docker/komodo/periphery/stacks/nas-management/stacks/unraid-nas/management \
+    komodo-periphery docker compose -p management --env-file .env \
+    up -d --force-recreate semaphore-boulder
+  ```
 
-- Simultaneous `timeout of 48000ms exceeded` alerts across
-`.klinker-cabin.computer` monitors (while containers and local ingress remain
-healthy) can be caused by CrowdSec on `unraid-nas` banning the Boulder home WAN
-IP (`pi-studio`) and `cs-unifi-bouncer` adding it to the Cabin UniFi firewall
-drop group—for example, when `crowdsecurity/http-probing` triggers on bursts of
-`404` responses such as missing `GET /Audio/<uuid>/Lyrics` requests from
-Jellyfin clients; clear false-positive bans on `unraid-nas` with `docker exec
-crowdsec cscli decisions delete --ip
-<ip>` and verify removal in `cs-unifi-bouncer ` logs.
+## Configuration & Maintenance
 
-- Simultaneous 48,000ms probe timeouts across .klinker-cabin.computer monitors
-in Uptime Kuma while local Cabin containers remain healthy can indicate CrowdSec
-on unraid-nas banned the Boulder WAN IP (pi-studio) via cs-unifi-bouncer; check
-cscli decisions list on unraid-nas.
+- **API vs Socket.IO authentication**: `UPTIME_KUMA_API_KEY` only
+  authenticates the read-only Prometheus `/metrics` endpoint. Mutating
+  monitors or status pages (`deleteMonitor`, `saveStatusPage`) requires
+  authenticating via Uptime Kuma's Socket.IO WebSocket with an admin username
+  and password.
+- **JSONata thresholds in `HTTP(s) - Json Query` monitors**: JSONata
+  expressions (`$number`, `$replace`, ternary `? :`) parse and threshold-check
+  string-formatted metrics (such as percentages) directly without modifying
+  the upstream API. Using a ternary expression with Expected Value `ok`
+  ensures failed checks include the offending value (`value was: [49%]`)
+  instead of `false`:
 
-- Simultaneous 48,000ms Uptime Kuma probe timeouts across
-`.klinker-cabin.computer` monitors while local containers remain healthy can
-indicate CrowdSec on `unraid-nas` banned Boulder's public WAN IP via
-`cs-unifi-bouncer`; clear false-positive bans with `docker exec crowdsec cscli
-decisions delete --ip <ip>`.
+  ```text
+  $number($replace($[2].estes_battery, "%", "")) >= 50 ? "ok" : $[2].estes_battery
+  ```
 
-- Simultaneous 48000ms timeout alerts from uptime.klinker.computer across Cabin
-monitors (*.klinker-cabin.computer) can be caused by CrowdSec (cs-unifi-bouncer)
-banning the Home WAN IP shared by Uptime Kuma and user devices; verify active
-bans with cscli decisions list.
+- **Compacting `kuma.db` on SD card storage**: When pruning millions of
+  `heartbeat` rows or compacting a multi-gigabyte SQLite database (`kuma.db`)
+  on slow SD cards, conditional `DELETE FROM heartbeat WHERE ...` causes
+  heavy row-by-row B-tree/index updates and massive `.db-wal` growth. Instead,
+  stash retained rows in `/dev/shm`, run an unconditional
+  `DELETE FROM heartbeat` (`O(1)` table truncation), and compact in RAM via
+  `VACUUM INTO '/dev/shm/kuma_compact.db'` without saturating SD card I/O.

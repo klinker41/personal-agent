@@ -2,70 +2,64 @@
 topic: android-builds-in-antigravity
 category: knowledge
 tags: [android, gradle, antigravity-docker, toolchain]
-updated_at: 2026-11-26T07:01:49.072987+00:00
+updated_at: 2026-11-28T07:49:54.426919+00:00
+compacted_at: 2026-11-28T07:49:54.426919+00:00
 confidence: 1.0
 ---
 
-# Android-Builds-In-Antigravity
+# Android Builds in Antigravity
 
-- Persistent Android toolchain lives on the NVMe volume under
-/home/developer/.gemini/android-toolchain (Temurin JDK 21 & 17, Android
-cmdline-tools/android CLI, platform-tools, build-tools 37.0.0, platforms
-android-37.2 & android-36) with Gradle home at /home/developer/.gemini/gradle.
-- Wrapper scripts in /home/developer/.gemini/antigravity-cli/bin (java, javac,
-android, sdkmanager, adb, aapt2, etc.) are already on PATH in antigravity-docker
-and automatically export JAVA_HOME, ANDROID_HOME, ANDROID_SDK_ROOT, and
-GRADLE_USER_HOME across container restarts without requiring sudo or image
-rebuilds.
-- `/home/developer/.gemini/gradle/gradle.properties` enables caching, parallel
-execution, and JDK 17/21 toolchain discovery
-(`org.gradle.java.installations.paths`) without overriding project JVM memory
-or worker limits.
+## Toolchain & Environment
 
-- With the 8g memory limit removed from the antigravity container, custom JVM
-heap/metaspace and worker caps (org.gradle.jvmargs, kotlin.daemon.jvmargs,
-org.gradle.workers.max) were removed from
-/home/developer/.gemini/gradle/gradle.properties while keeping
-org.gradle.caching=true.
+- The persistent Android toolchain lives on the `~/.gemini` NVMe volume at
+  `/home/developer/.gemini/android-toolchain/` so it survives container
+  restarts and rebuilds without `sudo` or Dockerfile edits:
+  - Temurin JDK 21 and 17 (registered via
+    `org.gradle.java.installations.paths`).
+  - Android SDK at `/home/developer/.gemini/android-toolchain/sdk` with
+    `cmdline-tools` (`android` CLI), `platform-tools`, `build-tools`
+    36.0.0/37.0.0, and platforms `android-36`/`android-37.2`.
+- Wrapper scripts in `/home/developer/.gemini/antigravity-cli/bin/` (already
+  on `PATH` in `antigravity-docker`) for `java`, `javac`, `android`,
+  `sdkmanager`, `adb`, `aapt2`, etc. automatically export `JAVA_HOME`,
+  `ANDROID_HOME`, `ANDROID_SDK_ROOT`, and
+  `GRADLE_USER_HOME=/home/developer/.gemini/gradle`.
 
-- Persistent Android toolchain is stored on the ~/.gemini NVMe volume at
-/home/developer/.gemini/android-toolchain/ (Temurin JDK 21 and 17 registered via
-org.gradle.java.installations.paths, plus Android SDK at
-/home/developer/.gemini/android-toolchain/sdk with cmdline-tools,
-platform-tools, build-tools 36.0.0/37.0.0, and platforms
-android-36/android-37.2) to survive container rebuilds without Dockerfile edits.
-- Wrapper scripts in /home/developer/.gemini/antigravity-cli/bin/ (already on
-PATH in antigravity-docker) for java, javac, android, sdkmanager, adb, and aapt2
-automatically export JAVA_HOME, ANDROID_HOME, ANDROID_SDK_ROOT, and
-GRADLE_USER_HOME=/home/developer/.gemini/gradle.
-- In an 8 GiB cgroup-limited container reporting 20 host CPU threads, Gradle's
-default 20 workers and 4 GiB heap trigger container OOM kills (such as during
-ktfmtFormat); cap memory and concurrency in
-/home/developer/.gemini/gradle/gradle.properties with
-org.gradle.jvmargs=-Xmx2560m, kotlin.daemon.jvmargs=-Xmx2048m, and
-org.gradle.workers.max=4.
+## Gradle Home & Container Isolation
 
-- Concurrent Gradle builds in the container can trigger Kotlin compiler
-OutOfMemoryError; wait for any active workspace Gradle process to complete
-before starting verification builds, and use --no-parallel if memory is
-constrained.
+- The `/home/developer/.gemini/antigravity-cli/bin/java` wrapper defaults
+  `GRADLE_USER_HOME` to `/home/developer/.gemini/gradle` when unset;
+  explicitly set `GRADLE_USER_HOME=/home/developer/.gradle` in the container
+  environment to use a `/home/developer/.gradle` bind mount instead.
+- Never share a single `GRADLE_USER_HOME` (`~/.gradle`) bind mount across
+  multiple containers (such as `antigravity` and `jenkins-android-agent`):
+  Gradle stores daemon registries, PID files, and lock-managed caches
+  expecting a single namespace. Isolate each container's `~/.gradle` on the
+  host, or run an HTTP `gradle/build-cache-node` for shared task outputs.
 
-- Antigravity's `/home/developer/.gemini/antigravity-cli/bin/java` wrapper
-defaults `GRADLE_USER_HOME` to `/home/developer/.gemini/gradle` when unset, so
-`GRADLE_USER_HOME=/home/developer/.gradle` must be explicitly set in the
-container environment for Gradle builds to use a `/home/developer/.gradle` bind
-mount.
-- Do not share a single `GRADLE_USER_HOME` (`~/.gradle`) bind mount across
-multiple containers (such as `antigravity` and `jenkins-android-agent`), as
-Gradle stores daemon registries, PID files, and lock-managed caches expecting a
-single namespace; isolate each container's `~/.gradle` directory on the host or
-use an HTTP `gradle/build-cache-node` service for shared task outputs.
+## Gradle Configuration & Resource Tuning
 
-- Capping `org.gradle.workers.max=10` on a 20-thread hybrid CPU (8 P-cores + 12
-E-cores) halves peak system load average during single-module Android builds
-without regressing wall-clock build time.
+- `/home/developer/.gemini/gradle/gradle.properties` enables build caching
+  (`org.gradle.caching=true`), parallel execution, and JDK 17/21 toolchain
+  discovery (`org.gradle.java.installations.paths`) without overriding
+  project JVM memory or worker limits. Custom JVM heap/metaspace and worker
+  caps (`org.gradle.jvmargs`, `kotlin.daemon.jvmargs`, and
+  `org.gradle.workers.max`) were removed once the 8 GiB memory limit was
+  removed from the `antigravity` container.
+- Avoid concurrent Gradle builds in the container, which can trigger Kotlin
+  compiler `OutOfMemoryError`; wait for any active workspace Gradle process
+  to complete before starting verification builds, and pass `--no-parallel`
+  when memory is constrained.
 - Properties in `$GRADLE_USER_HOME/gradle.properties` override a repository's
-`gradle.properties`, allowing high workstation/server memory settings
-(`-Xmx12g`, `kotlin.daemon.jvm.options=-Xmx6g`) in version control while
-applying constrained limits (`-Xmx4096m`, `-Xmx2g`, `org.gradle.workers.max=4`)
-on 4-vCPU / 16 GB GitHub Actions runners.
+  `gradle.properties`, allowing high workstation/server settings (`-Xmx12g`,
+  `kotlin.daemon.jvm.options=-Xmx6g`) in version control while applying
+  constrained limits (`-Xmx4096m`, `-Xmx2g`, `org.gradle.workers.max=4`) on
+  4-vCPU / 16 GB GitHub Actions runners.
+- In an 8 GiB cgroup-limited container reporting 20 host CPU threads,
+  Gradle's default 20 workers and 4 GiB heap trigger OOM kills (e.g., during
+  `ktfmtFormat`); in that setup, cap `gradle.properties` with
+  `org.gradle.jvmargs=-Xmx2560m`, `kotlin.daemon.jvmargs=-Xmx2048m`, and
+  `org.gradle.workers.max=4`.
+- On a 20-thread hybrid CPU (8 P-cores + 12 E-cores), capping
+  `org.gradle.workers.max=10` halves peak system load average during
+  single-module Android builds without regressing wall-clock build time.

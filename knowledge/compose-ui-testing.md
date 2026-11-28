@@ -2,8 +2,8 @@
 topic: compose-ui-testing
 category: knowledge
 tags: [knowledge, compose-ui-testing]
-updated_at: 2026-11-27T07:03:10.293513+00:00
-compacted_at: 2026-11-26T07:47:28.840738+00:00
+updated_at: 2026-11-28T07:54:42.588491+00:00
+compacted_at: 2026-11-28T07:54:42.588491+00:00
 confidence: 0.95
 ---
 
@@ -11,13 +11,13 @@ confidence: 0.95
 
 ## Preview Screenshot Testing
 
-- Record AGP Compose preview reference PNGs with
-  `:app:updateDebugScreenshotTestDefaultTestSuite` and verify against them
-  with `:app:testDebugScreenshotTestDefaultTestSuite`.
-- Screenshot previews render `GraphicsLayer` and chained `RenderEffect` blurs
-  directly in reference images.
-- For Coil images, provide a `LocalAsyncImagePreviewHandler` returning
-  `DataSource.MEMORY_CACHE` results to bypass crossfade animations and ensure
+- **Gradle Tasks**: Record AGP Compose preview reference PNGs with
+  `:app:updateDebugScreenshotTestDefaultTestSuite` and verify with
+  `:app:testDebugScreenshotTestDefaultTestSuite`.
+- **Visual Effects**: Screenshot previews render `GraphicsLayer` and chained
+  `RenderEffect` blurs directly in reference images.
+- **Coil Images**: Provide a `LocalAsyncImagePreviewHandler` returning
+  `DataSource.MEMORY_CACHE` results to bypass crossfade animations for
   deterministic renders.
 
 ## Robolectric UI & Rendering
@@ -54,8 +54,14 @@ confidence: 0.95
   from a horizontally offset hero button into a horizontal card row focuses the
   vertically aligned card rather than index `0`.
 
-- When verifying that resizing a `Slider` thumb on focus does not shift track
-bounds, test at a non-midpoint value and assert the thumb node's horizontal
-center remains invariant across focus states, rather than checking outer
-`Slider` bounds or testing at the 50% midpoint where symmetric inset changes
-cancel out.
+## Material 3 Slider Bounds
+
+- **Focus Thumb Resizing**: To verify that resizing a `Slider` thumb on focus
+  does not shift track bounds, test at a non-midpoint value (symmetric inset
+  changes cancel out at 50%) and assert the thumb node's horizontal center
+  remains invariant across focus states rather than checking outer `Slider`
+  bounds.
+- **Sibling Alignment**: When asserting horizontal layout bounds alignment
+  between sibling composables and a Material 3 `Slider` in Compose/Robolectric
+  tests, account for the thumb's touch-target overhang extending beyond the
+  visual track bounds.

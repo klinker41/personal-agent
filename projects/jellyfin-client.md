@@ -2,7 +2,7 @@
 topic: jellyfin-client
 category: project
 tags: [project, jellyfin-client]
-updated_at: 2026-11-27T07:03:10.288823+00:00
+updated_at: 2026-11-28T07:04:58.672418+00:00
 confidence: 0.95
 ---
 
@@ -706,3 +706,33 @@ instead animates (`150ms`) track and chapter-marker opacities
 (`rememberSeekBarVisualStyle`) while growing `TvSeekBarThumb` from `10.dp` to
 `20.dp` inside a fixed `20.dp` container on focus or active seek, preserving
 standard `SliderDefaults` in touch mode.
+
+- Non-live video player seekbar (`PlayerControls.kt` / `SeekBarTimestamps.kt`)
+stacks `SeekBarTimestamps` (current position at start, total or toggled
+`-remaining` time at end) above a full-width Material 3 `Slider` inside a
+`Column` (`8.dp` horizontal padding, `2.dp` vertical spacing), while live
+channels retain the inline live bar and `LIVE` badge.
+- `seekBarAnchor` is reported on the outer seekbar `Column` so
+`TrickplayPreview` clears the timestamp row, and `overlayBottomPadding` is
+`116.dp` while controls are visible so skip and sleep-timer prompts clear the
+stacked seekbar.
+- The clickable end timestamp (`onToggleRemainingTime`) uses
+`focusProperties { canFocus = false }` so Android TV D-pad up-navigation moves
+directly from the seekbar to the center controls.
+- Compose screenshot test baselines are updated via
+`:app:updateDebugScreenshotTestDefaultTestSuite`, and the full verification
+suite includes `ktfmtCheck`, static checks, unit/Robolectric tests, `lintDebug`,
+and screenshot tests.
+
+- Tapping items in Continue Listening on the Home screen (online and offline)
+and the Audiobookshelf tab starts or resumes playback immediately instead of
+navigating to the details screen.
+- AUDIOBOOKSHELF_PLAYER_ROUTE and createAudiobookshelfPlayerRoute
+(Destination.kt, MainNavigation.kt) support an optional autoPlay navigation
+argument (defaulting to false for mini-player taps); when autoPlay is true,
+AudiobookshelfPlayerViewModel.startPlayback resumes a matching already-loaded
+paused local or Audiobookshelf cast session immediately.
+- MusicPlayerViewModel.playOrResumeTrack handles direct podcast playback by
+resuming an already-loaded paused local or cast track without restarting the
+queue, or starting the playback service with a new single-item queue, checking
+castManager.castState.value.isMusicCasting synchronously.

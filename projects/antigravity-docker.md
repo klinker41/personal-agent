@@ -2,8 +2,8 @@
 topic: antigravity-docker
 category: project
 tags: [project, antigravity-docker]
-updated_at: 2026-11-21T07:03:59.330853+00:00
-compacted_at: 2026-11-07T07:30:50.661760+00:00
+updated_at: 2026-11-28T07:34:33.711843+00:00
+compacted_at: 2026-11-28T07:34:33.711843+00:00
 confidence: 0.95
 ---
 
@@ -18,11 +18,11 @@ confidence: 0.95
 - **CI/CD & Image Tags:** Jenkins job `antigravity-docker` on `unraid-nas`
   (`/mnt/user/docker/jenkins/home/jobs/antigravity-docker/config.xml`) builds
   `slim` and `full` multi-stage targets, extracts `AGY_VERSION` via
-  `docker run --rm --entrypoint agy jklinker/antigravity:slim --version | tr -d
-'[:space:]'`,
-  pushes `jklinker/antigravity:{latest,slim,<AGY_VERSION>,<AGY_VERSION>-slim}`
-  (legacy `jklinker/antigravity-docker:latest`), and triggers a Komodo
-  `DeployStack` call for `nas-ai` (`antigravity` service).
+  `docker run --rm --entrypoint agy jklinker/antigravity:slim --version |
+  tr -d '[:space:]'`, pushes
+  `jklinker/antigravity:{latest,slim,<AGY_VERSION>,<AGY_VERSION>-slim}` (legacy
+  `jklinker/antigravity-docker:latest`), and triggers a Komodo `DeployStack`
+  call for `nas-ai` (`antigravity` service).
 
 ## Configuration & Environment
 - **Networking & Services:** Exposes `AGY_PORT=4400` (auth proxy gateway),
@@ -70,6 +70,14 @@ confidence: 0.95
   custom models are configured. Placeholders `M500`-`M649` return `null`
   immediately, routing built-in models (Claude, GPT-OSS) upstream to Google
   when Astra is active.
+- **Tier Overrides (`TIER_MODEL_CANDIDATES`):** Configured in
+  `proxy/translation-proxy.js` mapping `pro` to `['gemini-4-neon-xhigh']`,
+  `flash` to `gemini-4-neon-medium`, and `flashLite` to
+  `gemini-4-hydrogen-medium`. Serves as the single source of truth for
+  `fetchAvailableModels` proxy rewriting and the `/sidecars` UI
+  (`proxy/lib/pages.js`), which displays an Active Model Tiers header bar,
+  resolved model chips on sidecar cards, and resolved model labels in modal
+  dropdowns.
 - **Argument Transcoding (`proxy/lib/transcoder.js`):** `sanitizeToolCallArgs`
   normalizes tool arguments across streaming and unary calls, coercing
   stringified booleans and integers into native types. Strips
@@ -99,11 +107,3 @@ confidence: 0.95
   filesystem fixtures in `finally` blocks (e.g., `tests/test-sidecar-manager.js`
   and `tests/test-security.js`) to prevent CSRF token or auth state leakage
   between test suites.
-
-- `TIER_MODEL_CANDIDATES` in `proxy/translation-proxy.js` configures tier
-overrides (`pro`: `gemini-4-carbon-high`, `flash`: `gemini-4-neon-medium`,
-`flashLite`: `gemini-4-hydrogen-medium`) and serves as the single source of
-truth for both `fetchAvailableModels` proxy rewriting and the `/sidecars` page
-UI (`proxy/lib/pages.js`), which displays an Active Model Tiers header bar,
-resolved model chips on sidecar cards, and resolved model labels in modal
-dropdowns.

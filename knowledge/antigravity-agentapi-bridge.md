@@ -2,7 +2,7 @@
 topic: antigravity-agentapi-bridge
 category: knowledge
 tags: [knowledge, antigravity, agentapi, language-server, transcript-polling]
-updated_at: 2026-10-30T18:59:00+00:00
+updated_at: 2026-11-28T07:04:39.595964+00:00
 compacted_at: 2026-10-30T18:59:00+00:00
 confidence: 0.95
 ---
@@ -46,3 +46,8 @@ confidence: 0.95
   conversation's `transcript.jsonl` for completed `PLANNER_RESPONSE` entries,
   maintaining file byte offsets to parse delta lines incrementally instead of
   performing `O(N^2)` full-file re-reads.
+
+- A hardcoded 120.0s timeout in AgentApiBridge._wait_for_response is
+insufficient for pro-model semantic compaction (observed at 167s-245s) and
+large-transcript dreaming synthesis (~128s+); timing out mid-stream prematurely
+deletes the ephemeral brain/ folder.
